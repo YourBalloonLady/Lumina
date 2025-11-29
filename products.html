@@ -218,7 +218,7 @@
 <section class="page-hero">
   <div class="container">
     <h1>All Lumina Products</h1>
-    <p>Browse every Tirzepatide and Retatrutide vial option. Add what you need and head to checkout when you're ready.</p>
+    <p>Browse every Tirzepatide and Retatrutide vial and pen option. Add what you need and head to checkout when you're ready.</p>
   </div>
 </section>
 
@@ -226,7 +226,7 @@
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-title">All Protocol Options</h2>
-      <p class="section-subtitle">Choose the vial strength and protocol that fits your current stage.</p>
+      <p class="section-subtitle">Choose the vial or pen strength that fits your current stage.</p>
     </div>
     <div class="row g-4" id="product-list"></div>
   </div>
@@ -257,15 +257,28 @@
 </div>
 
 <script>
-// same products array (no featured filter here)
+// --- PRODUCTS: VIALS + PENS ---
+
 const products = [
-  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg", price:70, stock:15, badge:"Best Value", badgeClass:"pill-best-value"},
-  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg", price:90, stock:22, badge:"Most Popular", badgeClass:"pill-popular"},
-  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg", price:120, stock:8},
-  {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg", price:150, stock:3},
-  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg", price:130, stock:19},
-  {img:"40mg Reta Vial.png", name:"Retatrutide 40mg", price:150, stock:11},
-  {img:"60mg Reta Vial.png", name:"Retatrutide 60mg", price:170, stock:5, badge:"Premium", badgeClass:"pill-premium"}
+  // VIALS
+  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg Vial", price:70, stock:15, badge:"Best Value", badgeClass:"pill-best-value"},
+  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg Vial", price:90, stock:22, badge:"Most Popular", badgeClass:"pill-popular"},
+  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg Vial", price:120, stock:8},
+  {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg Vial", price:150, stock:3},
+
+  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg Vial", price:130, stock:19},
+  {img:"40mg Reta Vial.png", name:"Retatrutide 40mg Vial", price:150, stock:11},
+  {img:"60mg Reta Vial.png", name:"Retatrutide 60mg Vial", price:170, stock:5, badge:"Premium", badgeClass:"pill-premium"},
+
+  // PENS
+  {img:"10mg Tirz Pen.png", name:"Tirzepatide 10mg Pen", price:80, stock:10},
+  {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10},
+  {img:"40mg Tirz Pen.png", name:"Tirzepatide 40mg Pen", price:125, stock:10},
+  {img:"60mg Tirz Pen.png", name:"Tirzepatide 60mg Pen", price:140, stock:10},
+
+  {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10},
+  {img:"40mg Reta Pen.png", name:"Retatrutide 40mg Pen", price:150, stock:10},
+  {img:"60mg Reta Pen.png", name:"Retatrutide 60mg Pen", price:170, stock:10}
 ];
 
 let cart = [];
@@ -288,14 +301,20 @@ function renderProducts() {
         <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
         <div class="product-body d-flex flex-column">
           <div class="text-start">
-            <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${p.name.includes('Retatrutide') ? 'RETATRUTIDE VIAL' : 'TIRZEPATIDE VIAL'}</div>
+            <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
+              ${
+                p.name.includes('Retatrutide')
+                  ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
+                  : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL')
+              }
+            </div>
             <div class="product-name">${p.name}</div>
           </div>
           <div class="d-flex justify-content-between align-items-center mt-2">
-            <div class="product-price">£${p.price}<span>/vial</span></div>
+            <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
           </div>
           <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
-            ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} vials`) : '<strong>Out of stock</strong>'}
+            ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock}`) : '<strong>Out of stock</strong>'}
           </p>
           <button class="btn btn-success btn-add mt-auto"
                   ${p.stock===0?'disabled':''}
@@ -325,7 +344,7 @@ function openModal(i) {
   document.getElementById('modalName').textContent = currentProduct.name;
   document.getElementById('modalPrice').textContent = `£${currentProduct.price}`;
   document.getElementById('modalStock').innerHTML = currentProduct.stock > 0
-    ? `In stock – ${currentProduct.stock} vials`
+    ? `In stock – ${currentProduct.stock}`
     : 'Out of stock';
   document.getElementById('modalQty').value = 1;
 
