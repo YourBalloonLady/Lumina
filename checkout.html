@@ -177,7 +177,6 @@
 <!-- EmailJS library -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // ✅ INIT EMAILJS WITH YOUR PUBLIC KEY
   (function() {
     emailjs.init('uZOuTrBdIAc6AmKjo');
   })();
@@ -211,11 +210,10 @@ document.getElementById('order-summary').innerHTML = cart.map(i => `
 `).join('');
 document.getElementById('final-total').textContent = `£${total.toFixed(2)}`;
 
-// Helpers to build email text
+// build text for emails
 function buildItemsText() {
   return cart.map(i => `${i.qty} × ${i.name} — £${(i.price * i.qty).toFixed(2)}`).join('\n');
 }
-
 function buildAddressText(details) {
   return [
     details.address1,
@@ -223,6 +221,15 @@ function buildAddressText(details) {
     details.city,
     details.postcode
   ].filter(Boolean).join('\n');
+}
+
+// ✅ clear cart stored on main site
+function clearStoredCart() {
+  try {
+    localStorage.removeItem('cart');
+  } catch (e) {
+    console.warn('Could not clear localStorage cart', e);
+  }
 }
 
 // ✅ Admin email (to you)
@@ -256,7 +263,9 @@ function sendCustomerEmail(details) {
     'service_i5zi096',
     'template_juevvvd',
     {
+      // send both, so template can use either {{customer_email}} or {{to_email}}
       customer_email: details.email,
+      to_email: details.email,
       customer_name: details.name,
       customer_address: addressText,
       order_reference: details.ref,
@@ -294,9 +303,12 @@ document.getElementById('addressForm').onsubmit = function(e) {
   document.getElementById('payment-amount').textContent = `£${total.toFixed(2)}`;
   document.getElementById('order-ref').textContent = ref;
 
-  // Fire emails (non-blocking)
+  // 🔥 send emails
   sendAdminEmail(details);
   sendCustomerEmail(details);
+
+  // 🧹 clear stored cart so basket is empty when they go back
+  clearStoredCart();
 
   // Show modal
   new bootstrap.Modal(document.getElementById('paymentModal')).show();
@@ -309,8 +321,8 @@ function copyAmount() {
 }
 
 function backToShop() {
-  const cartData = encodeURIComponent(JSON.stringify(cart));
-  window.location.href = `index.html?cart=${cartData}`;
+  // just go back to home – no cart in query now
+  window.location.href = 'index.html';
 }
 </script>
 
