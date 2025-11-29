@@ -157,7 +157,7 @@
     cursor: not-allowed;
   }
   .product-card img {
-    height: 260px;
+    height: 220px; /* smaller than before */
     object-fit: contain;
   }
   .product-body {
@@ -166,7 +166,7 @@
   .product-name {
     font-weight: 700;
     font-size: 1.1rem;
-    margin-bottom: .25rem;
+    margin-bottom: .15rem;
   }
   .product-price {
     font-size: 1.4rem;
@@ -306,7 +306,7 @@
   <div class="container">
     <div class="hero-eyebrow">
       <i class="fa-solid fa-sparkles"></i>
-      Clinically Proven Results
+      Clinically Inspired Protocols
     </div>
     <h1 class="hero-title">
       Your Weight Loss <span class="highlight">Journey</span> Starts Here
@@ -316,12 +316,15 @@
     </p>
     <div class="hero-cta">
       <a href="products.html" class="btn btn-primary-lw btn-lg">
-        Shop All Products
+        Shop All Products <i class="fa-solid fa-arrow-right ms-1"></i>
       </a>
       <a href="#contact" class="btn btn-ghost btn-lg">
         Ask a Question
       </a>
     </div>
+    <p class="text-muted mt-2" style="font-size:0.85rem;">
+      UK-based supply • Bank transfer only • Discreet packaging • For research use only
+    </p>
   </div>
 </section>
 
@@ -339,7 +342,7 @@
         <p class="product-price fs-1" id="modalPrice"></p>
         <p class="stock text-success mb-2" id="modalStock"></p>
 
-        <!-- ✅ DESCRIPTION BLOCK -->
+        <!-- DESCRIPTION BLOCK -->
         <div id="modalDescription" class="text-start small text-muted mb-3"></div>
 
         <div class="d-flex justify-content-center align-items-center gap-3 my-3">
@@ -360,7 +363,8 @@
       <div class="section-eyebrow">Popular</div>
       <h2 class="section-title">Featured Lumina Protocols</h2>
       <p class="section-subtitle">
-        Our most requested 20mg vials and pens. For every strength and format, head to the full products page.
+        Our most requested 20mg vials and pens, supplied strictly for <strong>laboratory research use only</strong>. 
+        For every strength and format, head to the full products page.
       </p>
     </div>
     <div class="row g-4" id="product-list"></div>
@@ -380,19 +384,19 @@
       <div class="col-md-4">
         <div class="review-card h-100">
           <p class="mb-3">“Down over 2 stone with Tirzepatide. Support has been spot on and vials are clearly labelled with dosing help.”</p>
-          <span class="fw-semibold">— Client A</span>
+          <span class="fw-semibold">— Client A, 42, UK</span>
         </div>
       </div>
       <div class="col-md-4">
         <div class="review-card h-100">
           <p class="mb-3">“Retatrutide gave me the results I couldn’t get elsewhere. Appetite quiet, energy up, and smooth delivery process.”</p>
-          <span class="fw-semibold">— Client B</span>
+          <span class="fw-semibold">— Client B, 37, UK</span>
         </div>
       </div>
       <div class="col-md-4">
         <div class="review-card h-100">
           <p class="mb-3">“Site is easy to use, checkout simple, and communication fast. Happy to recommend Lumina Weight.”</p>
-          <span class="fw-semibold">— Client C</span>
+          <span class="fw-semibold">— Client C, 51, UK</span>
         </div>
       </div>
     </div>
@@ -430,7 +434,9 @@
               <button type="submit" class="btn btn-primary-lw w-100" id="qm-button">
                 Send enquiry
               </button>
-              <div id="qm-status" class="mt-2 small text-muted"></div>
+              <div id="qm-status" class="mt-2 small text-muted">
+                We usually reply within 24 hours.
+              </div>
             </form>
           </div>
         </div>
@@ -487,6 +493,13 @@ function renderProducts() {
                 }
               </div>
               <div class="product-name">${p.name}</div>
+              <div class="text-muted" style="font-size:0.85rem;">
+                ${
+                  p.name.includes('Tirzepatide')
+                    ? 'Dual GIP/GLP-1 research agonist for appetite and glucose control.'
+                    : 'Multi-receptor research agonist for aggressive weight management.'
+                }
+              </div>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
               <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
@@ -537,11 +550,12 @@ function openModal(i) {
   modalPrice.textContent = `£${currentProduct.price}`;
   modalStock.innerHTML   = `In stock – ${currentProduct.stock} units`;
 
-  // ✅ Set description based on product type
+  // Set description based on product type
   if (currentProduct.name.includes("Tirzepatide")) {
     descEl.innerHTML = `
       <p><strong>Tirzepatide</strong> is a next-generation <strong>dual GIP/GLP-1 receptor agonist</strong> used in metabolic and weight-management research.</p>
       <p>It helps support <strong>appetite control, insulin sensitivity and blood-glucose regulation</strong>, making it ideal for long-term fat-loss protocols.</p>
+      <p class="mb-1"><em>Typical protocols: once-weekly subcutaneous administration in research settings.</em></p>
       <ul class="mb-0">
         <li><strong>Administration:</strong> Subcutaneous, once weekly</li>
         <li><strong>Use:</strong> Weight-loss and metabolic-balance research</li>
@@ -551,6 +565,7 @@ function openModal(i) {
     descEl.innerHTML = `
       <p><strong>Retatrutide</strong> is an advanced <strong>multi-receptor agonist</strong> being studied for powerful effects on appetite and fat metabolism.</p>
       <p>Protocols typically focus on <strong>rapid weight reduction, improved energy balance and enhanced metabolic health</strong>.</p>
+      <p class="mb-1"><em>Typical protocols: once-weekly subcutaneous administration in research settings.</em></p>
       <ul class="mb-0">
         <li><strong>Administration:</strong> Subcutaneous, once weekly</li>
         <li><strong>Use:</strong> Weight-loss and metabolic-health research</li>
