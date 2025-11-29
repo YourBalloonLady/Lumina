@@ -3,182 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumina Weight | Tirzepatide & Retatrutide UK</title>
+<title>All Products - Lumina Weight</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-:root {
-  --lw-mint: #22c55e;
-  --lw-mint-soft: #ecfdf5;
-  --lw-blue-soft: #e0f2fe;
-  --lw-purple-soft: #eef2ff;
-  --lw-dark: #0f172a;
-  --lw-muted: #64748b;
-  --lw-bg: #f3f4f6;
-}
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--lw-bg);
-  color: var(--lw-dark);
-  margin: 0;
-}
-.navbar {
-  background: #ffffff !important;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
-}
-.navbar-brand img { height: 36px; margin-right: 10px; }
-.navbar-brand span { font-weight: 700; font-size: 1.15rem; }
-.nav-link { font-weight: 500; color: var(--lw-muted) !important; }
-.nav-link.active, .nav-link:hover { color: var(--lw-dark) !important; }
-.cart-icon { cursor: pointer; font-size: 1.5rem; color: var(--lw-dark); }
+  :root {
+    --lw-mint: #22c55e;
+    --lw-mint-soft: #ecfdf5;
+    --lw-blue-soft: #e0f2fe;
+    --lw-purple-soft: #eef2ff;
+    --lw-dark: #0f172a;
+    --lw-muted: #64748b;
+    --lw-bg: #f3f4f6;
+  }
 
-/* HERO */
-.hero {
-  background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
-  padding: 120px 0 140px;
-  text-align: center;
-}
-.hero-title {
-  font-size: clamp(2.5rem, 5vw, 3.2rem);
-  font-weight: 800;
-}
-.hero-subtitle {
-  color: var(--lw-muted);
-  max-width: 550px;
-  margin: 16px auto 0;
-}
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--lw-bg);
+    color: var(--lw-dark);
+    margin: 0;
+  }
 
-/* PRODUCTS */
-.product-card {
-  border-radius: 24px;
-  background: #ffffff;
-  padding-top: 4px;
-  overflow: hidden;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-  cursor: pointer;
-}
-.product-card img { height: 260px; object-fit: contain; }
-.product-body { padding: 1.5rem; }
-.product-name { font-weight: 700; }
-.product-price { font-size: 1.4rem; font-weight: 800; }
+  .navbar {
+    background: #ffffff !important;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+  }
+  .navbar-brand img {
+    height: 36px;
+    margin-right: 10px;
+  }
+  .navbar-brand span {
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .nav-link {
+    font-weight: 500;
+    color: var(--lw-muted) !important;
+  }
+  .nav-link.active,
+  .nav-link:hover {
+    color: var(--lw-dark) !important;
+  }
+  .cart-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--lw-dark);
+  }
 
-.pill-label {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #fff;
-}
-.pill-popular { background: #22c55e; }
+  .page-hero {
+    background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
+    padding: 90px 0 70px;
+    text-align: center;
+  }
+  .page-hero h1 {
+    font-weight: 800;
+  }
+  .page-hero p {
+    color: var(--lw-muted);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  #products {
+    padding: 60px 0 80px;
+  }
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+  .section-subtitle {
+    color: var(--lw-muted);
+    max-width: 560px;
+    margin: 10px auto 0;
+  }
+
+  .product-card {
+    border: 0;
+    border-radius: 24px;
+    background: #ffffff;
+    padding-top: 4px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    transition: transform .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 60px rgba(15, 23, 42, 0.12);
+  }
+  .product-card.out-of-stock {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .product-card img {
+    height: 260px;
+    object-fit: contain;
+  }
+  .product-body {
+    padding: 1.5rem 1.6rem 1.6rem;
+  }
+  .product-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: .25rem;
+  }
+  .product-price {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .product-price span {
+    font-size: .9rem;
+    color: var(--lw-muted);
+    font-weight: 500;
+  }
+  .pill-label {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .pill-best-value { background: #f97316; }
+  .pill-popular    { background: #22c55e; }
+  .pill-premium    { background: #6366f1; }
+
+  .stock {
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  .btn-add {
+    border-radius: 999px;
+    font-weight: 600;
+    padding-inline: 24px;
+    margin-top: 10px;
+  }
+
+  .cart-sidebar {
+    height: 100vh;
+    width: 420px;
+    position: fixed;
+    top: 0;
+    right: -420px;
+    background: #ffffff;
+    box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18);
+    transition: 0.35s;
+    z-index: 9999;
+    overflow-y: auto;
+  }
+  .cart-sidebar.open { right: 0; }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 9998;
+  }
+  .overlay.show { display: block; }
 </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg fixed-top">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="#home">
-      <img src="LuminaLogoBlack.png">
+    <a class="navbar-brand d-flex align-items-center" href="index.html#home">
+      <img src="LuminaLogoBlack.png" alt="Lumina Weight Logo">
       <span>Lumina Weight</span>
     </a>
-    <div class="collapse navbar-collapse show">
-      <ul class="navbar-nav ms-auto gap-lg-3">
-        <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="products.html">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#reviews">Reviews</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
       </ul>
+      <div class="ms-lg-3 position-relative">
+        <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
+        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+      </div>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section id="home" class="hero">
-  <div class="container">
-    <h1 class="hero-title">Your Weight Loss Journey Starts Here</h1>
-    <p class="hero-subtitle">
-      Premium access to Tirzepatide and Retatrutide vials and pens.
-    </p>
+<div class="overlay" onclick="toggleCart()"></div>
+
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
+    <button class="btn-close" onclick="toggleCart()"></button>
   </div>
-</section>
-
-<!-- FEATURED PRODUCTS -->
-<section id="products" class="py-5">
-  <div class="container">
-
-    <!-- ✅ ALL PRODUCTS HEADER BACK -->
-   <div class="text-center mb-5">
-  <div class="section-eyebrow text-uppercase fw-bold text-success">
-    All Products
+  <div id="cart-items" class="p-4" style="min-height: 60vh;">
+    <p class="text-center text-muted m-0">Your cart is empty</p>
   </div>
-
-  <h2 class="section-title fw-bold">
-    Shop Best Selling Protocols
-  </h2>
-
-  <p class="section-subtitle text-muted">
-    Explore our most popular Tirzepatide and Retatrutide pens and vials.
-  </p>
-
-  <!-- ✅ CLICK TO ALL PRODUCTS PAGE -->
-  <a href="products.html" class="btn btn-success btn-lg rounded-pill mt-3">
-    View All Products →
-  </a>
+  <div class="p-4 border-top bg-light">
+    <div class="d-flex justify-content-between fs-5 mb-3">
+      <span class="fw-semibold">Total:</span>
+      <span id="cart-total" class="fw-bold">£0.00</span>
+    </div>
+    <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
+    <small class="text-muted d-block mt-2 text-center">Enter delivery details → get payment instructions by email</small>
+  </div>
 </div>
 
-    <!-- PRODUCT GRID -->
-    <div class="row g-4" id="product-list"></div>
-
+<section class="page-hero">
+  <div class="container">
+    <h1>All Lumina Products</h1>
+    <p>Browse every Tirzepatide and Retatrutide vial and pen option. Add what you need and head to checkout when you're ready.</p>
   </div>
 </section>
 
-<!-- MODAL -->
+<section id="products">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">All Protocol Options</h2>
+      <p class="section-subtitle">Choose the vial or pen strength that fits your current stage.</p>
+    </div>
+    <div class="row g-4" id="product-list"></div>
+  </div>
+</section>
+
+<!-- Product Modal -->
 <div class="modal fade" id="productModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 id="modalTitle"></h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="modalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
-        <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 220px; width:auto; object-fit:contain;">
+        <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 360px;">
         <h3 id="modalName"></h3>
-        <p id="modalPrice" class="fs-1 fw-bold"></p>
-        <p id="modalStock"></p>
-
-        <!-- ✅ DESCRIPTION -->
-        <div id="modalDescription" class="text-start small text-muted mb-3"></div>
-
-        <input type="number" id="modalQty" value="1" class="form-control w-25 mx-auto mb-3">
-        <button id="modalAddBtn" class="btn btn-success btn-lg">Add to Cart</button>
+        <p class="product-price fs-1" id="modalPrice"></p>
+        <p class="stock text-success mb-3" id="modalStock"></p>
+        <div class="d-flex justify-content-center align-items-center gap-3 my-4">
+          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
+          <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input" style="width:80px;">
+          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <button id="modalAddBtn" class="btn btn-success btn-lg rounded-pill">Add to Cart</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+// --- PRODUCTS: VIALS + PENS ---
+
 const products = [
-  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg Vial", price:90, stock:22},
-  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg Vial", price:120, stock:19},
-  {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10},
-  {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10}
+  // VIALS
+  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg Vial", price:70, stock:15},
+  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg Vial", price:90, stock:22, badge:"Best Seller", badgeClass:"pill-popular"},
+  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg Vial", price:115, stock:8},
+  {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg Vial", price:130, stock:3, badge:"Premium", badgeClass:"pill-premium"},
+
+  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg Vial", price:120, stock:19, badge:"Best Seller", badgeClass:"pill-popular"},
+  {img:"40mg Reta Vial.png", name:"Retatrutide 40mg Vial", price:140, stock:11},
+  {img:"60mg Reta Vial.png", name:"Retatrutide 60mg Vial", price:160, stock:5, badge:"Premium", badgeClass:"pill-premium"},
+
+  // PENS
+  {img:"10mg Tirz Pen.png", name:"Tirzepatide 10mg Pen", price:80, stock:10},
+  {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
+  {img:"40mg Tirz Pen.png", name:"Tirzepatide 40mg Pen", price:125, stock:10},
+  {img:"60mg Tirz Pen.png", name:"Tirzepatide 60mg Pen", price:140, stock:10, badge:"Premium", badgeClass:"pill-premium"},
+
+  {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
+  {img:"40mg Reta Pen.png", name:"Retatrutide 40mg Pen", price:150, stock:10},
+  {img:"60mg Reta Pen.png", name:"Retatrutide 60mg Pen", price:170, stock:10, badge:"Premium", badgeClass:"pill-premium"}
 ];
+
+let cart = [];
+const savedCart = localStorage.getItem('cart');
+if (savedCart) {
+  try { cart = JSON.parse(savedCart); } catch(e) { cart = []; }
+}
 
 let currentProduct = null;
 
+function saveCart() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
 function renderProducts() {
-  document.getElementById('product-list').innerHTML = products.map((p,i)=>`
-    <div class="col-md-3">
-      <div class="product-card" onclick="openModal(${i})">
-        <span class="pill-label pill-popular">Best Seller</span>
-        <img src="${p.img}" class="w-100 p-3">
-        <div class="product-body">
-          <div class="product-name">${p.name}</div>
-          <div class="product-price">£${p.price}</div>
+  document.getElementById('product-list').innerHTML = products.map((p, i) => `
+    <div class="col-md-4">
+      <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
+        ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
+        <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
+        <div class="product-body d-flex flex-column">
+          <div class="text-start">
+            <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
+              ${
+                p.name.includes('Retatrutide')
+                  ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
+                  : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL')
+              }
+            </div>
+            <div class="product-name">${p.name}</div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
+          </div>
+          <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
+            ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock}`) : '<strong>Out of stock</strong>'}
+          </p>
+          <button class="btn btn-success btn-add mt-auto"
+                  ${p.stock===0?'disabled':''}
+                  onclick="event.stopPropagation(); openModal(${i})">
+            ${p.stock>0?'Add to cart':'Sold out'}
+          </button>
         </div>
       </div>
     </div>
@@ -186,39 +330,93 @@ function renderProducts() {
 }
 renderProducts();
 
+function changeQty(delta) {
+  const input = document.getElementById('modalQty');
+  let val = parseInt(input.value) || 1;
+  val = Math.max(1, val + delta);
+  input.value = val;
+}
+
 function openModal(i) {
   currentProduct = products[i];
+  if (!currentProduct || currentProduct.stock === 0) return;
 
-  modalImg.src = currentProduct.img;
-  modalTitle.textContent = currentProduct.name;
-  modalName.textContent = currentProduct.name;
-  modalPrice.textContent = `£${currentProduct.price}`;
-  modalStock.textContent = `In stock – ${currentProduct.stock}`;
+  document.getElementById('modalImg').src = currentProduct.img;
+  document.getElementById('modalTitle').textContent = currentProduct.name;
+  document.getElementById('modalName').textContent = currentProduct.name;
+  document.getElementById('modalPrice').textContent = `£${currentProduct.price}`;
+  document.getElementById('modalStock').innerHTML = currentProduct.stock > 0
+    ? `In stock – ${currentProduct.stock}`
+    : 'Out of stock';
+  document.getElementById('modalQty').value = 1;
 
-  const desc = document.getElementById('modalDescription');
-
-  if (currentProduct.name.includes("Tirzepatide")) {
-    desc.innerHTML = `
-      <p><strong>Tirzepatide</strong> is a next-generation <strong>dual GIP and GLP-1 receptor agonist</strong> designed for metabolic and weight-management research.</p>
-      <p>It supports <strong>appetite control, insulin sensitivity and blood glucose regulation</strong>, helping promote sustained fat loss.</p>
-      <ul>
-        <li><strong>Administration:</strong> Subcutaneous, once weekly</li>
-        <li><strong>Primary Use:</strong> Weight management, metabolic support</li>
-      </ul>
-    `;
-  } 
-  else if (currentProduct.name.includes("Retatrutide")) {
-    desc.innerHTML = `
-      <p><strong>Retatrutide</strong> is an advanced <strong>multi-receptor agonist</strong> studied for its powerful effect on appetite suppression and fat metabolism.</p>
-      <p>It may support <strong>rapid weight reduction, improved energy balance and enhanced metabolic health</strong>.</p>
-      <ul>
-        <li><strong>Administration:</strong> Subcutaneous, once weekly</li>
-        <li><strong>Primary Use:</strong> Weight-loss research, metabolic optimisation</li>
-      </ul>
-    `;
-  }
+  document.getElementById('modalAddBtn').onclick = () => {
+    const qty = parseInt(document.getElementById('modalQty').value) || 1;
+    addToCart(currentProduct, qty);
+    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+  };
 
   new bootstrap.Modal(document.getElementById('productModal')).show();
+}
+
+function addToCart(product, qty) {
+  const existing = cart.find(item => item.name === product.name);
+  if (existing) existing.qty += qty;
+  else cart.push({name: product.name, price: product.price, qty});
+  updateCart();
+  saveCart();
+  toggleCart(true);
+}
+
+function updateQty(i, delta) {
+  cart[i].qty = Math.max(1, cart[i].qty + delta);
+  if (cart[i].qty === 0) cart.splice(i, 1);
+  updateCart();
+  saveCart();
+}
+
+function removeFromCart(i) {
+  cart.splice(i, 1);
+  updateCart();
+  saveCart();
+}
+
+function updateCart() {
+  const totalItems = cart.reduce((s,i)=>s+i.qty,0);
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('cart-count').textContent = totalItems;
+  document.getElementById('cart-items-count').textContent = totalItems;
+  document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
+  document.getElementById('cart-items').innerHTML = cart.length === 0
+    ? '<p class="text-center text-muted m-0">Your cart is empty</p>'
+    : cart.map((item,i) => `
+      <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+        <div class="flex-grow-1">
+          <strong>${item.name}</strong><br>
+          <small>£${item.price} × ${item.qty}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
+          <span class="fw-bold">${item.qty}</span>
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
+          <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
+        </div>
+      </div>`).join('');
+}
+updateCart();
+
+function toggleCart(force) {
+  const sb = document.getElementById('cart-sidebar');
+  const ov = document.querySelector('.overlay');
+  const open = force !== undefined ? force : !sb.classList.contains('open');
+  sb.classList.toggle('open', open);
+  ov.classList.toggle('show', open);
+}
+
+function goToCheckout() {
+  if (cart.length === 0) return alert('Your cart is empty!');
+  const cartData = encodeURIComponent(JSON.stringify(cart));
+  window.location.href = `checkout.html?cart=${cartData}`;
 }
 </script>
 
