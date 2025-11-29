@@ -247,6 +247,10 @@
         <h3 id="modalName"></h3>
         <p class="product-price fs-1" id="modalPrice"></p>
         <p class="stock text-success mb-3" id="modalStock"></p>
+
+        <!-- ✅ Dynamic product description goes here -->
+        <div id="modalDescription" class="text-start small text-muted mb-3"></div>
+
         <div class="d-flex justify-content-center align-items-center gap-3 my-4">
           <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
           <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input" style="width:80px;">
@@ -275,7 +279,7 @@ const products = [
   // PENS
   {img:"10mg Tirz Pen.png", name:"Tirzepatide 10mg Pen", price:80, stock:10},
   {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
-  {img:"40mg Tirz Pen .png", name:"Tirzepatide 40mg Pen", price:125, stock:10},
+  {img:"40mg Tirz Pen.png", name:"Tirzepatide 40mg Pen", price:125, stock:10},
   {img:"60mg Tirz Pen.png", name:"Tirzepatide 60mg Pen", price:140, stock:10, badge:"Premium", badgeClass:"pill-premium"},
 
   {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
@@ -349,6 +353,23 @@ function openModal(i) {
     ? `In stock – ${currentProduct.stock}`
     : 'Out of stock';
   document.getElementById('modalQty').value = 1;
+
+  // ✅ Inject Tirzepatide description for all Tirz products
+  const modalDesc = document.getElementById('modalDescription');
+  const isTirzepatide = currentProduct.name.includes('Tirzepatide');
+
+  if (isTirzepatide) {
+    modalDesc.innerHTML = `
+      <p><strong>Tirzepatide</strong> is a next-generation <strong>dual GIP and GLP-1 receptor agonist</strong> developed for advanced metabolic and weight-management research. By mimicking the natural actions of both <strong>GLP-1 (glucagon-like peptide-1)</strong> and <strong>GIP (glucose-dependent insulinotropic polypeptide)</strong>, Tirzepatide supports improvements in <strong>appetite regulation, insulin sensitivity, and blood glucose control</strong>.</p>
+      <p>Its unique dual-hormone mechanism helps <strong>reduce hunger, limit portion sizes, stabilise blood sugar levels, and promote sustained body-weight reduction</strong>, making it a leading compound in metabolic and weight-loss research.</p>
+      <ul class="mb-0">
+        <li><strong>Administration:</strong> Subcutaneous injection, once weekly</li>
+        <li><strong>Primary use:</strong> Weight management, metabolic support, glucose regulation</li>
+      </ul>
+    `;
+  } else {
+    modalDesc.innerHTML = '';
+  }
 
   document.getElementById('modalAddBtn').onclick = () => {
     const qty = parseInt(document.getElementById('modalQty').value) || 1;
