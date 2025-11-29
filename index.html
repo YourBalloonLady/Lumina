@@ -266,7 +266,8 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
         <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
+        <!-- 🔗 Products now goes to products.html -->
+        <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
         <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
         <li class="nav-item ms-lg-3">
@@ -297,7 +298,7 @@
       <span id="cart-total" class="fw-bold">£0.00</span>
     </div>
     <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
-    <small class="text-muted d-block mt-2 text-center">Enter delivery details → get bank details</small>
+    <small class="text-muted d-block mt-2 text-center">Enter delivery details → get payment instructions by email</small>
   </div>
 </div>
 
@@ -315,7 +316,8 @@
       Premium access to Tirzepatide and Retatrutide vials, backed by real-world experience and clinical data.
     </p>
     <div class="hero-cta">
-      <a href="#products" class="btn btn-primary-lw btn-lg">
+      <!-- 🔗 Hero CTA now goes to products.html -->
+      <a href="products.html" class="btn btn-primary-lw btn-lg">
         Shop Weight Loss Vials
       </a>
       <a href="#contact" class="btn btn-ghost btn-lg">
@@ -349,14 +351,14 @@
   </div>
 </div>
 
-<!-- PRODUCTS -->
+<!-- PRODUCTS (FEATURED ONLY) -->
 <section id="products">
   <div class="container">
     <div class="text-center mb-5">
-      <div class="section-eyebrow">Products</div>
-      <h2 class="section-title">Choose Your Lumina Protocol</h2>
+      <div class="section-eyebrow">Popular</div>
+      <h2 class="section-title">Featured Lumina Protocols</h2>
       <p class="section-subtitle">
-        Flexible vial strengths so you can tailor dosing, whether you’re starting out or optimising results.
+        A quick look at our most popular vial options. Browse the full range on the products page.
       </p>
     </div>
     <div class="row g-4" id="product-list"></div>
@@ -413,7 +415,6 @@
         <div class="card shadow-sm border-0">
           <div class="card-body p-4">
             <h5 class="fw-semibold mb-3">Quick message</h5>
-            <!-- ✅ UPDATED FORM WITH IDS -->
             <form id="quickMessageForm">
               <div class="mb-3">
                 <input type="text" class="form-control" id="qm-name" placeholder="Name" required>
@@ -443,13 +444,13 @@
 </footer>
 
 <script>
-// PRODUCTS
+// PRODUCTS (with featured flags)
 const products = [
-  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg", price:70, stock:15, badge:"Best Value", badgeClass:"pill-best-value"},
-  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg", price:90, stock:22, badge:"Most Popular", badgeClass:"pill-popular"},
-  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg", price:120, stock:8},
+  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg", price:70, stock:15, badge:"Best Value", badgeClass:"pill-best-value", featured:true},
+  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg", price:90, stock:22, badge:"Most Popular", badgeClass:"pill-popular", featured:true},
+  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg", price:120, stock:8, featured:true},
   {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg", price:150, stock:3},
-  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg", price:130, stock:19},
+  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg", price:130, stock:19, featured:true},
   {img:"40mg Reta Vial.png", name:"Retatrutide 40mg", price:150, stock:11},
   {img:"60mg Reta Vial.png", name:"Retatrutide 60mg", price:170, stock:5, badge:"Premium", badgeClass:"pill-premium"}
 ];
@@ -466,31 +467,41 @@ function saveCart() {
 }
 
 function renderProducts() {
-  document.getElementById('product-list').innerHTML = products.map((p, i) => `
-    <div class="col-md-4">
-      <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
-        ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
-        <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
-        <div class="product-body d-flex flex-column">
-          <div class="text-start">
-            <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${p.name.includes('Retatrutide') ? 'RETATRUTIDE VIAL' : 'TIRZEPATIDE VIAL'}</div>
-            <div class="product-name">${p.name}</div>
+  const featured = products.filter(p => p.featured);
+
+  document.getElementById('product-list').innerHTML =
+    featured.map((p, i) => `
+      <div class="col-md-4">
+        <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
+          ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
+          <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
+          <div class="product-body d-flex flex-column">
+            <div class="text-start">
+              <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${p.name.includes('Retatrutide') ? 'RETATRUTIDE VIAL' : 'TIRZEPATIDE VIAL'}</div>
+              <div class="product-name">${p.name}</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="product-price">£${p.price}<span>/vial</span></div>
+            </div>
+            <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
+              ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} vials`) : '<strong>Out of stock</strong>'}
+            </p>
+            <button class="btn btn-success btn-add mt-auto"
+                    ${p.stock===0?'disabled':''}
+                    onclick="event.stopPropagation(); openModal(${i})">
+              ${p.stock>0?'Add to cart':'Sold out'}
+            </button>
           </div>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <div class="product-price">£${p.price}<span>/vial</span></div>
-          </div>
-          <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
-            ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} vials`) : '<strong>Out of stock</strong>'}
-          </p>
-          <button class="btn btn-success btn-add mt-auto"
-                  ${p.stock===0?'disabled':''}
-                  onclick="event.stopPropagation(); openModal(${i})">
-            ${p.stock>0?'Add to cart':'Sold out'}
-          </button>
         </div>
       </div>
+    `).join('') +
+    `
+    <div class="col-12 text-center mt-3">
+      <a href="products.html" class="btn btn-outline-success rounded-pill px-4">
+        View all products
+      </a>
     </div>
-  `).join('');
+    `;
 }
 renderProducts();
 
@@ -611,14 +622,14 @@ function goToCheckout() {
 
       emailjs.send(
         'service_i5zi096',
-        'template_x5lnd1u', // reuse admin order template
+        'template_x5lnd1u',
         {
           to_email: 'luminaweight@gmail.com',
           customer_name: name,
-          customer_phone: email,             // we stuff their email into the "phone" field
+          customer_phone: email,
           customer_address: 'Quick Message (No Address)',
           order_reference: 'ENQUIRY-' + Date.now().toString().slice(-5),
-          order_items: message,              // message body
+          order_items: message,
           order_total: 'N/A'
         }
       ).then(() => {
