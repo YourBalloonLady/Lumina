@@ -266,7 +266,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
         <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
-        <!-- Products link -->
+        <!-- 🔗 Products now goes to products.html -->
         <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
         <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
@@ -313,11 +313,12 @@
       Your Weight Loss <span class="highlight">Journey</span> Starts Here
     </h1>
     <p class="hero-subtitle">
-      Premium access to Tirzepatide and Retatrutide vials and pens, backed by real-world experience and clinical data.
+      Premium access to Tirzepatide and Retatrutide vials, backed by real-world experience and clinical data.
     </p>
     <div class="hero-cta">
+      <!-- 🔗 Hero CTA now goes to products.html -->
       <a href="products.html" class="btn btn-primary-lw btn-lg">
-        Shop All Protocols
+        Shop Weight Loss Vials
       </a>
       <a href="#contact" class="btn btn-ghost btn-lg">
         Ask a Question
@@ -357,7 +358,7 @@
       <div class="section-eyebrow">Popular</div>
       <h2 class="section-title">Featured Lumina Protocols</h2>
       <p class="section-subtitle">
-        Our most requested 20mg vials and pens. For every strength and format, head to the full products page.
+        A quick look at our most popular vial options. Browse the full range on the products page.
       </p>
     </div>
     <div class="row g-4" id="product-list"></div>
@@ -443,12 +444,15 @@
 </footer>
 
 <script>
-// FEATURED PRODUCTS: only the four you want on home
+// PRODUCTS (with featured flags)
 const products = [
-  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg Vial", price:90, stock:22, badge:"Best Seller", badgeClass:"pill-popular", featured:true},
-  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg Vial", price:120, stock:19, badge:"Best Seller", badgeClass:"pill-popular", featured:true},
-  {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10, badge:"Best Seller", badgeClass:"pill-popular", featured:true},
-  {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10, badge:"Best Seller", badgeClass:"pill-popular", featured:true}
+  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg", price:70, stock:15, badge:"Best Seller", badgeClass:"pill-best-seller", featured:true},
+  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg", price:90, stock:22, },
+  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg", price:115, stock:8, badge:"Most Popular", badgeClass:"pill-popular", featured:true},
+  {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg", price:130, stock:3},
+  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg", price:120, stock:19, featured:true},
+  {img:"40mg Reta Vial.png", name:"Retatrutide 40mg", price:140, stock:11},
+  {img:"60mg Reta Vial.png", name:"Retatrutide 60mg", price:160, stock:5, badge:"Premium", badgeClass:"pill-premium"}
 ];
 
 let cart = [];
@@ -467,26 +471,20 @@ function renderProducts() {
 
   document.getElementById('product-list').innerHTML =
     featured.map((p, i) => `
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
           ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
           <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
           <div class="product-body d-flex flex-column">
             <div class="text-start">
-              <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
-                ${
-                  p.name.includes('Retatrutide')
-                    ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
-                    : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL')
-                }
-              </div>
+              <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${p.name.includes('Retatrutide') ? 'RETATRUTIDE VIAL' : 'TIRZEPATIDE VIAL'}</div>
               <div class="product-name">${p.name}</div>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
-              <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
+              <div class="product-price">£${p.price}<span>/vial</span></div>
             </div>
             <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
-              ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} units`) : '<strong>Out of stock</strong>'}
+              ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} vials`) : '<strong>Out of stock</strong>'}
             </p>
             <button class="btn btn-success btn-add mt-auto"
                     ${p.stock===0?'disabled':''}
@@ -521,7 +519,7 @@ function openModal(i) {
   document.getElementById('modalTitle').textContent = currentProduct.name;
   document.getElementById('modalName').textContent = currentProduct.name;
   document.getElementById('modalPrice').textContent = `£${currentProduct.price}`;
-  document.getElementById('modalStock').innerHTML = `In stock – ${currentProduct.stock} units`;
+  document.getElementById('modalStock').innerHTML = `In stock – ${currentProduct.stock} vials`;
   document.getElementById('modalQty').value = 1;
 
   document.getElementById('modalAddBtn').onclick = () => {
