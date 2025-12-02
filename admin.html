@@ -79,9 +79,9 @@
 
   async function updateStatus(id, value) {
     const { error } = await supabaseClient
-      .from("orders")
-      .update({ status: value })
-      .eq("id", id);
+  .from("Orders")
+  .update({ status: value })
+  .eq("id", id);
 
     if (error) {
       alert("Update failed – check Supabase policy");
@@ -91,9 +91,9 @@
 
   async function loadOrders() {
     const { data: orders, error } = await supabaseClient
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
+  .from("Orders")
+  .select("*")
+  .order("created_at", { ascending: false });
 
     if (error) {
       statusEl.textContent = "Could not load orders.";
