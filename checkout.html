@@ -264,14 +264,14 @@ async function saveOrderToSupabase(details) {
     };
 
     const { error: insertError } = await supabaseClient
-      .from('orders')
-      .insert({
-        user_id: user.id,
-        total_amount: total,
-        status: 'Pending',
-        reference: details.ref,
-        details: orderDetails
-      });
+  .from('Orders')
+  .insert({
+    user_id: user.id,
+    total_amount: total,
+    status: 'Pending',
+    reference: details.ref,
+    details: orderDetails
+  });
 
     if (insertError) {
       console.error('Error saving order to Supabase:', insertError);
