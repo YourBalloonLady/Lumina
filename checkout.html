@@ -153,12 +153,12 @@
           Your payment reference: 
           <strong id="order-ref" class="text-primary fw-bold"></strong>
         </p>
-   <p class="text-muted mb-0">
-  Order confirmed<br>
-  Payment instructions have been sent to your email.<br>
-  Please use the reference code <strong>ONLY</strong> when making your bank transfer.<br><br>
-  Thanks for choosing Lumina Weight.
-</p>
+        <p class="text-muted mb-0">
+          Order confirmed<br>
+          Payment instructions have been sent to your email.<br>
+          Please use the reference code <strong>ONLY</strong> when making your bank transfer.<br><br>
+          Thanks for choosing Lumina Weight.
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-success" onclick="backToShop()">Back to shop</button>
@@ -167,12 +167,19 @@
   </div>
 </div>
 
-<!-- EmailJS library -->
+<!-- EmailJS + Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
   (function() {
     emailjs.init('uZOuTrBdIAc6AmKjo');
   })();
+
+  // Supabase client
+  const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
 <script>
@@ -225,6 +232,57 @@ function clearStoredCart() {
   }
 }
 
+// --------------- SUPABASE ORDER SAVE ---------------
+async function saveOrderToSupabase(details) {
+  try {
+    const { data, error } = await supabaseClient.auth.getUser();
+
+    if (error || !data || !data.user) {
+      console.log('No logged-in user, skipping Supabase order save.');
+      return;
+    }
+
+    const user = data.user;
+
+    const orderDetails = {
+      customer: {
+        name: details.name,
+        email: details.email,
+        phone: details.phone,
+        address1: details.address1,
+        address2: details.address2,
+        city: details.city,
+        postcode: details.postcode
+      },
+      items: cart.map(i => ({
+        name: i.name,
+        qty: i.qty,
+        price_each: i.price,
+        line_total: i.price * i.qty
+      })),
+      reference: details.ref
+    };
+
+    const { error: insertError } = await supabaseClient
+      .from('orders')
+      .insert({
+        user_id: user.id,
+        total_amount: total,
+        status: 'Pending',
+        reference: details.ref,
+        details: orderDetails
+      });
+
+    if (insertError) {
+      console.error('Error saving order to Supabase:', insertError);
+    } else {
+      console.log('✅ Order saved to Supabase');
+    }
+  } catch (err) {
+    console.error('Unexpected error saving order to Supabase:', err);
+  }
+}
+
 // --------------- EMAILS ---------------
 
 // 📥 ADMIN EMAIL TO YOU – template_juevvvd
@@ -272,7 +330,7 @@ function sendCustomerEmail(details) {
 }
 
 // --------------- FORM SUBMIT ---------------
-document.getElementById('addressForm').onsubmit = function(e) {
+document.getElementById('addressForm').onsubmit = async function(e) {
   e.preventDefault();
 
   const name = document.getElementById('fullName').value.trim() || 'Customer';
@@ -300,6 +358,9 @@ document.getElementById('addressForm').onsubmit = function(e) {
   // Send emails
   sendAdminEmail(details);
   sendCustomerEmail(details);
+
+  // Save to Supabase (if user is logged in)
+  await saveOrderToSupabase(details);
 
   // Clear cart storage so basket is empty when back on main page
   clearStoredCart();
