@@ -54,7 +54,9 @@
   <div id="orders-list" class="mt-3"></div>
 </div>
 
+<!-- Libs: Supabase + EmailJS -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
@@ -64,12 +66,20 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ✅ Init EmailJS (v4 syntax)
+  // ✅ Init EmailJS (defensive, so it can't crash the script)
   (function () {
-    emailjs.init({
-      publicKey: "uZOuTrBdIAc6AmKjo",
-    });
-    console.log("✅ EmailJS initialized");
+    try {
+      if (window.emailjs) {
+        emailjs.init({
+          publicKey: "uZOuTrBdIAc6AmKjo",
+        });
+        console.log("✅ EmailJS initialized");
+      } else {
+        console.warn("⚠️ EmailJS library not loaded");
+      }
+    } catch (e) {
+      console.error("❌ EmailJS init failed", e);
+    }
   })();
 
   const statusEl  = document.getElementById("admin-status");
@@ -105,6 +115,11 @@
 
     if (!order) {
       console.warn("❌ No order object passed to sendShippedEmail");
+      return;
+    }
+
+    if (!window.emailjs) {
+      console.warn("⚠️ EmailJS not available, cannot send shipped email");
       return;
     }
 
@@ -249,28 +264,28 @@
   }
 
   async function init() {
-  statusEl.textContent = "Checking access…";
+    statusEl.textContent = "Checking access…";
 
-  const { data: sessionData, error: sessionError } =
-    await supabaseClient.auth.getSession();
+    const { data: sessionData, error: sessionError } =
+      await supabaseClient.auth.getSession();
 
-  if (sessionError || !sessionData?.session?.user) {
-    console.warn("❌ No active session");
-    window.location.href = "index.html";
-    return;
-  }
+    if (sessionError || !sessionData?.session?.user) {
+      console.warn("❌ No active session", sessionError);
+      window.location.href = "index.html";
+      return;
+    }
 
-  const user = sessionData.session.user;
+    const user = sessionData.session.user;
 
-  if (user.email !== ADMIN_EMAIL) {
-    warningEl.innerHTML =
-      `<div class="alert alert-danger">Access denied.</div>`;
-    statusEl.textContent = "Not authorised";
-    return;
-  }
+    if (user.email !== ADMIN_EMAIL) {
+      warningEl.innerHTML =
+        `<div class="alert alert-danger">Access denied.</div>`;
+      statusEl.textContent = "Not authorised";
+      return;
+    }
 
-  statusEl.textContent = "Admin verified ✅";
-  loadOrders();
+    statusEl.textContent = "Admin verified ✅";
+    loadOrders();
   }
 
   logoutBtn.onclick = async () => {
