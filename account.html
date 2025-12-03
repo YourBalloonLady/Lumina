@@ -98,8 +98,19 @@
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
         <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="index.html#reviews">Reviews</a></li>
+        <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+
+        <!-- Admin (toggled via Supabase) -->
+        <li class="nav-item" id="admin-nav-item" style="display:none;">
+          <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+
+        <!-- My Account / Login -->
+        <li class="nav-item">
+          <a class="nav-link active" href="account.html" id="account-link">My Account</a>
+        </li>
+
         <li class="nav-item">
           <button id="logout-btn" class="btn btn-outline-secondary btn-sm rounded-pill">
             Logout
@@ -146,16 +157,45 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  const ADMIN_EMAIL  = "luminaweight@gmail.com";
+  const adminNavItem = document.getElementById('admin-nav-item');
+  const accountLink  = document.getElementById('account-link');
+
   const greetingEl = document.getElementById('account-greeting');
   const statusEl   = document.getElementById('account-status');
   const ordersEl   = document.getElementById('orders-list');
   const logoutBtn  = document.getElementById('logout-btn');
 
+  // Toggle Admin nav + My Account/Login text based on auth
+  (async () => {
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user || null;
+
+      if (!error && adminNavItem) {
+        adminNavItem.style.display =
+          user && user.email === ADMIN_EMAIL ? 'block' : 'none';
+      }
+
+      if (accountLink) {
+        if (user) {
+          accountLink.textContent = 'My Account';
+          accountLink.href = 'account.html';
+        } else {
+          accountLink.textContent = 'Login';
+          accountLink.href = 'account.html';
+        }
+      }
+    } catch (e) {
+      console.error('Error checking auth for nav', e);
+    }
+  })();
+
   function getStatusBadge(status) {
     const s = (status || 'Pending').toLowerCase();
-    if (s === 'paid')   return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
-    if (s === 'shipped')return '<span class="badge bg-primary-subtle text-primary badge-status">SHIPPED</span>';
-    if (s === 'cancelled')return '<span class="badge bg-danger-subtle text-danger badge-status">CANCELLED</span>';
+    if (s === 'paid')      return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
+    if (s === 'shipped')   return '<span class="badge bg-primary-subtle text-primary badge-status">SHIPPED</span>';
+    if (s === 'cancelled') return '<span class="badge bg-danger-subtle text-danger badge-status">CANCELLED</span>';
     return '<span class="badge bg-warning-subtle text-warning badge-status">PENDING</span>';
   }
 
@@ -163,19 +203,19 @@
     const { data: { user }, error } = await supabaseClient.auth.getUser();
 
     if (error || !user) {
-  // 🔒 HARD PROTECTION: no access if not logged in
-  window.location.href = 'index.html';
-  return;
-}
+      // 🔒 HARD PROTECTION: no access if not logged in
+      window.location.href = 'index.html';
+      return;
+    }
 
     greetingEl.textContent = `Signed in as ${user.email}`;
     statusEl.textContent = 'Loading orders…';
 
     const { data: orders, error: ordersError } = await supabaseClient
-  .from('Orders')
-  .select('*')
-  .eq('user_id', user.id)
-  .order('created_at', { ascending: false });
+      .from('Orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (ordersError) {
       statusEl.textContent = 'Could not load orders.';
