@@ -73,8 +73,8 @@
 
   <!-- REVIEWS SECTION -->
   <div class="section-card">
-    <h3>Reviews</h3>
-    <p class="text-muted" id="reviews-status">Loading reviews…</p>
+    <h3>Pending Reviews</h3>
+    <p class="text-muted" id="reviews-status">Loading pending reviews…</p>
     <div id="reviews-list" class="mt-3"></div>
   </div>
 </div>
@@ -265,23 +265,16 @@
       })
       .join("");
   }
-  <section class="container my-5">
-  <h2 class="mb-2">Pending Reviews</h2>
-  <p class="text-muted mb-4">Approve or reject customer reviews before they go live.</p>
 
-  <div id="admin-reviews-list" class="row g-3">
-    <p class="text-muted">Loading pending reviews...</p>
-  </div>
-</section>
+  // ------- REVIEWS MODERATION (PENDING ONLY) -------
 
-  // ------- REVIEWS MODERATION -------
-
-  async function loadReviews() {
-    reviewsStatus.textContent = "Loading reviews…";
+  async function loadPendingReviews() {
+    reviewsStatus.textContent = "Loading pending reviews…";
 
     const { data, error } = await supabaseClient
       .from("Reviews")
       .select("*")
+      .eq("is_published", false)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -291,40 +284,42 @@
     }
 
     if (!data || data.length === 0) {
-      reviewsStatus.textContent = "No reviews submitted yet.";
+      reviewsStatus.textContent = "No pending reviews 🎉";
       reviewsEl.innerHTML = "";
       return;
     }
 
-    reviewsStatus.textContent = `${data.length} reviews found`;
+    reviewsStatus.textContent = `${data.length} pending review(s)`;
 
     reviewsEl.innerHTML = data
-      .map((r) => {
-        const created = new Date(r.created_at).toLocaleString();
-        const approvedBadge = r.approved
-          ? `<span class="badge bg-success">APPROVED</span>`
-          : `<span class="badge bg-secondary">HIDDEN</span>`;
+      .map((review) => {
+        const created = review.created_at
+          ? new Date(review.created_at).toLocaleString()
+          : "";
+
+        const stars = review.rating
+          ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating)
+          : "";
 
         return `
         <div class="review-card">
           <div class="d-flex justify-content-between">
             <div>
-              <div class="review-meta mb-1">
-                <strong>${r.name || "Anonymous"}</strong>
-                ${r.rating ? `• ${"⭐".repeat(r.rating)}` : ""}
-              </div>
-              <p class="mb-1">${r.message || ""}</p>
+              <strong>${review.first_name || "Anonymous"}</strong>
+              ${review.product_name ? `<div class="review-meta">${review.product_name}</div>` : ""}
+              <div class="my-1">${stars}</div>
+              ${review.title ? `<h6 class="mb-1">${review.title}</h6>` : ""}
+              <p class="mb-1">${review.body || ""}</p>
               <small class="review-meta">${created}</small>
             </div>
             <div class="text-end" style="min-width: 140px;">
-              <div class="mb-2">${approvedBadge}</div>
-              <button class="btn btn-sm ${r.approved ? "btn-outline-warning" : "btn-success"} mb-1"
-                onclick="toggleReviewApproved('${r.id}', ${r.approved ? "false" : "true"})">
-                ${r.approved ? "Hide" : "Approve"}
+              <button class="btn btn-sm btn-success mb-1"
+                onclick="publishReview('${review.id}')">
+                ✅ Publish
               </button>
               <button class="btn btn-sm btn-outline-danger"
-                onclick="deleteReview('${r.id}')">
-                Delete
+                onclick="deleteReview('${review.id}')">
+                🗑 Delete
               </button>
             </div>
           </div>
@@ -334,22 +329,25 @@
       .join("");
   }
 
-  async function toggleReviewApproved(id, newValue) {
+  async function publishReview(id) {
+    if (!confirm("Publish this review?")) return;
+
     const { error } = await supabaseClient
       .from("Reviews")
-      .update({ approved: newValue })
+      .update({ is_published: true })
       .eq("id", id);
 
     if (error) {
-      console.error("Error updating review", error);
-      alert("Could not update review – check console.");
+      console.error("Error publishing review", error);
+      alert("Failed to publish review – check console.");
       return;
     }
-    loadReviews();
+
+    loadPendingReviews();
   }
 
   async function deleteReview(id) {
-    if (!confirm("Delete this review? This cannot be undone.")) return;
+    if (!confirm("Delete this review permanently?")) return;
 
     const { error } = await supabaseClient
       .from("Reviews")
@@ -361,7 +359,8 @@
       alert("Could not delete review – check console.");
       return;
     }
-    loadReviews();
+
+    loadPendingReviews();
   }
 
   // ------- INIT + AUTH CHECK -------
@@ -390,7 +389,7 @@
 
     statusEl.textContent = "Admin verified ✅";
     loadOrders();
-    loadReviews();
+    loadPendingReviews();
   }
 
   logoutBtn.onclick = async () => {
@@ -399,9 +398,9 @@
   };
 
   // Expose functions for inline onclick
-  window.updateStatus        = updateStatus;
-  window.toggleReviewApproved = toggleReviewApproved;
-  window.deleteReview         = deleteReview;
+  window.updateStatus   = updateStatus;
+  window.publishReview  = publishReview;
+  window.deleteReview   = deleteReview;
 
   init();
 </script>
