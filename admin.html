@@ -47,10 +47,20 @@
 
 <!-- CONTENT -->
 <div class="container mt-4">
-  <h3>Orders</h3>
-  <p id="admin-status" class="text-muted">Checking access…</p>
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h3 class="mb-0">Orders</h3>
+      <p id="admin-status" class="text-muted mb-0">Checking access…</p>
+    </div>
+    <div class="text-end">
+      <button id="send-summary-btn" class="btn btn-dark btn-sm">
+        Email today's summary
+      </button>
+      <div id="summary-status" class="small text-muted mt-1"></div>
+    </div>
+  </div>
 
-  <div id="admin-warning"></div>
+  <div id="admin-warning" class="mt-3"></div>
   <div id="orders-list" class="mt-3"></div>
 </div>
 
@@ -64,12 +74,13 @@
 
   const ADMIN_EMAIL = "luminaweight@gmail.com";
 
-  // ⬇️ IMPORTANT: change this to your REAL EmailJS template ID for “Order Shipped”
-  const EMAILJS_TEMPLATE_SHIPPED = "template_shipped"; // e.g. "template_abcd123"
+  // 🔔 Set your EmailJS template IDs here
+  const EMAILJS_TEMPLATE_SHIPPED = "template_shipped";        // already working
+  const EMAILJS_TEMPLATE_DAILY   = "template_daily_summary";  // CHANGE to your daily summary template ID
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ✅ Init EmailJS the same way as your other pages
+  // ✅ Init EmailJS
   (function () {
     try {
       emailjs.init("uZOuTrBdIAc6AmKjo");
@@ -79,10 +90,12 @@
     }
   })();
 
-  const statusEl  = document.getElementById("admin-status");
-  const ordersEl  = document.getElementById("orders-list");
-  const warningEl = document.getElementById("admin-warning");
-  const logoutBtn = document.getElementById("logout-btn");
+  const statusEl       = document.getElementById("admin-status");
+  const ordersEl       = document.getElementById("orders-list");
+  const warningEl      = document.getElementById("admin-warning");
+  const logoutBtn      = document.getElementById("logout-btn");
+  const summaryBtn     = document.getElementById("send-summary-btn");
+  const summaryStatus  = document.getElementById("summary-status");
 
   // Cache orders by id so we know details when status changes
   const ordersCache = {};
@@ -107,6 +120,7 @@
       .join("\n");
   }
 
+  // ---------- SHIPPED EMAIL ----------
   function sendShippedEmail(order) {
     console.log("📦 Preparing shipped email for order:", order);
 
@@ -120,7 +134,6 @@
       return;
     }
 
-    // Prefer details.customer, but fall back to top-level fields if needed
     const customer = order.details?.customer || {};
     const toEmail =
       customer.email ||
@@ -136,20 +149,15 @@
       return;
     }
 
-    const ref = order.reference || order.id;
+    const ref   = order.reference || order.id;
     const total = `£${Number(order.total_amount || 0).toFixed(2)}`;
     const items = buildItemsText(order);
 
-    console.log(
-      "📨 Sending shipped email via EmailJS to:",
-      toEmail,
-      "ref:",
-      ref
-    );
+    console.log("📨 Sending shipped email to:", toEmail, "ref:", ref);
 
     emailjs
-      .send("service_i5zi096", "template_abcd123", {
-        email: toEmail,              // ✅ matches {{email}} in your template
+      .send("service_i5zi096", EMAILJS_TEMPLATE_SHIPPED, {
+        email: toEmail,              // matches {{email}} in template
         customer_name: customerName,
         order_reference: ref,
         order_items: items,
@@ -178,12 +186,10 @@
       return;
     }
 
-    // Keep cache status in sync
     if (ordersCache[id]) {
       ordersCache[id].status = value;
     }
 
-    // If marked as Shipped → send dispatch email
     if (value === "Shipped" && ordersCache[id]) {
       sendShippedEmail(ordersCache[id]);
     } else if (value === "Shipped") {
@@ -191,6 +197,7 @@
     }
   }
 
+  // ---------- LOAD ORDERS ----------
   async function loadOrders() {
     const { data: orders, error } = await supabaseClient
       .from("Orders")
@@ -205,12 +212,12 @@
 
     if (!orders || orders.length === 0) {
       statusEl.textContent = "No orders yet.";
+      ordersEl.innerHTML = "";
       return;
     }
 
     statusEl.textContent = `${orders.length} orders found`;
 
-    // Fill cache
     orders.forEach((o) => {
       ordersCache[o.id] = o;
     });
@@ -260,6 +267,87 @@
       .join("");
   }
 
+  // ---------- DAILY SUMMARY BUTTON ----------
+  async function sendDailySummary() {
+    if (!window.emailjs) {
+      alert("EmailJS not loaded – cannot send summary.");
+      return;
+    }
+
+    summaryBtn.disabled = true;
+    summaryStatus.textContent = "Sending summary…";
+
+    // Today from midnight to now (UTC-ish – good enough for you checking at 5pm UK)
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const { data: orders, error } = await supabaseClient
+      .from("Orders")
+      .select("*")
+      .gte("created_at", start.toISOString())
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("❌ Failed to load orders for summary", error);
+      summaryStatus.textContent = "Could not load orders for summary.";
+      summaryBtn.disabled = false;
+      return;
+    }
+
+    const count = (orders || []).length;
+    const totalRevenue = (orders || []).reduce(
+      (sum, o) => sum + Number(o.total_amount || 0),
+      0
+    );
+
+    const list = (orders || [])
+      .map((o) => {
+        const created = new Date(o.created_at).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const ref = o.reference || o.id;
+        const name =
+          o.details?.customer?.name ||
+          o.customer_name ||
+          o.name ||
+          "Customer";
+        const email =
+          o.details?.customer?.email ||
+          o.customer_email ||
+          o.email ||
+          "No email";
+        const status = o.status || "Pending";
+        const total = Number(o.total_amount || 0).toFixed(2);
+        return `${created} — ${ref} — £${total} — ${name} (${email}) — ${status}`;
+      })
+      .join("\n");
+
+    const summaryDate = new Date().toLocaleDateString("en-GB");
+
+    emailjs
+      .send("service_i5zi096", EMAILJS_TEMPLATE_DAILY, {
+        email: ADMIN_EMAIL,
+        summary_date: summaryDate,
+        orders_count: String(count),
+        total_revenue: `£${totalRevenue.toFixed(2)}`,
+        orders_list: list || "No orders today.",
+      })
+      .then((res) => {
+        console.log("✅ Daily summary email sent", res.status, res.text);
+        summaryStatus.textContent = "Summary sent to your email.";
+      })
+      .catch((err) => {
+        console.error("❌ Daily summary email failed", err);
+        summaryStatus.textContent =
+          "Summary failed: " + (err.text || err.message || "unknown error");
+      })
+      .finally(() => {
+        summaryBtn.disabled = false;
+      });
+  }
+
+  // ---------- INIT ----------
   async function init() {
     statusEl.textContent = "Checking access…";
 
@@ -278,6 +366,7 @@
       warningEl.innerHTML =
         `<div class="alert alert-danger">Access denied.</div>`;
       statusEl.textContent = "Not authorised";
+      summaryBtn.style.display = "none";
       return;
     }
 
@@ -289,6 +378,8 @@
     await supabaseClient.auth.signOut();
     location.href = "index.html";
   };
+
+  summaryBtn.onclick = sendDailySummary;
 
   init();
 </script>
