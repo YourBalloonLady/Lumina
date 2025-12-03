@@ -335,15 +335,27 @@
     <div id="cart-items" class="p-4" style="min-height: 60vh;">
       <p class="text-center text-muted m-0">Your cart is empty</p>
     </div>
-    <div class="p-4 border-top bg-light">
-      <div class="d-flex justify-content-between fs-5 mb-3">
-        <span class="fw-semibold">Total:</span>
-        <span id="cart-total" class="fw-bold">£0.00</span>
-      </div>
-      <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
-      <small class="text-muted d-block mt-2 text-center">Enter delivery details → get payment instructions by email</small>
-    </div>
+    <<div class="p-4 border-top bg-light">
+  <!-- Bundle discount row -->
+  <div class="d-flex justify-content-between small mb-1"
+       id="cart-bundle-row"
+       style="display:none;">
+    <span class="fw-semibold">Bundle discount</span>
+    <span id="cart-bundle-amount">-£0.00</span>
   </div>
+  <div id="cart-bundle-message" class="small text-success mb-2"></div>
+
+  <!-- Final total -->
+  <div class="d-flex justify-content-between fs-5 mb-3">
+    <span class="fw-semibold">Total:</span>
+    <span id="cart-total" class="fw-bold">£0.00</span>
+  </div>
+
+  <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
+  <small class="text-muted d-block mt-2 text-center">
+    Enter delivery details → get payment instructions by email
+  </small>
+</div>
 
   <!-- HERO -->
   <section id="home" class="hero text-center">
