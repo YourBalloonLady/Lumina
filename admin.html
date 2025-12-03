@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Orders | Lumina Weight</title>
+<title>Admin | Lumina Weight</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -22,16 +22,31 @@
     font-weight: 700;
   }
 
-  .order-card {
+  .section-card {
     background: #fff;
     border-radius: 16px;
     padding: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+  }
+
+  .order-card,
+  .review-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 12px;
   }
 
   .badge-status {
     font-size: 0.75rem;
     text-transform: uppercase;
+  }
+
+  .review-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
   }
 </style>
 </head>
@@ -47,21 +62,21 @@
 
 <!-- CONTENT -->
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center">
-    <div>
-      <h3 class="mb-0">Orders</h3>
-      <p id="admin-status" class="text-muted mb-0">Checking access…</p>
-    </div>
-    <div class="text-end">
-      <button id="send-summary-btn" class="btn btn-dark btn-sm">
-        Email today's summary
-      </button>
-      <div id="summary-status" class="small text-muted mt-1"></div>
-    </div>
+
+  <!-- ORDERS SECTION -->
+  <div class="section-card mb-4">
+    <h3>Orders</h3>
+    <p id="admin-status" class="text-muted">Checking access…</p>
+    <div id="admin-warning"></div>
+    <div id="orders-list" class="mt-3"></div>
   </div>
 
-  <div id="admin-warning" class="mt-3"></div>
-  <div id="orders-list" class="mt-3"></div>
+  <!-- REVIEWS SECTION -->
+  <div class="section-card">
+    <h3>Reviews</h3>
+    <p class="text-muted" id="reviews-status">Loading reviews…</p>
+    <div id="reviews-list" class="mt-3"></div>
+  </div>
 </div>
 
 <!-- Libs: Supabase + EmailJS -->
@@ -74,30 +89,29 @@
 
   const ADMIN_EMAIL = "luminaweight@gmail.com";
 
-  // 🔔 Set your EmailJS template IDs here
-  const EMAILJS_TEMPLATE_SHIPPED = "template_shipped";        // already working
-  const EMAILJS_TEMPLATE_DAILY   = "template_daily_summary";  // CHANGE to your daily summary template ID
-
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ✅ Init EmailJS
+  // EmailJS init (for shipped emails)
   (function () {
     try {
-      emailjs.init("uZOuTrBdIAc6AmKjo");
-      console.log("✅ EmailJS initialized");
+      if (window.emailjs) {
+        emailjs.init({ publicKey: "uZOuTrBdIAc6AmKjo" });
+        console.log("✅ EmailJS initialized");
+      }
     } catch (e) {
       console.error("❌ EmailJS init failed", e);
     }
   })();
 
-  const statusEl       = document.getElementById("admin-status");
-  const ordersEl       = document.getElementById("orders-list");
-  const warningEl      = document.getElementById("admin-warning");
-  const logoutBtn      = document.getElementById("logout-btn");
-  const summaryBtn     = document.getElementById("send-summary-btn");
-  const summaryStatus  = document.getElementById("summary-status");
+  const statusEl      = document.getElementById("admin-status");
+  const ordersEl      = document.getElementById("orders-list");
+  const warningEl     = document.getElementById("admin-warning");
+  const logoutBtn     = document.getElementById("logout-btn");
 
-  // Cache orders by id so we know details when status changes
+  const reviewsStatus = document.getElementById("reviews-status");
+  const reviewsEl     = document.getElementById("reviews-list");
+
+  // Cache orders by id
   const ordersCache = {};
 
   function badge(status) {
@@ -120,19 +134,8 @@
       .join("\n");
   }
 
-  // ---------- SHIPPED EMAIL ----------
   function sendShippedEmail(order) {
-    console.log("📦 Preparing shipped email for order:", order);
-
-    if (!order) {
-      console.warn("❌ No order object passed to sendShippedEmail");
-      return;
-    }
-
-    if (!window.emailjs) {
-      console.warn("⚠️ EmailJS not available, cannot send shipped email");
-      return;
-    }
+    if (!order || !window.emailjs) return;
 
     const customer = order.details?.customer || {};
     const toEmail =
@@ -153,11 +156,9 @@
     const total = `£${Number(order.total_amount || 0).toFixed(2)}`;
     const items = buildItemsText(order);
 
-    console.log("📨 Sending shipped email to:", toEmail, "ref:", ref);
-
     emailjs
-      .send("service_i5zi096", EMAILJS_TEMPLATE_SHIPPED, {
-        email: toEmail,              // matches {{email}} in template
+      .send("service_i5zi096", "template_shipped", {
+        email: toEmail,
         customer_name: customerName,
         order_reference: ref,
         order_items: items,
@@ -168,7 +169,7 @@
       })
       .catch((err) => {
         console.error("❌ Shipped email failed", err);
-        alert("Shipped email failed: " + (err.text || err.message || "unknown error"));
+        alert("Shipped email failed – check console for details.");
       });
   }
 
@@ -197,7 +198,6 @@
     }
   }
 
-  // ---------- LOAD ORDERS ----------
   async function loadOrders() {
     const { data: orders, error } = await supabaseClient
       .from("Orders")
@@ -212,7 +212,6 @@
 
     if (!orders || orders.length === 0) {
       statusEl.textContent = "No orders yet.";
-      ordersEl.innerHTML = "";
       return;
     }
 
@@ -240,7 +239,7 @@
         const total = Number(order.total_amount || 0).toFixed(2);
 
         return `
-        <div class="order-card mb-3">
+        <div class="order-card">
           <div class="d-flex justify-content-between">
             <div>
               <strong>${ref}</strong><br>
@@ -267,87 +266,98 @@
       .join("");
   }
 
-  // ---------- DAILY SUMMARY BUTTON ----------
-  async function sendDailySummary() {
-    if (!window.emailjs) {
-      alert("EmailJS not loaded – cannot send summary.");
-      return;
-    }
+  // ------- REVIEWS MODERATION -------
 
-    summaryBtn.disabled = true;
-    summaryStatus.textContent = "Sending summary…";
+  async function loadReviews() {
+    reviewsStatus.textContent = "Loading reviews…";
 
-    // Today from midnight to now (UTC-ish – good enough for you checking at 5pm UK)
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    const { data: orders, error } = await supabaseClient
-      .from("Orders")
+    const { data, error } = await supabaseClient
+      .from("Reviews")
       .select("*")
-      .gte("created_at", start.toISOString())
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("❌ Failed to load orders for summary", error);
-      summaryStatus.textContent = "Could not load orders for summary.";
-      summaryBtn.disabled = false;
+      console.error("Error loading reviews", error);
+      reviewsStatus.textContent = "Could not load reviews.";
       return;
     }
 
-    const count = (orders || []).length;
-    const totalRevenue = (orders || []).reduce(
-      (sum, o) => sum + Number(o.total_amount || 0),
-      0
-    );
+    if (!data || data.length === 0) {
+      reviewsStatus.textContent = "No reviews submitted yet.";
+      reviewsEl.innerHTML = "";
+      return;
+    }
 
-    const list = (orders || [])
-      .map((o) => {
-        const created = new Date(o.created_at).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const ref = o.reference || o.id;
-        const name =
-          o.details?.customer?.name ||
-          o.customer_name ||
-          o.name ||
-          "Customer";
-        const email =
-          o.details?.customer?.email ||
-          o.customer_email ||
-          o.email ||
-          "No email";
-        const status = o.status || "Pending";
-        const total = Number(o.total_amount || 0).toFixed(2);
-        return `${created} — ${ref} — £${total} — ${name} (${email}) — ${status}`;
-      })
-      .join("\n");
+    reviewsStatus.textContent = `${data.length} reviews found`;
 
-    const summaryDate = new Date().toLocaleDateString("en-GB");
+    reviewsEl.innerHTML = data
+      .map((r) => {
+        const created = new Date(r.created_at).toLocaleString();
+        const approvedBadge = r.approved
+          ? `<span class="badge bg-success">APPROVED</span>`
+          : `<span class="badge bg-secondary">HIDDEN</span>`;
 
-    emailjs
-      .send("service_i5zi096", "template_yr6ipx3", {
-        email: ADMIN_EMAIL,
-        summary_date: summaryDate,
-        orders_count: String(count),
-        total_revenue: `£${totalRevenue.toFixed(2)}`,
-        orders_list: list || "No orders today.",
+        return `
+        <div class="review-card">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="review-meta mb-1">
+                <strong>${r.name || "Anonymous"}</strong>
+                ${r.rating ? `• ${"⭐".repeat(r.rating)}` : ""}
+              </div>
+              <p class="mb-1">${r.message || ""}</p>
+              <small class="review-meta">${created}</small>
+            </div>
+            <div class="text-end" style="min-width: 140px;">
+              <div class="mb-2">${approvedBadge}</div>
+              <button class="btn btn-sm ${r.approved ? "btn-outline-warning" : "btn-success"} mb-1"
+                onclick="toggleReviewApproved('${r.id}', ${r.approved ? "false" : "true"})">
+                ${r.approved ? "Hide" : "Approve"}
+              </button>
+              <button class="btn btn-sm btn-outline-danger"
+                onclick="deleteReview('${r.id}')">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
       })
-      .then((res) => {
-        console.log("✅ Daily summary email sent", res.status, res.text);
-        summaryStatus.textContent = "Summary sent to your email.";
-      })
-      .catch((err) => {
-        console.error("❌ Daily summary email failed", err);
-        summaryStatus.textContent =
-          "Summary failed: " + (err.text || err.message || "unknown error");
-      })
-      .finally(() => {
-        summaryBtn.disabled = false;
-      });
+      .join("");
   }
 
-  // ---------- INIT ----------
+  async function toggleReviewApproved(id, newValue) {
+    const { error } = await supabaseClient
+      .from("Reviews")
+      .update({ approved: newValue })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating review", error);
+      alert("Could not update review – check console.");
+      return;
+    }
+    loadReviews();
+  }
+
+  async function deleteReview(id) {
+    if (!confirm("Delete this review? This cannot be undone.")) return;
+
+    const { error } = await supabaseClient
+      .from("Reviews")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting review", error);
+      alert("Could not delete review – check console.");
+      return;
+    }
+    loadReviews();
+  }
+
+  // ------- INIT + AUTH CHECK -------
+
   async function init() {
     statusEl.textContent = "Checking access…";
 
@@ -366,12 +376,13 @@
       warningEl.innerHTML =
         `<div class="alert alert-danger">Access denied.</div>`;
       statusEl.textContent = "Not authorised";
-      summaryBtn.style.display = "none";
+      reviewsStatus.textContent = "Not authorised";
       return;
     }
 
     statusEl.textContent = "Admin verified ✅";
     loadOrders();
+    loadReviews();
   }
 
   logoutBtn.onclick = async () => {
@@ -379,7 +390,10 @@
     location.href = "index.html";
   };
 
-  summaryBtn.onclick = sendDailySummary;
+  // Expose functions for inline onclick
+  window.updateStatus        = updateStatus;
+  window.toggleReviewApproved = toggleReviewApproved;
+  window.deleteReview         = deleteReview;
 
   init();
 </script>
