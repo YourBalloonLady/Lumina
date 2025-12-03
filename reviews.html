@@ -168,6 +168,16 @@
         <li class="nav-item"><a class="nav-link active" href="reviews.html">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
 
+        <!-- Admin link (hidden by default) -->
+        <li class="nav-item" id="admin-nav-item" style="display:none;">
+          <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+
+        <!-- My Account / Login -->
+        <li class="nav-item">
+          <a class="nav-link" href="account.html" id="account-link">My Account</a>
+        </li>
+
         <li class="nav-item ms-lg-3">
           <div class="position-relative">
             <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
@@ -302,6 +312,35 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  const ADMIN_EMAIL = "luminaweight@gmail.com";
+  const adminNavItem = document.getElementById('admin-nav-item');
+  const accountLink  = document.getElementById('account-link');
+
+  // Check auth to toggle Admin + My Account/Login text
+  (async () => {
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user || null;
+
+      if (!error && adminNavItem) {
+        adminNavItem.style.display =
+          user && user.email === ADMIN_EMAIL ? 'block' : 'none';
+      }
+
+      if (accountLink) {
+        if (user) {
+          accountLink.textContent = 'My Account';
+          accountLink.href = 'account.html';
+        } else {
+          accountLink.textContent = 'Login';
+          accountLink.href = 'account.html';
+        }
+      }
+    } catch (e) {
+      console.error('Error checking auth', e);
+    }
+  })();
+
   // ------- CART (shared with other pages) -------
   let cart = [];
   const savedCart = localStorage.getItem("cart");
@@ -421,7 +460,7 @@
       const res = await supabaseClient
         .from('Reviews')
         .select('*')
-        .eq('approved', true)
+        .eq('is_published', true)
         .order('created_at', { ascending: false });
 
       dbReviews = res.data || [];
@@ -469,7 +508,7 @@
         created = r.created_label;
       }
 
-      const name = r.name || 'Anonymous';
+      const name = r.name || r.first_name || 'Anonymous';
       const rating = r.rating || 0;
       const message = r.message || r.body || '';
 
@@ -519,7 +558,7 @@
         name,
         rating,
         message,
-        approved: false   // goes to admin first
+        is_published: false   // goes to admin first
       });
 
     if (error) {
