@@ -411,13 +411,13 @@ function sendCustomerEmail(details) {
   .catch(err => console.error('❌ Customer email failed', err));
 }
 
-// 💌 ABANDONED / RECOVERY EMAIL – template_abandoned_checkout
+// 💌 ABANDONED / RECOVERY EMAIL – template_guh3ord
 function sendAbandonedEmail(details, recoveryLink) {
   const cartSummary = getCartSummaryText();
 
   return emailjs.send(
     'service_i5zi096',
-    'template_abandoned_checkout', // make sure this exists in EmailJS
+    'template_guh3ord', // <- your abandoned checkout template ID
     {
       to_email: details.email,
       customer_name: details.name || 'there',
