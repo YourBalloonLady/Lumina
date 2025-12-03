@@ -26,6 +26,7 @@
     margin: 0;
   }
 
+  /* NAVBAR */
   .navbar {
     background: #ffffff !important;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
@@ -52,22 +53,47 @@
     color: var(--lw-dark);
   }
 
-  .page-hero {
+  /* HERO */
+  .hero {
     background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
-    padding: 90px 0 70px;
-    text-align: center;
+    padding: 120px 0 80px;
   }
-  .page-hero h1 {
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.08);
+    color: #15803d;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .hero-eyebrow i { font-size: 0.9rem; }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 4vw, 2.6rem);
     font-weight: 800;
+    line-height: 1.1;
+    margin-top: 18px;
   }
-  .page-hero p {
+  .hero-subtitle {
     color: var(--lw-muted);
-    max-width: 520px;
-    margin: 0 auto;
+    font-size: 1.0rem;
+    max-width: 650px;
+    margin: 16px auto 0;
   }
 
+  /* PRODUCT GRID */
   #products {
     padding: 60px 0 80px;
+  }
+  .section-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 0.78rem;
+    color: #0f766e;
+    font-weight: 700;
   }
   .section-title {
     font-size: 2rem;
@@ -98,7 +124,7 @@
     cursor: not-allowed;
   }
   .product-card img {
-    height: 260px;
+    height: 200px;
     object-fit: contain;
   }
   .product-body {
@@ -106,16 +132,16 @@
   }
   .product-name {
     font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: .25rem;
+    font-size: 1.05rem;
+    margin-bottom: .15rem;
   }
   .product-price {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 800;
     color: #0f172a;
   }
   .product-price span {
-    font-size: .9rem;
+    font-size: .85rem;
     color: var(--lw-muted);
     font-weight: 500;
   }
@@ -129,15 +155,14 @@
     font-weight: 700;
     color: #ffffff;
   }
+  .pill-popular { background: #22c55e; }
+  .pill-premium { background: #6366f1; }
   .pill-best-value { background: #f97316; }
-  .pill-popular     { background: #22c55e; }
-  .pill-premium     { background: #6366f1; }
 
   .stock {
     font-size: 0.9rem;
     margin-top: 4px;
   }
-
   .btn-add {
     border-radius: 999px;
     font-weight: 600;
@@ -145,6 +170,7 @@
     margin-top: 10px;
   }
 
+  /* CART SIDEBAR */
   .cart-sidebar {
     height: 100vh;
     width: 420px;
@@ -167,10 +193,21 @@
     z-index: 9998;
   }
   .overlay.show { display: block; }
+
+  .qty-btn { width: 38px; height: 38px; }
+  .qty-input { width: 60px; text-align: center; }
+
+  footer {
+    background: #020617;
+    color: #9ca3af;
+    padding: 22px 0;
+    font-size: 0.9rem;
+  }
 </style>
 </head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="index.html#home">
@@ -188,17 +225,26 @@
         <li class="nav-item"><a class="nav-link active" href="products.html">Products</a></li>
         <li class="nav-item"><a class="nav-link" href="index.html#reviews">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+
+        <!-- Admin (shown only for you on index via Supabase check) -->
+        <li class="nav-item d-none d-lg-block">
+          <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+
+        <li class="nav-item ms-lg-3">
+          <div class="position-relative">
+            <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
+            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+          </div>
+        </li>
       </ul>
-      <div class="ms-lg-3 position-relative">
-        <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
-        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-      </div>
     </div>
   </div>
 </nav>
 
 <div class="overlay" onclick="toggleCart()"></div>
 
+<!-- CART SIDEBAR -->
 <div class="cart-sidebar" id="cart-sidebar">
   <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
     <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
@@ -213,201 +259,76 @@
       <span id="cart-total" class="fw-bold">£0.00</span>
     </div>
     <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
-    <small class="text-muted d-block mt-2 text-center">Enter delivery details → get payment instructions by email</small>
+    <small class="text-muted d-block mt-2 text-center">
+      Enter delivery details → get payment instructions by email
+    </small>
   </div>
 </div>
 
-<section class="page-hero">
+<!-- HERO -->
+<section class="hero text-center">
   <div class="container">
-    <h1>All Lumina Products</h1>
-    <p>Browse every Tirzepatide and Retatrutide vial and pen option. Add what you need and head to checkout when you're ready.</p>
+    <div class="hero-eyebrow">
+      <i class="fa-solid fa-vial-circle-check"></i>
+      Full Tirzepatide & Retatrutide Range
+    </div>
+    <h1 class="hero-title">All Lumina Products</h1>
+    <p class="hero-subtitle">
+      Browse every Tirzepatide and Retatrutide vial and pen option. 
+      Mix strengths to match where you are in your protocol right now.
+    </p>
   </div>
 </section>
 
+<!-- ALL PRODUCTS -->
 <section id="products">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="section-title">All Product Options</h2>
-      <p class="section-subtitle">Choose the vial or pen strength that fits your current stage.</p>
+    <div class="text-center mb-4">
+      <div class="section-eyebrow">All Product Options</div>
+      <h2 class="section-title">Choose Your Strength & Format</h2>
+      <p class="section-subtitle">
+        Select the vial or pen strength that fits your current phase. 
+        All products are supplied for <strong>research use only</strong>.
+      </p>
     </div>
-    <div class="row g-4" id="product-list"></div>
+
+    <div id="all-products-status" class="text-center text-muted mb-3">
+      Loading products…
+    </div>
+
+    <div class="row g-4" id="all-products-list"></div>
   </div>
 </section>
 
-<!-- Product Modal -->
-<div class="modal fade" id="productModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 360px;">
-        <h3 id="modalName"></h3>
-        <p class="product-price fs-1" id="modalPrice"></p>
-        <p class="stock text-success mb-3" id="modalStock"></p>
-
-        <!-- ✅ Dynamic product description goes here -->
-        <div id="modalDescription" class="text-start small text-muted mb-3"></div>
-
-        <div class="d-flex justify-content-center align-items-center gap-3 my-4">
-          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
-          <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input" style="width:80px;">
-          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(1)">+</button>
-        </div>
-        <button id="modalAddBtn" class="btn btn-success btn-lg rounded-pill">Add to Cart</button>
-      </div>
-    </div>
+<footer class="text-center">
+  <div class="container">
+    <p class="mb-0">
+      © 2025 Lumina Weight • Research Purposes Only • Not For Human Consumption
+    </p>
   </div>
-</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
 <script>
-// --- PRODUCTS: VIALS + PENS ---
-
-const products = [
-  // VIALS
-  {img:"10mg Tirz Vial.png", name:"Tirzepatide 10mg Vial", price:70, stock:15},
-  {img:"20mg Tirz Vial.png", name:"Tirzepatide 20mg Vial", price:90, stock:22, badge:"Best Seller", badgeClass:"pill-popular"},
-  {img:"40mg Tirz Vial.png", name:"Tirzepatide 40mg Vial", price:115, stock:8},
-  {img:"60mg Tirz Vial.png", name:"Tirzepatide 60mg Vial", price:130, stock:3, badge:"Premium", badgeClass:"pill-premium"},
-
-  {img:"20mg Reta Vial.png", name:"Retatrutide 20mg Vial", price:120, stock:19, badge:"Best Seller", badgeClass:"pill-popular"},
-  {img:"40mg Reta Vial.png", name:"Retatrutide 40mg Vial", price:140, stock:11},
-  {img:"60mg Reta Vial.png", name:"Retatrutide 60mg Vial", price:160, stock:5, badge:"Premium", badgeClass:"pill-premium"},
-
-  // PENS
-  {img:"10mg Tirz Pen.png", name:"Tirzepatide 10mg Pen", price:80, stock:10},
-  {img:"20mg Tirz Pen.png", name:"Tirzepatide 20mg Pen", price:100, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
-  {img:"40mg Tirz Pen .png", name:"Tirzepatide 40mg Pen", price:125, stock:10},
-  {img:"60mg Tirz Pen.png", name:"Tirzepatide 60mg Pen", price:140, stock:10, badge:"Premium", badgeClass:"pill-premium"},
-
-  {img:"20mg Reta Pen.png", name:"Retatrutide 20mg Pen", price:130, stock:10, badge:"Best Seller", badgeClass:"pill-popular"},
-  {img:"40mg Reta Pen.png", name:"Retatrutide 40mg Pen", price:150, stock:10},
-  {img:"60mg Reta Pen.png", name:"Retatrutide 60mg Pen", price:170, stock:10, badge:"Premium", badgeClass:"pill-premium"}
-];
-
+// ---------- CART (same behaviour as index) ----------
 let cart = [];
 const savedCart = localStorage.getItem('cart');
 if (savedCart) {
-  try { cart = JSON.parse(savedCart); } catch(e) { cart = []; }
+  try { cart = JSON.parse(savedCart); } catch (e) { cart = []; }
 }
-
-let currentProduct = null;
 
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function renderProducts() {
-  document.getElementById('product-list').innerHTML = products.map((p, i) => `
-    <div class="col-md-4">
-      <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
-        ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
-        <img src="${p.img}" class="w-100 p-4" alt="${p.name}">
-        <div class="product-body d-flex flex-column">
-          <div class="text-start">
-            <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
-              ${
-                p.name.includes('Retatrutide')
-                  ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
-                  : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL')
-              }
-            </div>
-            <div class="product-name">${p.name}</div>
-          </div>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
-          </div>
-          <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
-            ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock}`) : '<strong>Out of stock</strong>'}
-          </p>
-          <button class="btn btn-success btn-add mt-auto"
-                  ${p.stock===0?'disabled':''}
-                  onclick="event.stopPropagation(); openModal(${i})">
-            ${p.stock>0?'Add to cart':'Sold out'}
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-renderProducts();
-
-function changeQty(delta) {
-  const input = document.getElementById('modalQty');
-  let val = parseInt(input.value) || 1;
-  val = Math.max(1, val + delta);
-  input.value = val;
-}
-
-function openModal(i) {
-  currentProduct = products[i];
-  if (!currentProduct || currentProduct.stock === 0) return;
-
-  document.getElementById('modalImg').src = currentProduct.img;
-  document.getElementById('modalTitle').textContent = currentProduct.name;
-  document.getElementById('modalName').textContent = currentProduct.name;
-  document.getElementById('modalPrice').textContent = `£${currentProduct.price}`;
-  document.getElementById('modalStock').innerHTML = currentProduct.stock > 0
-    ? `In stock – ${currentProduct.stock}`
-    : 'Out of stock';
-  document.getElementById('modalQty').value = 1;
-
-  const modalDesc = document.getElementById('modalDescription');
-  const name = currentProduct.name;
-
-  if (name.includes('Tirzepatide')) {
-    modalDesc.innerHTML = `
-      <p><strong>Tirzepatide</strong> is a next-generation <strong>dual GIP and GLP-1 receptor agonist</strong> developed for advanced metabolic and weight-management research. By mimicking the natural actions of both <strong>GLP-1 (glucagon-like peptide-1)</strong> and <strong>GIP (glucose-dependent insulinotropic polypeptide)</strong>, Tirzepatide supports improvements in <strong>appetite regulation, insulin sensitivity, and blood glucose control</strong>.</p>
-      <p>Its unique dual-hormone mechanism helps <strong>reduce hunger, limit portion sizes, stabilise blood sugar levels, and promote sustained body-weight reduction</strong>, making it a leading compound in metabolic and weight-loss research.</p>
-      <ul class="mb-0">
-        <li><strong>Administration:</strong> Subcutaneous injection, once weekly</li>
-        <li><strong>Primary use:</strong> Weight management, metabolic support, glucose regulation</li>
-      </ul>
-    `;
-  } else if (name.includes('Retatrutide')) {
-    modalDesc.innerHTML = `
-      <p><strong>Retatrutide</strong> is an investigational <strong>multi-receptor agonist</strong> designed for advanced metabolic and obesity research. By targeting key pathways involved in <strong>appetite control, energy balance, and glucose regulation</strong>, Retatrutide has been studied for its potent impact on body-weight reduction and metabolic health markers.</p>
-      <p>In research settings, Retatrutide has shown the potential to <strong>reduce appetite, support sustained fat loss, and improve overall metabolic profile</strong>, making it a powerful candidate for long-term weight-management protocols.</p>
-      <ul class="mb-0">
-        <li><strong>Administration:</strong> Subcutaneous injection, once weekly</li>
-        <li><strong>Primary use:</strong> Weight-management research, appetite modulation, metabolic support</li>
-      </ul>
-    `;
-  } else {
-    modalDesc.innerHTML = '';
-  }
-
-  document.getElementById('modalAddBtn').onclick = () => {
-    const qty = parseInt(document.getElementById('modalQty').value) || 1;
-    addToCart(currentProduct, qty);
-    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-  };
-
-  new bootstrap.Modal(document.getElementById('productModal')).show();
-}
-
-function addToCart(product, qty) {
-  const existing = cart.find(item => item.name === product.name);
-  if (existing) existing.qty += qty;
-  else cart.push({name: product.name, price: product.price, qty});
-  updateCart();
-  saveCart();
-  toggleCart(true);
-}
-
-function updateQty(i, delta) {
-  cart[i].qty = Math.max(1, cart[i].qty + delta);
-  if (cart[i].qty === 0) cart.splice(i, 1);
-  updateCart();
-  saveCart();
-}
-
-function removeFromCart(i) {
-  cart.splice(i, 1);
-  updateCart();
-  saveCart();
 }
 
 function updateCart() {
@@ -416,6 +337,7 @@ function updateCart() {
   document.getElementById('cart-count').textContent = totalItems;
   document.getElementById('cart-items-count').textContent = totalItems;
   document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
+
   document.getElementById('cart-items').innerHTML = cart.length === 0
     ? '<p class="text-center text-muted m-0">Your cart is empty</p>'
     : cart.map((item,i) => `
@@ -434,6 +356,19 @@ function updateCart() {
 }
 updateCart();
 
+function updateQty(i, delta) {
+  cart[i].qty = Math.max(1, cart[i].qty + delta);
+  if (cart[i].qty === 0) cart.splice(i, 1);
+  updateCart();
+  saveCart();
+}
+
+function removeFromCart(i) {
+  cart.splice(i, 1);
+  updateCart();
+  saveCart();
+}
+
 function toggleCart(force) {
   const sb = document.getElementById('cart-sidebar');
   const ov = document.querySelector('.overlay');
@@ -447,8 +382,195 @@ function goToCheckout() {
   const cartData = encodeURIComponent(JSON.stringify(cart));
   window.location.href = `checkout.html?cart=${cartData}`;
 }
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+// ---------- PRODUCTS FROM SUPABASE ----------
+let products = [];
+let currentProduct = null;
+
+// optional: simple badge logic based on name/price
+function computeBadge(p) {
+  if (p.name?.includes('20mg')) return { text: 'Most Popular', class: 'pill-popular' };
+  if (p.price >= 130)         return { text: 'Premium',      class: 'pill-premium' };
+  return null;
+}
+
+function renderProducts() {
+  const listEl = document.getElementById('all-products-list');
+  const statusEl = document.getElementById('all-products-status');
+
+  if (!products.length) {
+    statusEl.textContent = 'No products available yet.';
+    listEl.innerHTML = '';
+    return;
+  }
+
+  statusEl.textContent = '';
+
+  listEl.innerHTML = products.map((p, i) => {
+    const badge = computeBadge(p);
+    const typeLabel =
+      p.name.includes('Retatrutide')
+        ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
+        : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL');
+
+    return `
+      <div class="col-md-3">
+        <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
+          ${badge ? `<span class="pill-label ${badge.class}">${badge.text}</span>` : ''}
+          <img src="${p.image || ''}" class="w-100 p-4" alt="${p.name}">
+          <div class="product-body d-flex flex-column">
+            <div class="text-start">
+              <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${typeLabel}</div>
+              <div class="product-name">${p.name}</div>
+              <div class="text-muted" style="font-size:0.85rem;">
+                ${
+                  p.name.includes('Tirzepatide')
+                    ? 'Dual GIP/GLP-1 research agonist for appetite and glucose control.'
+                    : p.name.includes('Retatrutide')
+                      ? 'Multi-receptor research agonist for aggressive weight management.'
+                      : 'Weight-management research peptide.'
+                }
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="product-price">
+                £${Number(p.price || 0).toFixed(2)}
+                <span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span>
+              </div>
+            </div>
+            <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
+              ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} units`) : '<strong>Out of stock</strong>'}
+            </p>
+            <button class="btn btn-success btn-add mt-auto"
+                    ${p.stock===0?'disabled':''}
+                    onclick="event.stopPropagation(); openModal(${i})">
+              ${p.stock>0?'Add to cart':'Sold out'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadProductsFromDb() {
+  const statusEl = document.getElementById('all-products-status');
+  statusEl.textContent = 'Loading products…';
+
+  const { data, error } = await supabaseClient
+    .from('Products')
+    .select('id, name, price, image, stock')
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error loading products', error);
+    statusEl.textContent = 'Could not load products.';
+    return;
+  }
+
+  products = (data || []).map(row => ({
+    id: row.id,
+    name: row.name,
+    price: Number(row.price || 0),
+    image: row.image || '20mg Tirz Vial.png', // fallback image if needed
+    stock: row.stock ?? 0
+  }));
+
+  renderProducts();
+}
+
+// ---------- MODAL ----------
+function openModal(i) {
+  const p = products[i];
+  if (!p || p.stock === 0) return;
+
+  currentProduct = p;
+
+  let modal = document.getElementById('productModal');
+  if (!modal) {
+    // lazy-create modal if not present
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalTitle"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 320px;">
+              <h3 id="modalName"></h3>
+              <p class="product-price fs-1" id="modalPrice"></p>
+              <p class="stock text-success mb-2" id="modalStock"></p>
+              <div id="modalDescription" class="text-start small text-muted mb-3"></div>
+              <div class="d-flex justify-content-center align-items-center gap-3 my-3">
+                <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
+                <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input">
+                <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(1)">+</button>
+              </div>
+              <button id="modalAddBtn" class="btn btn-success btn-lg rounded-pill">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrapper.firstElementChild);
+    modal = document.getElementById('productModal');
+  }
+
+  document.getElementById('modalImg').src = p.image || '';
+  document.getElementById('modalTitle').textContent = p.name;
+  document.getElementById('modalName').textContent  = p.name;
+  document.getElementById('modalPrice').textContent = `£${Number(p.price || 0).toFixed(2)}`;
+  document.getElementById('modalStock').innerHTML   = `In stock – ${p.stock} units`;
+
+  const descEl = document.getElementById('modalDescription');
+  if (p.name.includes('Tirzepatide')) {
+    descEl.innerHTML = `
+      <p><strong>Tirzepatide</strong> is a dual <strong>GIP/GLP-1 receptor agonist</strong> widely studied in metabolic and weight-management research.</p>
+      <p>Typically used for protocols focused on <strong>appetite control, insulin sensitivity and blood-glucose regulation</strong>.</p>
+      <p class="mb-1"><em>For research use only. Not for human consumption.</em></p>
+    `;
+  } else if (p.name.includes('Retatrutide')) {
+    descEl.innerHTML = `
+      <p><strong>Retatrutide</strong> is an advanced <strong>multi-receptor agonist</strong> researched for aggressive weight-management strategies.</p>
+      <p>Often used where <strong>rapid fat loss and metabolic reset</strong> are the focus.</p>
+      <p class="mb-1"><em>For research use only. Not for human consumption.</em></p>
+    `;
+  } else {
+    descEl.textContent = 'Weight-management research peptide. For laboratory research only.';
+  }
+
+  document.getElementById('modalQty').value = 1;
+
+  document.getElementById('modalAddBtn').onclick = () => {
+    const qty = parseInt(document.getElementById('modalQty').value) || 1;
+    addToCart(p, qty);
+    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+  };
+
+  new bootstrap.Modal(modal).show();
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('modalQty');
+  let val = parseInt(input.value) || 1;
+  val = Math.max(1, val + delta);
+  input.value = val;
+}
+
+function addToCart(product, qty) {
+  const existing = cart.find(item => item.name === product.name && item.price === product.price);
+  if (existing) existing.qty += qty;
+  else cart.push({ name: product.name, price: product.price, qty });
+  updateCart();
+  saveCart();
+  toggleCart(true);
+}
+
+// kick things off
+loadProductsFromDb();
+</script>
 </body>
 </html>
