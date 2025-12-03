@@ -248,24 +248,30 @@
       .join("");
   }
 
-  async function init() {
-    const { data } = await supabaseClient.auth.getUser();
+ async function init() {
+  statusEl.textContent = "Checking access…";
 
-    if (!data?.user) {
-      window.location.href = "index.html";
-      return;
-    }
+  const { data: sessionData, error: sessionError } =
+    await supabaseClient.auth.getSession();
 
-    if (data.user.email !== ADMIN_EMAIL) {
-      warningEl.innerHTML =
-        '<div class="alert alert-danger">Access denied.</div>';
-      statusEl.textContent = "Not authorised";
-      return;
-    }
-
-    statusEl.textContent = "Admin verified ✅";
-    loadOrders();
+  if (sessionError || !sessionData?.session?.user) {
+    console.warn("❌ No active session");
+    window.location.href = "index.html";
+    return;
   }
+
+  const user = sessionData.session.user;
+
+  if (user.email !== ADMIN_EMAIL) {
+    warningEl.innerHTML =
+      `<div class="alert alert-danger">Access denied.</div>`;
+    statusEl.textContent = "Not authorised";
+    return;
+  }
+
+  statusEl.textContent = "Admin verified ✅";
+  loadOrders();
+}
 
   logoutBtn.onclick = async () => {
     await supabaseClient.auth.signOut();
