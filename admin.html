@@ -312,23 +312,18 @@
 
   // ------- REVIEWS MODERATION (PENDING ONLY) -------
 
- // ------- REVIEWS MODERATION (PENDING ONLY) -------
+// ------- REVIEWS MODERATION (PENDING ONLY) -------
 
 async function loadPendingReviews() {
   reviewsStatus.textContent = "Loading pending reviews…";
 
-  let data = null;
-  let error = null;
-
-  // Try the "new" schema first (message + is_published)
-  ({ data, error } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("Reviews")
-    .select("id, name, rating, message, review_text, body, approved, is_published, created_at")
-    .order("created_at", { ascending: false })
-  );
+    .select("*")                    // <-- no specific column list
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Primary reviews query failed", error);
+    console.error("Error loading reviews", error);
     reviewsStatus.textContent = "Could not load reviews.";
     return;
   }
@@ -341,9 +336,15 @@ async function loadPendingReviews() {
 
   // Work out which ones are actually "pending"
   const pending = data.filter((r) => {
-    if (typeof r.is_published === "boolean") return !r.is_published;
-    if (typeof r.approved === "boolean") return !r.approved;
-    // If there is no status flag at all, treat as pending
+    // if is_published exists, use that
+    if ("is_published" in r && typeof r.is_published === "boolean") {
+      return !r.is_published;
+    }
+    // else if approved exists, use that
+    if ("approved" in r && typeof r.approved === "boolean") {
+      return !r.approved;
+    }
+    // if neither flag exists, treat as pending
     return true;
   });
 
@@ -361,8 +362,9 @@ async function loadPendingReviews() {
         ? new Date(review.created_at).toLocaleString()
         : "";
 
-      const stars = review.rating
-        ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating)
+      const rating = review.rating || 0;
+      const stars = rating
+        ? "★".repeat(rating) + "☆".repeat(5 - rating)
         : "";
 
       const name =
@@ -405,7 +407,7 @@ async function loadPendingReviews() {
 async function publishReview(id) {
   if (!confirm("Publish this review?")) return;
 
-  // Support either is_published or approved
+  // Try to support both schemas: is_published and/or approved
   const { error } = await supabaseClient
     .from("Reviews")
     .update({ is_published: true, approved: true })
