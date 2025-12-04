@@ -25,8 +25,7 @@
     background: var(--lw-bg);
     color: var(--lw-dark);
     margin: 0;
-    /* shift page content down so it doesn't hide under trust bar + navbar */
-    padding-top: 80px;
+    padding-top: 80px; /* trust bar + nav */
   }
 
   /* TRUST / DELIVERY BAR */
@@ -42,19 +41,14 @@
     z-index: 1100;
     text-align: center;
   }
-
-  #trust-bar span {
-    white-space: nowrap;
-  }
+  #trust-bar span { white-space: nowrap; }
 
   /* NAVBAR */
   .navbar {
     background: #ffffff !important;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
   }
-  .navbar.fixed-top {
-    top: 32px; /* sits just under the trust bar */
-  }
+  .navbar.fixed-top { top: 32px; }
   .navbar-brand img {
     height: 36px;
     margin-right: 10px;
@@ -77,6 +71,7 @@
     color: var(--lw-dark);
   }
 
+  /* HERO */
   .hero-reviews {
     background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
     padding: 110px 0 70px;
@@ -105,6 +100,7 @@
     margin: 12px auto 0;
   }
 
+  /* CARDS */
   .stats-card, .form-card, .review-card {
     border-radius: 20px;
     background: #ffffff;
@@ -112,9 +108,7 @@
     padding: 20px 22px;
   }
 
-  .review-card {
-    height: 100%;
-  }
+  .review-card { height: 100%; }
 
   .review-meta {
     font-size: 0.85rem;
@@ -140,6 +134,7 @@
     font-weight: 600;
   }
 
+  /* CART SIDEBAR */
   .cart-sidebar {
     height: 100vh;
     width: 420px;
@@ -241,7 +236,9 @@
         <span id="cart-total" class="fw-bold">£0.00</span>
       </div>
       <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
-      <small class="text-muted d-block mt-2 text-center">Enter delivery details → get payment instructions by email</small>
+      <small class="text-muted d-block mt-2 text-center">
+        Enter delivery details → get payment instructions by email
+      </small>
     </div>
   </div>
 
@@ -348,10 +345,10 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const ADMIN_EMAIL = "luminaweight@gmail.com";
-    const adminNavItem = document.getElementById('admin-nav-item');
-    const accountLink  = document.getElementById('account-link');
+    const adminNavItem = document.getElementById("admin-nav-item");
+    const accountLink  = document.getElementById("account-link");
 
-    // Check auth to toggle Admin + My Account/Login text
+    // Auth: toggle Admin + My Account text
     (async () => {
       try {
         const { data, error } = await supabaseClient.auth.getUser();
@@ -359,20 +356,20 @@
 
         if (!error && adminNavItem) {
           adminNavItem.style.display =
-            user && user.email === ADMIN_EMAIL ? 'block' : 'none';
+            user && user.email === ADMIN_EMAIL ? "block" : "none";
         }
 
         if (accountLink) {
           if (user) {
-            accountLink.textContent = 'My Account';
-            accountLink.href = 'account.html';
+            accountLink.textContent = "My Account";
+            accountLink.href = "account.html";
           } else {
-            accountLink.textContent = 'Login';
-            accountLink.href = 'account.html';
+            accountLink.textContent = "Login";
+            accountLink.href = "account.html";
           }
         }
       } catch (e) {
-        console.error('Error checking auth', e);
+        console.error("Error checking auth", e);
       }
     })();
 
@@ -390,10 +387,10 @@
     function updateCart() {
       const totalItems = cart.reduce((s,i)=>s+i.qty,0);
       const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-      document.getElementById('cart-count').textContent = totalItems;
-      document.getElementById('cart-items-count').textContent = totalItems;
-      document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
-      document.getElementById('cart-items').innerHTML = cart.length === 0
+      document.getElementById("cart-count").textContent = totalItems;
+      document.getElementById("cart-items-count").textContent = totalItems;
+      document.getElementById("cart-total").textContent = `£${total.toFixed(2)}`;
+      document.getElementById("cart-items").innerHTML = cart.length === 0
         ? '<p class="text-center text-muted m-0">Your cart is empty</p>'
         : cart.map((item,i) => `
           <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
@@ -407,7 +404,7 @@
               <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
               <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
             </div>
-          </div>`).join('');
+          </div>`).join("");
     }
     updateCart();
 
@@ -424,15 +421,15 @@
     }
 
     function toggleCart(force) {
-      const sb = document.getElementById('cart-sidebar');
-      const ov = document.querySelector('.overlay');
-      const open = force !== undefined ? force : !sb.classList.contains('open');
-      sb.classList.toggle('open', open);
-      ov.classList.toggle('show', open);
+      const sb = document.getElementById("cart-sidebar");
+      const ov = document.querySelector(".overlay");
+      const open = force !== undefined ? force : !sb.classList.contains("open");
+      sb.classList.toggle("open", open);
+      ov.classList.toggle("show", open);
     }
 
     function goToCheckout() {
-      if (cart.length === 0) return alert('Your cart is empty!');
+      if (cart.length === 0) return alert("Your cart is empty!");
       const cartData = encodeURIComponent(JSON.stringify(cart));
       window.location.href = `checkout.html?cart=${cartData}`;
     }
@@ -442,7 +439,7 @@
     window.toggleCart = toggleCart;
     window.goToCheckout = goToCheckout;
 
-    // ------- SEEDED REAL REVIEWS (your 5 customers) -------
+    // ------- SEEDED REVIEWS -------
     const seededReviews = [
       {
         name: "Sarah",
@@ -477,14 +474,18 @@
     ];
 
     // ------- LOAD APPROVED REVIEWS -------
-    const reviewsListEl = document.getElementById('reviews-list');
-    const avgRatingEl   = document.getElementById('avg-rating');
-    const avgStarsEl    = document.getElementById('avg-stars');
-    const reviewCountEl = document.getElementById('review-count');
+    const reviewsListEl = document.getElementById("reviews-list");
+    const avgRatingEl   = document.getElementById("avg-rating");
+    const avgStarsEl    = document.getElementById("avg-stars");
+    const reviewCountEl = document.getElementById("review-count");
 
     function renderStars(n) {
-      if (!n || n <= 0) return '';
-      return '★'.repeat(n).split('').map(()=>'<span class="star">★</span>').join('');
+      if (!n || n <= 0) return "";
+      return "★"
+        .repeat(n)
+        .split("")
+        .map(() => '<span class="star">★</span>')
+        .join("");
     }
 
     async function loadReviews() {
@@ -493,142 +494,143 @@
 
       try {
         const res = await supabaseClient
-  .from('Reviews')
-  .select('*')
-  .eq('approved', true)
-  .order('created_at', { ascending: false });
+          .from("Reviews")
+          .select("id, name, rating, review_text, approved, created_at")
+          .eq("approved", true)
+          .order("created_at", { ascending: false });
 
         dbReviews = res.data || [];
         error = res.error || null;
+        console.log("Loaded DB reviews:", dbReviews, error);
       } catch (e) {
-        console.error('Error loading reviews', e);
+        console.error("Error loading reviews", e);
         error = e;
       }
 
-      // Combine seeded + DB reviews
-      const allReviews = [...seededReviews, ...dbReviews];
+      const allReviews = [
+        ...seededReviews,
+        ...dbReviews
+      ];
 
       if (error && dbReviews.length === 0 && seededReviews.length === 0) {
-        reviewsListEl.innerHTML = '<div class="col-12 text-muted">Could not load reviews.</div>';
-        avgRatingEl.textContent = '–';
-        avgStarsEl.innerHTML = '';
-        reviewCountEl.textContent = '0';
+        reviewsListEl.innerHTML =
+          '<div class="col-12 text-muted">Could not load reviews.</div>';
+        avgRatingEl.textContent = "–";
+        avgStarsEl.innerHTML = "";
+        reviewCountEl.textContent = "0";
         return;
       }
 
       if (!allReviews.length) {
-        reviewsListEl.innerHTML = '<div class="col-12 text-muted">No reviews yet. Be the first to leave one above.</div>';
-        avgRatingEl.textContent = '–';
-        avgStarsEl.innerHTML = '';
-        reviewCountEl.textContent = '0';
+        reviewsListEl.innerHTML =
+          '<div class="col-12 text-muted">No reviews yet. Be the first to leave one above.</div>';
+        avgRatingEl.textContent = "–";
+        avgStarsEl.innerHTML = "";
+        reviewCountEl.textContent = "0";
         return;
       }
 
-      // Summary stats (include seeded + db)
-      const ratings = allReviews.map(r => r.rating || 0).filter(r => r > 0);
-      const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length) : 0;
-      avgRatingEl.textContent = avg ? avg.toFixed(1) : '–';
+      const ratings = allReviews
+        .map((r) => r.rating || 0)
+        .filter((r) => r > 0);
+      const avg = ratings.length
+        ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+        : 0;
+
+      avgRatingEl.textContent = avg ? avg.toFixed(1) : "–";
       avgStarsEl.innerHTML = renderStars(Math.round(avg));
       reviewCountEl.textContent = allReviews.length.toString();
 
-      // List
-      reviewsListEl.innerHTML = allReviews.map(r => {
-        // If it's a DB review, use created_at; if seeded, use created_label
-        let created = '';
-        if (r.created_at) {
-          created = new Date(r.created_at).toLocaleDateString('en-GB', {
-            day: '2-digit', month: 'short', year: 'numeric'
-          });
-        } else if (r.created_label) {
-          created = r.created_label;
-        }
+      reviewsListEl.innerHTML = allReviews
+        .map((r) => {
+          let created = "";
+          if (r.created_at) {
+            created = new Date(r.created_at).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            });
+          } else if (r.created_label) {
+            created = r.created_label;
+          }
 
-        const name = r.name || r.first_name || 'Anonymous';
-        const rating = r.rating || 0;
-        const message = r.message || r.body || '';
+          const name = r.name || r.first_name || "Anonymous";
+          const rating = r.rating || 0;
+          const message = r.review_text || r.message || r.body || "";
 
-        return `
-          <div class="col-md-6">
-            <div class="review-card">
-              <div class="d-flex justify-content-between mb-1">
-                <div class="review-meta">
-                  <strong>${name}</strong><br>
-                  <span>${created}</span>
+          return `
+            <div class="col-md-6">
+              <div class="review-card">
+                <div class="d-flex justify-content-between mb-1">
+                  <div class="review-meta">
+                    <strong>${name}</strong><br>
+                    <span>${created}</span>
+                  </div>
+                  <div>${renderStars(rating)}</div>
                 </div>
-                <div>${renderStars(rating)}</div>
+                <p class="mb-1">${message}</p>
               </div>
-              <p class="mb-1">${message}</p>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        })
+        .join("");
     }
 
     loadReviews();
 
     // ------- SUBMIT REVIEW -------
-    const reviewForm   = document.getElementById('review-form');
-    const revName      = document.getElementById('rev-name');
-    const revRating    = document.getElementById('rev-rating');
-    const revMessage   = document.getElementById('rev-message');
-    const revSubmitBtn = document.getElementById('rev-submit');
-    const revStatus    = document.getElementById('rev-status');
+    const reviewForm   = document.getElementById("review-form");
+    const revName      = document.getElementById("rev-name");
+    const revRating    = document.getElementById("rev-rating");
+    const revMessage   = document.getElementById("rev-message");
+    const revSubmitBtn = document.getElementById("rev-submit");
+    const revStatus    = document.getElementById("rev-status");
 
-    reviewForm.addEventListener('submit', async (e) => {
+    reviewForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name    = revName.value.trim() || null;
+      const name    = revName.value.trim() || "Anonymous";
       const rating  = parseInt(revRating.value, 10);
       const message = revMessage.value.trim();
 
       if (!rating || !message) return;
 
       revSubmitBtn.disabled = true;
-      revSubmitBtn.textContent = 'Submitting…';
-      revStatus.textContent = '';
+      revSubmitBtn.textContent = "Submitting…";
+      revStatus.textContent = "";
 
-     const { data, error } = await supabaseClient
-  .from("Reviews")
-  .insert([
-    {
-      name,
-      rating,
-      message,
-      is_published: false // goes to admin first
-    }
-  ])
-  .select(); // ask Supabase to return the inserted row
+      const { data, error } = await supabaseClient
+        .from("Reviews")
+        .insert([
+          {
+            name,
+            email: "website@luminaweight.xyz", // dummy email to satisfy NOT NULL
+            product_name: "Website",           // generic product label
+            rating,
+            review_text: message,
+            approved: false                    // pending until admin approves
+          }
+        ])
+        .select();
 
-console.log("review insert result:", { data, error });
-
-if (error) {
-  console.error("Error submitting review", error);
-  revStatus.textContent =
-    "Something went wrong submitting your review. Please try again.";
-  revStatus.classList.remove("text-success");
-  revStatus.classList.add("text-danger");
-} else {
-  reviewForm.reset();
-  revStatus.textContent =
-    "Thanks! Your review has been submitted for approval.";
-  revStatus.classList.remove("text-danger");
-  revStatus.classList.add("text-success");
-}
+      console.log("review insert result:", { data, error });
 
       if (error) {
-        console.error('Error submitting review', error);
-        revStatus.textContent = 'Something went wrong submitting your review. Please try again.';
-        revStatus.classList.remove('text-success');
-        revStatus.classList.add('text-danger');
+        console.error("Error submitting review", error);
+        revStatus.textContent =
+          "Something went wrong submitting your review. Please try again.";
+        revStatus.classList.remove("text-success");
+        revStatus.classList.add("text-danger");
       } else {
         reviewForm.reset();
-        revStatus.textContent = 'Thanks! Your review has been submitted for approval.';
-        revStatus.classList.remove('text-danger');
-        revStatus.classList.add('text-success');
+        revStatus.textContent =
+          "Thanks! Your review has been submitted for approval.";
+        revStatus.classList.remove("text-danger");
+        revStatus.classList.add("text-success");
       }
 
       revSubmitBtn.disabled = false;
-      revSubmitBtn.textContent = 'Submit review';
+      revSubmitBtn.textContent = "Submit review";
     });
   </script>
 </body>
