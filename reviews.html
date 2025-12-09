@@ -159,6 +159,36 @@
     font-size: 0.9rem;
     margin-top: 60px;
   }
+      /* --- NAV / TRUST BAR RESPONSIVE FIX --- */
+
+    /* Desktop: keep trust bar + navbar fixed */
+    @media (min-width: 769px) {
+      .navbar.fixed-top {
+        position: fixed;
+        left: 0;
+        right: 0;
+      }
+
+      body {
+        padding-top: 80px; /* space for trust bar + nav */
+      }
+    }
+
+    /* Mobile: make them normal scrolling elements */
+    @media (max-width: 768px) {
+      #trust-bar {
+        position: static;
+      }
+
+      .navbar.fixed-top {
+        position: static;
+        top: auto;
+      }
+
+      body {
+        padding-top: 0; /* no extra gap needed on mobile */
+      }
+    }
 </style>
 </head>
 <body>
