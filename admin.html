@@ -229,10 +229,13 @@
       .order("created_at", { ascending: false });
 
     if (error) {
-      statusEl.textContent = "Could not load orders.";
-      console.error(error);
-      return;
-    }
+  statusEl.textContent = "Could not load orders.";
+  warningEl.innerHTML = `<div class="alert alert-danger small mb-0">
+    ${error.message || "Unknown error"} (${error.code || "no-code"})
+  </div>`;
+  console.error(error);
+  return;
+}
 
     if (!orders || orders.length === 0) {
       statusEl.textContent = "No orders yet.";
