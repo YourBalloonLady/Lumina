@@ -16,7 +16,6 @@
   <meta property="og:url" content="https://luminaweight.xyz/products.html">
   <meta property="og:image" content="https://luminaweight.xyz/LuminaLogoBlack.png">
 
-  <!-- Optional canonical URL -->
   <link rel="canonical" href="https://luminaweight.xyz/products.html">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -41,7 +40,6 @@
       padding-top: 80px;
     }
 
-    /* TRUST / DELIVERY BAR */
     #trust-bar {
       position: fixed;
       top: 0;
@@ -54,10 +52,8 @@
       z-index: 1100;
       text-align: center;
     }
-
     #trust-bar span { white-space: nowrap; }
 
-    /* NAVBAR */
     .navbar {
       background: #ffffff !important;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
@@ -70,7 +66,6 @@
     .nav-link.active, .nav-link:hover { color: var(--lw-dark) !important; }
     .cart-icon { cursor: pointer; font-size: 1.5rem; color: var(--lw-dark); }
 
-    /* HERO */
     .hero {
       background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
       padding: 120px 0 80px;
@@ -101,7 +96,6 @@
       margin: 16px auto 0;
     }
 
-    /* PRODUCT GRID */
     #products { padding: 60px 0 80px; }
     .section-eyebrow {
       text-transform: uppercase;
@@ -148,12 +142,11 @@
     .pill-popular { background: #22c55e; }
     .pill-premium { background: #6366f1; }
     .pill-best-value { background: #f97316; }
-    .pill-wolverine { background: #111827; } /* ✅ Wolverine badge */
+    .pill-wolverine { background: #111827; }
 
     .stock { font-size: 0.9rem; margin-top: 4px; }
     .btn-add { border-radius: 999px; font-weight: 600; padding-inline: 24px; margin-top: 10px; }
 
-    /* INFO CARDS */
     .info-card {
       border-radius: 20px;
       background: #ffffff;
@@ -184,7 +177,6 @@
     }
     .btn-info-link:hover { text-decoration: underline; color: #115e59; }
 
-    /* CART SIDEBAR */
     .cart-sidebar {
       height: 100vh;
       width: 420px;
@@ -218,12 +210,10 @@
       font-size: 0.9rem;
     }
 
-    /* Desktop */
     @media (min-width: 769px) {
       .navbar.fixed-top { position: fixed; left: 0; right: 0; }
       body { padding-top: 80px; }
     }
-    /* Mobile */
     @media (max-width: 768px) {
       #trust-bar { position: static; }
       .navbar.fixed-top { position: static; top: auto; }
@@ -233,7 +223,6 @@
 </head>
 
 <body>
-  <!-- TRUST / DELIVERY BAR -->
   <div id="trust-bar">
     <div class="container d-flex justify-content-center gap-4 flex-wrap">
       <span>🚚 <strong>Next Day Delivery</strong> on orders before <strong>3PM</strong></span>
@@ -243,7 +232,6 @@
     </div>
   </div>
 
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html#home">
@@ -262,12 +250,10 @@
           <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
 
-          <!-- Admin (toggled by Supabase auth) -->
           <li class="nav-item" id="admin-nav-item" style="display:none;">
             <a class="nav-link" href="admin.html">Admin</a>
           </li>
 
-          <!-- My Account / Login -->
           <li class="nav-item">
             <a class="nav-link" href="account.html" id="account-link">My Account</a>
           </li>
@@ -285,7 +271,6 @@
 
   <div class="overlay" onclick="toggleCart()"></div>
 
-  <!-- CART SIDEBAR -->
   <div class="cart-sidebar" id="cart-sidebar">
     <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
@@ -306,7 +291,6 @@
     </div>
   </div>
 
-  <!-- HERO -->
   <section class="hero text-center">
     <div class="container">
       <div class="hero-eyebrow">
@@ -321,7 +305,6 @@
     </div>
   </section>
 
-  <!-- ALL PRODUCTS -->
   <section id="products">
     <div class="container">
       <div class="text-center mb-4">
@@ -345,7 +328,6 @@
     </div>
   </section>
 
-  <!-- INFO / DOSAGE GUIDE SECTION -->
   <section id="info-cards" class="py-5">
     <div class="container">
       <div class="text-center mb-4">
@@ -405,7 +387,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
@@ -437,6 +418,8 @@
 
   <script>
     // ---------- CART ----------
+    // Cart item shape (IMPORTANT):
+    // { id: <uuid>, name: <string>, price: <number>, qty: <int>, image?: <string> }
     let cart = [];
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
@@ -446,8 +429,9 @@
     function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
 
     function updateCart() {
-      const totalItems = cart.reduce((s,i)=>s+i.qty,0);
-      const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+      const totalItems = cart.reduce((s,i)=>s+(i.qty||0),0);
+      const total = cart.reduce((s,i)=>s+(Number(i.price||0) * (i.qty||0)),0);
+
       document.getElementById('cart-count').textContent = totalItems;
       document.getElementById('cart-items-count').textContent = totalItems;
       document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
@@ -458,7 +442,7 @@
           <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
             <div class="flex-grow-1">
               <strong>${item.name}</strong><br>
-              <small>£${item.price} × ${item.qty}</small>
+              <small>£${Number(item.price||0).toFixed(2)} × ${item.qty}</small>
             </div>
             <div class="d-flex align-items-center gap-2">
               <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
@@ -470,9 +454,15 @@
     }
     updateCart();
 
+    // FIXED: allow qty to hit 0 and remove
     function updateQty(i, delta) {
-      cart[i].qty = Math.max(1, cart[i].qty + delta);
-      if (cart[i].qty === 0) cart.splice(i, 1);
+      if (!cart[i]) return;
+      const next = (cart[i].qty || 0) + delta;
+      if (next <= 0) {
+        cart.splice(i, 1);
+      } else {
+        cart[i].qty = next;
+      }
       updateCart();
       saveCart();
     }
@@ -503,12 +493,9 @@
 
     function computeBadge(p) {
       const name = (p.name || '').toLowerCase();
-
-      // ✅ Wolverine badge for blend
       if (name.includes('bpc-157') || name.includes('tb500')) {
         return { text: 'Wolverine Stack', class: 'pill-wolverine' };
       }
-
       if (p.name?.includes('20mg')) return { text: 'Most Popular', class: 'pill-popular' };
       if (p.price >= 130) return { text: 'Premium', class: 'pill-premium' };
       return null;
@@ -711,10 +698,18 @@
       input.value = val;
     }
 
+    // FIXED: store product.id in cart (so checkout can deduct stock by ID)
     function addToCart(product, qty) {
-      const existing = cart.find(item => item.name === product.name && item.price === product.price);
+      const existing = cart.find(item => item.id === product.id);
       if (existing) existing.qty += qty;
-      else cart.push({ name: product.name, price: product.price, qty });
+      else cart.push({
+        id: product.id,
+        name: product.name,
+        price: Number(product.price || 0),
+        qty: qty,
+        image: product.image || ''
+      });
+
       updateCart();
       saveCart();
       toggleCart(true);
