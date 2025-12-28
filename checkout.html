@@ -589,24 +589,53 @@ document.getElementById('addressForm').onsubmit = async function(e) {
     sendCustomerEmail(details);
 
     // Save order to Supabase for EVERYONE (guest + logged in)
-    await saveOrderToSupabase(details);
+    async function saveOrderToSupabase(details) {
+  try {
+    // Try get user (optional)
+    let userId = null;
+    try {
+      const { data } = await supabaseClient.auth.getUser();
+      userId = data?.user?.id || null;
+    } catch (e) {}
 
-    // Clear cart storage so basket is empty when back on main page
-    clearStoredCart();
+    const orderDetails = {
+      customer: {
+        name: details.name,
+        email: details.email,
+        phone: details.phone,
+        address1: details.address1,
+        address2: details.address2,
+        city: details.city,
+        postcode: details.postcode
+      },
+      items: cart.map(i => ({
+        name: i.name,
+        qty: i.qty,
+        price_each: i.price,
+        line_total: i.price * i.qty
+      })),
+      reference: details.ref
+    };
 
-    // Show modal
-    new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    const { error: insertError } = await supabaseClient
+      .from('Orders')
+      .insert({
+        user_id: userId,          // can be null for guest
+        total_amount: total,
+        status: 'Pending',
+        reference: details.ref,
+        details: orderDetails
+      });
 
-    checkoutStatus.textContent = 'We’ve emailed your payment instructions and order link.';
-    checkoutStatus.classList.add('text-success');
+    if (insertError) {
+      console.error('❌ Error saving order to Supabase:', insertError);
+    } else {
+      console.log('✅ Order saved to Supabase');
+    }
   } catch (err) {
-    console.error('Checkout flow error', err);
-    checkoutStatus.textContent = 'There was a problem handling your order. Please try again.';
-    checkoutStatus.classList.add('text-danger');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Confirm order → Payment details';
+    console.error('Unexpected error saving order to Supabase:', err);
   }
+}
 };
 
 function backToShop() {
