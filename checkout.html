@@ -586,7 +586,7 @@ document.getElementById('addressForm').onsubmit = async function(e) {
   // 5. Show success modal
   new bootstrap.Modal(document.getElementById('paymentModal')).show();
 
-  checkoutStatus.textContent = 'We've emailed your payment instructions and order link.';
+  checkoutStatus.textContent = "We've emailed your payment instructions and order link.";
   checkoutStatus.classList.add('text-success');
   } catch (err) {
     console.error('Checkout flow error', err);
