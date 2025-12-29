@@ -569,26 +569,24 @@ document.getElementById('addressForm').onsubmit = async function(e) {
   btn.textContent = 'Processing...';
 
   try {
-    // Save abandoned checkout (so we can recover later)
-    await saveAbandonedCheckout(details, recoveryToken);
-
-    // Send abandoned / recovery email
-    await sendAbandonedEmail(details, recoveryLink);
-
-    // Existing emails
-    sendAdminEmail(details);
-    sendCustomerEmail(details);
-
-    // Save order to Supabase if user logged in
+    // 1. SAVE THE ACTUAL ORDER FIRST (for both guest and logged-in users)
     await saveOrderToSupabase(details);
 
-    // Clear cart storage so basket is empty when back on main page
+    // 2. Save abandoned checkout for recovery tracking
+    await saveAbandonedCheckout(details, recoveryToken);
+
+    // 3. Send all emails
+    sendAdminEmail(details);
+    sendCustomerEmail(details);
+    await sendAbandonedEmail(details, recoveryLink);
+
+    // 4. Clear cart
     clearStoredCart();
 
-    // Show modal
+    // 5. Show success modal
     new bootstrap.Modal(document.getElementById('paymentModal')).show();
 
-    checkoutStatus.textContent = 'We’ve emailed your payment instructions and order link.';
+    checkoutStatus.textContent = 'We've emailed your payment instructions and order link.';
     checkoutStatus.classList.add('text-success');
   } catch (err) {
     console.error('Checkout flow error', err);
