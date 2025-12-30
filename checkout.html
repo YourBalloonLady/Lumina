@@ -417,6 +417,49 @@ async function saveOrderToSupabase(details) {
     console.error('Unexpected error saving order to Supabase:', err);
   }
 }
+  // ---------- STOCK DEDUCTION ----------
+async function deductStock(cartItems) {
+  try {
+    // Get all product names from cart
+    const productNames = cartItems.map(item => item.name);
+    
+    // Fetch current stock levels
+    const { data: products, error: fetchError } = await supabaseClient
+      .from('Products')
+      .select('id, name, stock')
+      .in('name', productNames);
+
+    if (fetchError) {
+      console.error('Error fetching products:', fetchError);
+      return;
+    }
+
+    // Update stock for each item
+    for (const cartItem of cartItems) {
+      const product = products.find(p => p.name === cartItem.name);
+      
+      if (!product) {
+        console.warn(`Product not found: ${cartItem.name}`);
+        continue;
+      }
+
+      const newStock = Math.max(0, product.stock - cartItem.qty);
+
+      const { error: updateError } = await supabaseClient
+        .from('Products')
+        .update({ stock: newStock })
+        .eq('id', product.id);
+
+      if (updateError) {
+        console.error(`Error updating stock for ${cartItem.name}:`, updateError);
+      } else {
+        console.log(`✅ Stock updated: ${cartItem.name} - New stock: ${newStock}`);
+      }
+    }
+  } catch (err) {
+    console.error('Unexpected error deducting stock:', err);
+  }
+}
 
 // ---------- ABANDONED CHECKOUT SAVE ----------
 async function saveAbandonedCheckout(details, recoveryToken) {
@@ -572,7 +615,10 @@ document.getElementById('addressForm').onsubmit = async function(e) {
   // 1. SAVE THE ACTUAL ORDER FIRST (for both guest and logged-in users)
   await saveOrderToSupabase(details);
 
-  // 2. Save abandoned checkout for recovery tracking
+  // 2. DEDUCT STOCK from products
+  await deductStock(cart);
+
+  // 3. Save abandoned checkout for recovery tracking
   await saveAbandonedCheckout(details, recoveryToken);
 
   // 3. Send all emails
