@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout - Lumina Weight</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
 
 <style>
   :root {
@@ -67,6 +68,28 @@
     background: var(--lw-mint);
     color: #ffffff;
   }
+
+  .payment-option {
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+  }
+  .payment-option:hover {
+    border-color: var(--lw-mint);
+    background: var(--lw-mint-soft);
+  }
+  .payment-option.selected {
+    border-color: var(--lw-mint);
+    background: var(--lw-mint-soft);
+  }
+  .payment-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--lw-mint);
+  }
 </style>
 </head>
 <body>
@@ -74,7 +97,7 @@
 <div class="hero">
   <div class="container">
     <h1 class="display-5 fw-bold">Checkout</h1>
-    <p>Enter your delivery details so we can generate your order reference and payment info.</p>
+    <p>Enter your delivery details and choose your payment method.</p>
     <button class="btn btn-outline-light btn-sm mt-2" onclick="backToShop()">← Back to shop</button>
   </div>
 </div>
@@ -115,7 +138,6 @@
             <h4 class="fw-semibold mb-3">Order summary</h4>
             <div id="order-summary"></div>
 
-            <!-- Bundle info on checkout -->
             <div id="bundle-message" class="small text-warning mt-2"></div>
             <div class="d-flex justify-content-between small text-success mt-1"
                  id="bundle-row" style="display:none;">
@@ -128,8 +150,32 @@
               <span id="final-total">£0.00</span>
             </div>
 
+            <hr class="my-4">
+
+            <h4 class="fw-semibold mb-3">Payment method</h4>
+            
+            <div class="payment-option selected" onclick="selectPayment('card')">
+              <div class="d-flex align-items-center">
+                <input type="radio" name="payment" id="payment-card" value="card" checked>
+                <label for="payment-card" class="ms-3 mb-0 flex-grow-1" style="cursor: pointer;">
+                  <div class="fw-semibold">💳 Credit/Debit Card</div>
+                  <small class="text-muted">Pay securely with Stripe - instant processing</small>
+                </label>
+              </div>
+            </div>
+
+            <div class="payment-option" onclick="selectPayment('bank')">
+              <div class="d-flex align-items-center">
+                <input type="radio" name="payment" id="payment-bank" value="bank">
+                <label for="payment-bank" class="ms-3 mb-0 flex-grow-1" style="cursor: pointer;">
+                  <div class="fw-semibold">🏦 Bank Transfer</div>
+                  <small class="text-muted">Pay via bank transfer - details sent by email</small>
+                </label>
+              </div>
+            </div>
+
             <button type="submit" class="btn btn-success btn-lg w-100 mt-4 rounded-pill">
-              Confirm order → Payment details
+              <span id="checkout-btn-text">Pay with Card</span>
             </button>
             <div id="checkout-status" class="small text-muted mt-2"></div>
           </form>
@@ -139,7 +185,7 @@
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
+<!-- PAYMENT MODAL (for bank transfer) -->
 <div class="modal fade" id="paymentModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -178,7 +224,6 @@
   </div>
 </div>
 
-<!-- EmailJS + Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
@@ -186,19 +231,36 @@
     emailjs.init('uZOuTrBdIAc6AmKjo');
   })();
 
-  // Supabase client
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
-
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Initialize Stripe with your TEST key
+  const stripe = Stripe('pk_test_51Sk3THB54cI3xDRFzg7FSSLdhthtOms680eJFOriDzQ6gz1vdJ7ibubkITSec6pWKFq4PS1wWUYAaOFsWAsgwUuI00s4GstRQA');
+
+  let selectedPayment = 'card';
+
+  function selectPayment(method) {
+    selectedPayment = method;
+    document.getElementById('payment-card').checked = (method === 'card');
+    document.getElementById('payment-bank').checked = (method === 'bank');
+    
+    const btnText = document.getElementById('checkout-btn-text');
+    btnText.textContent = method === 'card' ? 'Pay with Card' : 'Confirm Order → Payment Details';
+    
+    document.querySelectorAll('.payment-option').forEach(opt => {
+      opt.classList.remove('selected');
+    });
+    document.querySelector(`#payment-${method}`).closest('.payment-option').classList.add('selected');
+  }
+
+  selectPayment('card');
 </script>
-  
 
 <script>
 let cart = [];
 let total = 0;
 
-// ---------- BUNDLE CALCULATOR (same logic as cart) ----------
 function calculateBundle(cart) {
   let vialQty = 0, penQty = 0;
   let vialTotal = 0, penTotal = 0, otherTotal = 0;
@@ -222,20 +284,18 @@ function calculateBundle(cart) {
   let discount = 0;
   const messages = [];
 
-  // VIAL bundles
   if (vialQty >= 3) {
-    const d = vialTotal * 0.10; // 10% off vials
+    const d = vialTotal * 0.10;
     discount += d;
     messages.push('10% multi-vial bundle discount applied.');
   } else if (vialQty === 2) {
-    const d = vialTotal * 0.05; // 5% off vials
+    const d = vialTotal * 0.05;
     discount += d;
     messages.push('5% vial bundle discount applied (2 vials).');
   }
 
-  // PEN bundles
   if (penQty >= 2) {
-    const d = penTotal * 0.05; // 5% off pens
+    const d = penTotal * 0.05;
     discount += d;
     messages.push('5% pen bundle discount applied (2+ pens).');
   }
@@ -250,7 +310,6 @@ function calculateBundle(cart) {
   };
 }
 
-// ---------- CART / RECOVERY HELPERS ----------
 function getCartFromUrlOrStorage() {
   const params = new URLSearchParams(window.location.search);
   const urlCart = params.get('cart');
@@ -291,13 +350,11 @@ async function maybeRecoverCart() {
 
     if (data && data.cart) {
       localStorage.setItem('cart', JSON.stringify(data.cart));
-      // Optional: mark as recovered
       await supabaseClient
         .from('AbandonedCheckouts')
         .update({ status: 'recovered' })
         .eq('recovery_token', token);
 
-      // Clean URL
       const url = new URL(window.location.href);
       url.searchParams.delete('recover');
       url.searchParams.delete('cart');
@@ -371,12 +428,9 @@ function getCartSummaryText() {
   return buildItemsText();
 }
 
-// ---------- SUPABASE ORDER SAVE ----------
-async function saveOrderToSupabase(details) {
+async function saveOrderToSupabase(details, paymentMethod = 'bank_transfer') {
   try {
     const { data, error } = await supabaseClient.auth.getUser();
-    
-    // Get user_id if logged in, otherwise null for guest orders
     const userId = (error || !data || !data.user) ? null : data.user.id;
 
     const orderDetails = {
@@ -395,15 +449,16 @@ async function saveOrderToSupabase(details) {
         price_each: i.price,
         line_total: i.price * i.qty
       })),
-      reference: details.ref
+      reference: details.ref,
+      payment_method: paymentMethod
     };
 
     const { error: insertError } = await supabaseClient
       .from('Orders')
       .insert({
-        user_id: userId,  // This will be null for guest orders
+        user_id: userId,
         total_amount: total,
-        status: 'Pending',
+        status: paymentMethod === 'stripe' ? 'Paid' : 'Pending',
         reference: details.ref,
         details: orderDetails
       });
@@ -417,13 +472,11 @@ async function saveOrderToSupabase(details) {
     console.error('Unexpected error saving order to Supabase:', err);
   }
 }
-  // ---------- STOCK DEDUCTION ----------
+
 async function deductStock(cartItems) {
   try {
-    // Get all product names from cart
     const productNames = cartItems.map(item => item.name);
     
-    // Fetch current stock levels
     const { data: products, error: fetchError } = await supabaseClient
       .from('Products')
       .select('id, name, stock')
@@ -434,7 +487,6 @@ async function deductStock(cartItems) {
       return;
     }
 
-    // Update stock for each item
     for (const cartItem of cartItems) {
       const product = products.find(p => p.name === cartItem.name);
       
@@ -461,7 +513,6 @@ async function deductStock(cartItems) {
   }
 }
 
-// ---------- ABANDONED CHECKOUT SAVE ----------
 async function saveAbandonedCheckout(details, recoveryToken) {
   try {
     const { error } = await supabaseClient
@@ -486,9 +537,6 @@ async function saveAbandonedCheckout(details, recoveryToken) {
   }
 }
 
-// ---------- EMAILS ----------
-
-// 📥 ADMIN EMAIL TO YOU – template_juevvvd
 function sendAdminEmail(details) {
   const itemsText = buildItemsText();
   const addressText = buildAddressText(details);
@@ -510,7 +558,6 @@ function sendAdminEmail(details) {
   .catch(err => console.error('❌ Admin email failed', err));
 }
 
-// 🧑‍💻 CUSTOMER EMAIL – template_x5lnd1u
 function sendCustomerEmail(details) {
   const itemsText = buildItemsText();
   const addressText = buildAddressText(details);
@@ -532,13 +579,12 @@ function sendCustomerEmail(details) {
   .catch(err => console.error('❌ Customer email failed', err));
 }
 
-// 💌 ABANDONED / RECOVERY EMAIL – template_guh3ord
 function sendAbandonedEmail(details, recoveryLink) {
   const cartSummary = getCartSummaryText();
 
   return emailjs.send(
     'service_i5zi096',
-    'template_guh3ord', // abandoned checkout template
+    'template_guh3ord',
     {
       to_email: details.email,
       customer_name: details.name || 'there',
@@ -550,7 +596,6 @@ function sendAbandonedEmail(details, recoveryLink) {
   .catch(err => console.error('❌ Abandoned email failed', err));
 }
 
-// ---------- FORM SUBMIT ----------
 const checkoutStatus = document.getElementById('checkout-status');
 
 document.getElementById('addressForm').onsubmit = async function(e) {
@@ -573,38 +618,10 @@ document.getElementById('addressForm').onsubmit = async function(e) {
     return;
   }
 
-  // Recalculate bundle & total right before saving / emailing
   const bundle = calculateBundle(cart);
   total = bundle.finalTotal;
 
   const details = { name, phone, email, address1, address2, city, postcode, ref };
-
-  // Fill modal
-  document.getElementById('customerName').textContent = name;
-  document.getElementById('payment-summary').innerHTML = cart.map(i => `
-    <div class="d-flex justify-content-between">
-      <span>${i.qty} × ${i.name}</span>
-      <span>£${(i.price*i.qty).toFixed(2)}</span>
-    </div>
-  `).join('');
-  document.getElementById('payment-total').textContent = `£${total.toFixed(2)}`;
-
-  const paymentDiscountEl = document.getElementById('payment-discount');
-  if (paymentDiscountEl) {
-    if (bundle.discount > 0) {
-      paymentDiscountEl.style.display = 'block';
-      paymentDiscountEl.textContent = `Bundle discount applied: -£${bundle.discount.toFixed(2)}`;
-    } else {
-      paymentDiscountEl.style.display = 'none';
-      paymentDiscountEl.textContent = '';
-    }
-  }
-
-  document.getElementById('order-ref').textContent = ref;
-
-  // Abandoned / recovery setup
-  const recoveryToken = createRecoveryToken();
-  const recoveryLink  = `https://luminaweight.xyz/checkout.html?recover=${encodeURIComponent(recoveryToken)}`;
 
   checkoutStatus.textContent = '';
   checkoutStatus.classList.remove('text-danger', 'text-success');
@@ -612,35 +629,91 @@ document.getElementById('addressForm').onsubmit = async function(e) {
   btn.textContent = 'Processing...';
 
   try {
-  // 1. SAVE THE ACTUAL ORDER FIRST (for both guest and logged-in users)
-  await saveOrderToSupabase(details);
+    if (selectedPayment === 'card') {
+      // STRIPE CARD PAYMENT
+      
+      // 1. Save order first
+      await saveOrderToSupabase(details, 'stripe');
+      await deductStock(cart);
 
-  // 2. DEDUCT STOCK from products
-  await deductStock(cart);
+      // 2. Create line items for Stripe
+      const lineItems = cart.map(item => ({
+        price_data: {
+          currency: 'gbp',
+          product_data: {
+            name: item.name,
+            description: `Order ref: ${ref}`
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to pence
+        },
+        quantity: item.qty,
+      }));
 
-  // 3. Save abandoned checkout for recovery tracking
-  await saveAbandonedCheckout(details, recoveryToken);
+      // 3. Redirect to Stripe Checkout
+      const { error } = await stripe.redirectToCheckout({
+        lineItems: lineItems,
+        mode: 'payment',
+        successUrl: `${window.location.origin}/success.html?ref=${ref}`,
+        cancelUrl: `${window.location.origin}/checkout.html`,
+        customerEmail: email,
+        clientReferenceId: ref,
+        shippingAddressCollection: {
+          allowedCountries: ['GB'],
+        },
+      });
 
-  // 4. Send all emails
-  sendAdminEmail(details);
-  sendCustomerEmail(details);
-  await sendAbandonedEmail(details, recoveryLink);
+      if (error) {
+        throw new Error(error.message);
+      }
 
-  // 5. Clear cart
-  clearStoredCart();
+    } else {
+      // BANK TRANSFER (existing flow)
+      await saveOrderToSupabase(details, 'bank_transfer');
+      await deductStock(cart);
 
-  // 6. Show success modal
-  new bootstrap.Modal(document.getElementById('paymentModal')).show();
+      const recoveryToken = createRecoveryToken();
+      const recoveryLink  = `https://luminaweight.xyz/checkout.html?recover=${encodeURIComponent(recoveryToken)}`;
 
-  checkoutStatus.textContent = "We've emailed your payment instructions and order link.";
-  checkoutStatus.classList.add('text-success');
+      await saveAbandonedCheckout(details, recoveryToken);
+      sendAdminEmail(details);
+      sendCustomerEmail(details);
+      await sendAbandonedEmail(details, recoveryLink);
+
+      // Fill modal
+      document.getElementById('customerName').textContent = name;
+      document.getElementById('payment-summary').innerHTML = cart.map(i => `
+        <div class="d-flex justify-content-between">
+          <span>${i.qty} × ${i.name}</span>
+          <span>£${(i.price*i.qty).toFixed(2)}</span>
+        </div>
+      `).join('');
+      document.getElementById('payment-total').textContent = `£${total.toFixed(2)}`;
+
+      const paymentDiscountEl = document.getElementById('payment-discount');
+      if (paymentDiscountEl) {
+        if (bundle.discount > 0) {
+          paymentDiscountEl.style.display = 'block';
+          paymentDiscountEl.textContent = `Bundle discount applied: -£${bundle.discount.toFixed(2)}`;
+        } else {
+          paymentDiscountEl.style.display = 'none';
+        }
+      }
+
+      document.getElementById('order-ref').textContent = ref;
+
+      clearStoredCart();
+      new bootstrap.Modal(document.getElementById('paymentModal')).show();
+
+      checkoutStatus.textContent = "We've emailed your payment instructions and order link.";
+      checkoutStatus.classList.add('text-success');
+    }
   } catch (err) {
     console.error('Checkout flow error', err);
-    checkoutStatus.textContent = 'There was a problem handling your order. Please try again.';
+    checkoutStatus.textContent = 'There was a problem processing your order. Please try again.';
     checkoutStatus.classList.add('text-danger');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Confirm order → Payment details';
+    btn.textContent = selectedPayment === 'card' ? 'Pay with Card' : 'Confirm Order → Payment Details';
   }
 };
 
@@ -648,7 +721,6 @@ function backToShop() {
   window.location.href = 'index.html';
 }
 
-// ---------- INIT ----------
 (async function initCheckout() {
   await maybeRecoverCart();
   cart = getCartFromUrlOrStorage();
