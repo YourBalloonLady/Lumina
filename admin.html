@@ -13,21 +13,10 @@
     background: #f3f4f6;
   }
 
-  .navbar {
-    background: #020617;
-  }
-
-  .navbar-brand {
-    color: #fff;
-    font-weight: 700;
-  }
-
-  .navbar .nav-link {
-    color: #e5e7eb;
-  }
-  .navbar .nav-link:hover {
-    color: #ffffff;
-  }
+  .navbar { background: #020617; }
+  .navbar-brand { color: #fff; font-weight: 700; }
+  .navbar .nav-link { color: #e5e7eb; }
+  .navbar .nav-link:hover { color: #ffffff; }
 
   .section-card {
     background: #fff;
@@ -46,12 +35,16 @@
     margin-bottom: 12px;
   }
 
-  .review-meta {
-    font-size: 0.85rem;
-    color: #6b7280;
+  .review-meta { font-size: 0.85rem; color: #6b7280; }
+
+  .btn-row {
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
   }
 </style>
 </head>
+
 <body>
 <!-- TRUST BAR -->
 <div id="trust-bar">
@@ -66,9 +59,7 @@
 <!-- NAV -->
 <nav class="navbar navbar-dark navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="index.html#home">
-      🌙 Lumina Admin
-    </a>
+    <a class="navbar-brand" href="index.html#home">🌙 Lumina Admin</a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
       <span class="navbar-toggler-icon"></span>
@@ -76,31 +67,20 @@
 
     <div class="collapse navbar-collapse" id="adminNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#home">Store Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="products.html">Products</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="reviews.html">Reviews</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="account.html">My Account</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="index.html#home">Store Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
+        <li class="nav-item"><a class="nav-link" href="account.html">My Account</a></li>
       </ul>
 
-      <button id="logout-btn" class="btn btn-outline-light btn-sm">
-        Logout
-      </button>
+      <button id="logout-btn" class="btn btn-outline-light btn-sm">Logout</button>
     </div>
   </div>
 </nav>
 
 <!-- CONTENT -->
 <div class="container mt-4">
-
-  <!-- ORDERS SECTION (unchanged, use your existing orders code if you like) -->
+  <!-- ORDERS -->
   <div class="section-card mb-4">
     <h3>Orders</h3>
     <p id="admin-status" class="text-muted">Checking access…</p>
@@ -108,7 +88,7 @@
     <div id="orders-list" class="mt-3"></div>
   </div>
 
-  <!-- REVIEWS SECTION -->
+  <!-- REVIEWS -->
   <div class="section-card">
     <h3>Pending Reviews</h3>
     <p class="text-muted" id="reviews-status">Loading pending reviews…</p>
@@ -123,11 +103,11 @@
 <script>
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
-
   const ADMIN_EMAIL = "luminaweight@gmail.com";
+
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // EmailJS init (for shipped emails on orders)
+  // EmailJS init
   (function () {
     try {
       if (window.emailjs) {
@@ -142,10 +122,10 @@
   const ordersEl      = document.getElementById("orders-list");
   const warningEl     = document.getElementById("admin-warning");
   const logoutBtn     = document.getElementById("logout-btn");
-
   const reviewsStatus = document.getElementById("reviews-status");
   const reviewsEl     = document.getElementById("reviews-list");
 
+  // Cache orders so buttons can reference them
   const ordersCache = {};
 
   function badge(status) {
@@ -160,104 +140,115 @@
     const items = order?.details?.items || [];
     if (!items.length) return "Items not recorded.";
     return items
-      .map((i) =>
-        `${i.qty} × ${i.name} — £${Number(
-          i.line_total || (i.price_each || 0) * i.qty
-        ).toFixed(2)}`
-      )
+      .map((i) => `${i.qty} × ${i.name} — £${Number(i.line_total || (i.price_each || 0) * i.qty).toFixed(2)}`)
       .join("\n");
   }
 
+  // ---------- EMAIL: SHIPPED ----------
   function sendShippedEmail(order) {
     if (!order || !window.emailjs) return;
 
     const customer = order.details?.customer || {};
-    const toEmail =
-      customer.email ||
-      order.customer_email ||
-      order.email ||
-      "";
-
-    const customerName =
-      customer.name || order.customer_name || order.name || "Customer";
+    const toEmail = customer.email || order.customer_email || order.email || "";
+    const customerName = customer.name || order.customer_name || order.name || "Customer";
 
     if (!toEmail) {
-      console.warn("No email found on order");
+      alert("No email found on this order.");
       return;
     }
-    function sendCancelledEmail(order) {
-  if (!order || !window.emailjs) return;
-
-  const customer = order.details?.customer || {};
-  const toEmail =
-    customer.email ||
-    order.customer_email ||
-    order.email ||
-    "";
-
-  const customerName =
-    customer.name || order.customer_name || order.name || "Customer";
-
-  if (!toEmail) {
-    console.warn("No email found on order – cannot send cancellation");
-    return;
-  }
-
-  const ref = order.reference || order.id;
-  const orderDate = order.created_at
-    ? new Date(order.created_at).toLocaleString()
-    : new Date().toLocaleString();
-
-  emailjs.send("service_i5zi096", "template_cancelled", {
-    email: toEmail,              // EmailJS uses this as the "to" if your template is set that way
-    customer_name: customerName, // matches {{customer_name}}
-    order_ref: ref,              // matches {{order_ref}}
-    order_date: orderDate        // matches {{order_date}}
-  })
-  .then(() => console.log("✅ Cancellation email sent"))
-  .catch((err) => console.error("❌ Cancellation email failed", err));
-}
 
     const ref   = order.reference || order.id;
     const total = `£${Number(order.total_amount || 0).toFixed(2)}`;
     const items = buildItemsText(order);
 
-    emailjs
-      .send("service_i5zi096", "template_shipped", {
-        email: toEmail,
-        customer_name: customerName,
-        order_reference: ref,
-        order_items: items,
-        order_total: total,
-      })
-      .catch((err) => console.error("Shipped email failed", err));
+    return emailjs.send("service_i5zi096", "template_shipped", {
+      email: toEmail,
+      customer_name: customerName,
+      order_reference: ref,
+      order_items: items,
+      order_total: total,
+    });
   }
 
+  // ---------- EMAIL: CANCELLED ----------
+  function sendCancelledEmail(order) {
+    if (!order || !window.emailjs) return;
+
+    const customer = order.details?.customer || {};
+    const toEmail = customer.email || order.customer_email || order.email || "";
+    const customerName = customer.name || order.customer_name || order.name || "Customer";
+
+    if (!toEmail) {
+      alert("No email found on this order.");
+      return;
+    }
+
+    const ref = order.reference || order.id;
+    const orderDate = order.created_at
+      ? new Date(order.created_at).toLocaleString()
+      : new Date().toLocaleString();
+
+    // IMPORTANT: these keys must match your EmailJS template variables:
+    // {{customer_name}} {{order_ref}} {{order_date}}
+    return emailjs.send("service_i5zi096", "template_cancelled", {
+      email: toEmail,
+      customer_name: customerName,
+      order_ref: ref,
+      order_date: orderDate
+    });
+  }
+
+  // ---------- BUTTON HANDLERS (manual send) ----------
+  async function sendShippedEmailById(orderId) {
+    const order = ordersCache[orderId];
+    if (!order) return alert("Order not found.");
+
+    if (!confirm("Send SHIPPED email to customer?")) return;
+
+    try {
+      await sendShippedEmail(order);
+      alert("Shipped email sent ✅");
+    } catch (e) {
+      console.error("Shipped email failed", e);
+      alert("Shipped email failed — check console");
+    }
+  }
+
+  async function sendCancelledEmailById(orderId) {
+    const order = ordersCache[orderId];
+    if (!order) return alert("Order not found.");
+
+    if (!confirm("Send CANCELLED email to customer?")) return;
+
+    try {
+      await sendCancelledEmail(order);
+      alert("Cancelled email sent ❌");
+    } catch (e) {
+      console.error("Cancelled email failed", e);
+      alert("Cancelled email failed — check console");
+    }
+  }
+
+  // ---------- STATUS UPDATE (NO EMAIL AUTO-SEND) ----------
   async function updateStatus(id, value) {
-  const { error } = await supabaseClient
-    .from("Orders")
-    .update({ status: value })
-    .eq("id", id);
+    const { error } = await supabaseClient
+      .from("Orders")
+      .update({ status: value })
+      .eq("id", id);
 
-  if (error) {
-    alert("Update failed – check Supabase policy");
-    console.error(error);
-    return;
+    if (error) {
+      alert("Update failed – check Supabase policy");
+      console.error(error);
+      return;
+    }
+
+    if (ordersCache[id]) ordersCache[id].status = value;
+
+    // Optional: refresh UI so badge updates immediately
+    loadOrders();
   }
 
-  if (ordersCache[id]) {
-    ordersCache[id].status = value;
-  }
-
-  if (value === "Shipped" && ordersCache[id]) {
-    sendShippedEmail(ordersCache[id]);
-  }
-
-  if (value === "Cancelled" && ordersCache[id]) {
-    sendCancelledEmail(ordersCache[id]);
-  }
-}
-
+  // ---------- LOAD ORDERS ----------
   async function loadOrders() {
     const { data: orders, error } = await supabaseClient
       .from("Orders")
@@ -272,60 +263,70 @@
 
     if (!orders || orders.length === 0) {
       statusEl.textContent = "No orders yet.";
+      ordersEl.innerHTML = "";
       return;
     }
 
     statusEl.textContent = `${orders.length} orders found`;
 
-    orders.forEach((o) => { ordersCache[o.id] = o; });
+    // refresh cache
+    for (const o of orders) ordersCache[o.id] = o;
 
-    ordersEl.innerHTML = orders
-      .map((order) => {
-        const created = new Date(order.created_at).toLocaleString();
-        const ref = order.reference || order.id;
-        const status = order.status || "Pending";
-        const email =
-          order.details?.customer?.email ||
-          order.customer_email ||
-          order.email ||
-          "No email";
-        const name =
-          order.details?.customer?.name ||
-          order.customer_name ||
-          order.name ||
-          "Customer";
-        const total = Number(order.total_amount || 0).toFixed(2);
+    ordersEl.innerHTML = orders.map((order) => {
+      const created = new Date(order.created_at).toLocaleString();
+      const ref = order.reference || order.id;
+      const status = order.status || "Pending";
+      const email =
+        order.details?.customer?.email ||
+        order.customer_email ||
+        order.email ||
+        "No email";
+      const name =
+        order.details?.customer?.name ||
+        order.customer_name ||
+        order.name ||
+        "Customer";
+      const total = Number(order.total_amount || 0).toFixed(2);
 
-        return `
+      return `
         <div class="order-card">
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
               <strong>${ref}</strong><br>
               <small>${created}</small><br>
               <small>${name} — ${email}</small>
             </div>
 
-            <div class="text-end">
+            <div class="text-end" style="min-width: 220px;">
               <div class="mb-1">${badge(status)}</div>
               <div class="fw-bold">£${total}</div>
 
-              <select class="form-select form-select-sm mt-1"
+              <select class="form-select form-select-sm mt-2"
                 onchange="updateStatus('${order.id}', this.value)">
                 <option ${status === "Pending" ? "selected" : ""}>Pending</option>
                 <option ${status === "Paid" ? "selected" : ""}>Paid</option>
                 <option ${status === "Shipped" ? "selected" : ""}>Shipped</option>
                 <option ${status === "Cancelled" ? "selected" : ""}>Cancelled</option>
               </select>
+
+              <div class="btn-row">
+                <button class="btn btn-sm btn-primary"
+                  onclick="sendShippedEmailById('${order.id}')">
+                  📦 Send Shipped Email
+                </button>
+                <button class="btn btn-sm btn-danger"
+                  onclick="sendCancelledEmailById('${order.id}')">
+                  ❌ Send Cancelled Email
+                </button>
+              </div>
             </div>
           </div>
         </div>
       `;
-      })
-      .join("");
+    }).join("");
   }
 
   // ------- REVIEWS MODERATION -------
-
   async function loadPendingReviews() {
     reviewsStatus.textContent = "Loading pending reviews…";
 
@@ -347,22 +348,15 @@
       return;
     }
 
-    reviewsStatus.textContent = `${data.length} review(s) · 1 pending`;
+    reviewsStatus.textContent = `${data.length} review(s) pending`;
 
-    reviewsEl.innerHTML = data
-      .map((review) => {
-        const created = review.created_at
-          ? new Date(review.created_at).toLocaleString()
-          : "";
+    reviewsEl.innerHTML = data.map((review) => {
+      const created = review.created_at ? new Date(review.created_at).toLocaleString() : "";
+      const stars = review.rating ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating) : "";
+      const name = review.name || "Anonymous";
+      const message = review.review_text || "";
 
-        const stars = review.rating
-          ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating)
-          : "";
-
-        const name = review.name || "Anonymous";
-        const message = review.review_text || "";
-
-        return `
+      return `
         <div class="review-card">
           <div class="d-flex justify-content-between">
             <div>
@@ -372,20 +366,13 @@
               <small class="review-meta">${created}</small>
             </div>
             <div class="text-end" style="min-width: 140px;">
-              <button class="btn btn-sm btn-success mb-1"
-                onclick="publishReview('${review.id}')">
-                ✅ Publish
-              </button>
-              <button class="btn btn-sm btn-outline-danger"
-                onclick="deleteReview('${review.id}')">
-                🗑 Delete
-              </button>
+              <button class="btn btn-sm btn-success mb-1" onclick="publishReview('${review.id}')">✅ Publish</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteReview('${review.id}')">🗑 Delete</button>
             </div>
           </div>
         </div>
       `;
-      })
-      .join("");
+    }).join("");
   }
 
   async function publishReview(id) {
@@ -401,7 +388,6 @@
       alert("Failed to publish review – check console.");
       return;
     }
-
     loadPendingReviews();
   }
 
@@ -418,7 +404,6 @@
       alert("Could not delete review – check console.");
       return;
     }
-
     loadPendingReviews();
   }
 
@@ -426,11 +411,9 @@
   async function init() {
     statusEl.textContent = "Checking access…";
 
-    const { data: sessionData, error: sessionError } =
-      await supabaseClient.auth.getSession();
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
 
     if (sessionError || !sessionData?.session?.user) {
-      console.warn("No active session", sessionError);
       window.location.href = "index.html";
       return;
     }
@@ -438,8 +421,7 @@
     const user = sessionData.session.user;
 
     if ((user.email || "").toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      warningEl.innerHTML =
-        `<div class="alert alert-danger">Access denied.</div>`;
+      warningEl.innerHTML = `<div class="alert alert-danger">Access denied.</div>`;
       statusEl.textContent = "Not authorised";
       reviewsStatus.textContent = "Not authorised";
       return;
@@ -455,16 +437,17 @@
     location.href = "index.html";
   };
 
-  window.updateStatus   = updateStatus;
-  window.publishReview  = publishReview;
-  window.deleteReview   = deleteReview;
+  // expose functions for inline onclick handlers
+  window.updateStatus = updateStatus;
+  window.sendShippedEmailById = sendShippedEmailById;
+  window.sendCancelledEmailById = sendCancelledEmailById;
+  window.publishReview = publishReview;
+  window.deleteReview = deleteReview;
 
   init();
-    // ------- INACTIVITY LOGOUT -------
 
-  // time in ms (e.g. 15 minutes)
+  // ------- INACTIVITY LOGOUT -------
   const INACTIVITY_TIMEOUT = 15 * 60 * 1000;
-
   let inactivityTimer;
 
   function resetInactivityTimer() {
@@ -472,13 +455,7 @@
 
     inactivityTimer = setTimeout(async () => {
       try {
-        console.log("Logging out due to inactivity...");
         await supabaseClient.auth.signOut();
-
-        // If you also want to clear cart etc., do it here:
-        // localStorage.removeItem("cart");
-
-        // Redirect wherever makes sense
         window.location.href = "account.html?timeout=1";
       } catch (e) {
         console.error("Error during inactivity logout", e);
@@ -486,12 +463,10 @@
     }, INACTIVITY_TIMEOUT);
   }
 
-  // Any of these events = "user is active", so reset the timer
   ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach((evt) => {
     window.addEventListener(evt, resetInactivityTimer, { passive: true });
   });
 
-  // Start the timer when the page loads
   resetInactivityTimer();
 </script>
 </body>
