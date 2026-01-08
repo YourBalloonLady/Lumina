@@ -23,14 +23,48 @@
     margin: 0;
   }
 
+  /* Trust bar */
+  #trust-bar{
+    background:#16a34a;
+    color:#fff;
+    font-size:0.95rem;
+    padding:10px 0;
+  }
+  #trust-bar span{opacity:.95}
+
   .navbar {
     background: #ffffff !important;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+  }
+  .navbar-brand img {
+    height: 36px;
+    margin-right: 10px;
+  }
+  .navbar-brand span {
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .nav-link {
+    font-weight: 500;
+    color: var(--lw-muted) !important;
+  }
+  .nav-link.active,
+  .nav-link:hover {
+    color: var(--lw-dark) !important;
   }
 
   .page-hero {
     padding: 80px 0 40px;
     background: radial-gradient(circle at top left, #ecfdf5, #e0f2fe 40%, #eef2ff 100%);
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+  .section-subtitle {
+    color: var(--lw-muted);
+    max-width: 560px;
   }
 
   .order-card {
@@ -40,6 +74,12 @@
     padding: 18px 20px;
   }
 
+  .badge-status {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+  }
+
   footer {
     background: #020617;
     color: #9ca3af;
@@ -47,19 +87,67 @@
     font-size: 0.9rem;
     margin-top: 40px;
   }
+
+  /* Desktop: keep trust bar + navbar fixed */
+  @media (min-width: 769px) {
+    .navbar.fixed-top {
+      position: fixed;
+      left: 0;
+      right: 0;
+    }
+    body { padding-top: 80px; }
+  }
+
+  /* Mobile: make them normal scrolling elements */
+  @media (max-width: 768px) {
+    #trust-bar { position: static; }
+    .navbar.fixed-top { position: static; top: auto; }
+    body { padding-top: 0; }
+  }
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="index.html">Lumina Weight</a>
+<!-- TRUST / DELIVERY BAR -->
+<div id="trust-bar">
+  <div class="container d-flex justify-content-center gap-4 flex-wrap">
+    <span>🚚 <strong>Next Day Delivery</strong> on orders before <strong>3PM</strong></span>
+    <span>🔒 Secure Bank Transfer</span>
+    <span>🇬🇧 UK Dispatch</span>
+    <span>📦 Discreet Packaging</span>
+  </div>
+</div>
 
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto gap-3">
-        <li class="nav-item"><a class="nav-link active" href="account.html">My Account</a></li>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html#home">
+      <img src="LuminaLogoBlack.png" alt="Lumina Weight Logo">
+      <span>Lumina Weight</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+
+        <!-- Admin (toggled via Supabase) -->
+        <li class="nav-item" id="admin-nav-item" style="display:none;">
+          <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+
+        <!-- My Account / Login -->
+        <li class="nav-item">
+          <a class="nav-link active" href="account.html" id="account-link">My Account</a>
+        </li>
+
         <li class="nav-item">
           <button id="logout-btn" class="btn btn-outline-secondary btn-sm rounded-pill">
             Logout
@@ -73,44 +161,51 @@
 <!-- HERO -->
 <section class="page-hero">
   <div class="container">
-    <h1 class="fw-bold">My Account</h1>
-    <p id="account-greeting" class="text-muted">Loading…</p>
+    <h1 class="section-title mb-2">My Account</h1>
+    <p class="section-subtitle mb-0" id="account-greeting">
+      Loading your account…
+    </p>
   </div>
 </section>
 
-<!-- CONTENT -->
+<!-- ACCOUNT ACTIONS -->
 <section class="py-4">
   <div class="container">
 
-    <!-- CHANGE PASSWORD -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5 class="fw-bold mb-3">Change Password</h5>
-
-        <form id="pwForm">
-          <input id="pw1" type="password" class="form-control mb-2" placeholder="New password" minlength="8" required>
-          <input id="pw2" type="password" class="form-control mb-2" placeholder="Confirm new password" minlength="8" required>
-          <button class="btn btn-dark w-100">Update password</button>
-        </form>
-
-        <div id="pwMsg" class="small mt-2"></div>
-
-        <div class="mt-2">
-          <a href="/forgot-password.html" class="link-primary">Forgot password?</a>
+    <!-- CHANGE PASSWORD (new) -->
+    <div class="order-card mb-4">
+      <h2 class="h5 mb-3">Change Password</h2>
+      <form id="pwForm" class="row g-2">
+        <div class="col-12 col-md-6">
+          <input id="pw1" type="password" class="form-control" placeholder="New password" minlength="8" required>
         </div>
+        <div class="col-12 col-md-6">
+          <input id="pw2" type="password" class="form-control" placeholder="Confirm new password" minlength="8" required>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-dark w-100">Update password</button>
+        </div>
+      </form>
+      <div id="pwMsg" class="small mt-2"></div>
+
+      <div class="mt-2">
+        <a href="/forgot-password.html" class="link-primary">Forgot password?</a>
       </div>
     </div>
 
     <!-- ORDERS -->
-    <h5 class="mb-3">Order History</h5>
-    <div id="orders-list"></div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Order History</h2>
+      <small id="account-status" class="text-muted"></small>
+    </div>
 
+    <div id="orders-list"></div>
   </div>
 </section>
 
 <footer class="text-center">
   <div class="container">
-    <p class="mb-0">© 2025 Lumina Weight</p>
+    <p class="mb-0">© 2025 Lumina Weight • Research Purposes Only • Not For Human Consumption</p>
   </div>
 </footer>
 
@@ -118,70 +213,155 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
-  const supabaseClient = supabase.createClient(
-    "https://qketnqhfjfxbqiuqevnh.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys"
-  );
+  const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const greetingEl = document.getElementById("account-greeting");
-  const ordersEl = document.getElementById("orders-list");
-  const pwMsg = document.getElementById("pwMsg");
+  const ADMIN_EMAIL  = "luminaweight@gmail.com";
+  const adminNavItem = document.getElementById('admin-nav-item');
+  const accountLink  = document.getElementById('account-link');
 
-  async function init() {
-    const { data } = await supabaseClient.auth.getUser();
-    const user = data?.user;
+  const greetingEl = document.getElementById('account-greeting');
+  const statusEl   = document.getElementById('account-status');
+  const ordersEl   = document.getElementById('orders-list');
+  const logoutBtn  = document.getElementById('logout-btn');
 
-    if (!user) {
-      window.location.href = "index.html";
+  const pwForm = document.getElementById('pwForm');
+  const pwMsg  = document.getElementById('pwMsg');
+  const pw1    = document.getElementById('pw1');
+  const pw2    = document.getElementById('pw2');
+
+  // Toggle Admin nav + My Account/Login text based on auth
+  (async () => {
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user || null;
+
+      if (!error && adminNavItem) {
+        adminNavItem.style.display =
+          user && user.email === ADMIN_EMAIL ? 'block' : 'none';
+      }
+
+      if (accountLink) {
+        if (user) {
+          accountLink.textContent = 'My Account';
+          accountLink.href = 'account.html';
+        } else {
+          accountLink.textContent = 'Login';
+          accountLink.href = 'account.html';
+        }
+      }
+    } catch (e) {
+      console.error('Error checking auth for nav', e);
+    }
+  })();
+
+  function getStatusBadge(status) {
+    const s = (status || 'Pending').toLowerCase();
+    if (s === 'paid')      return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
+    if (s === 'shipped')   return '<span class="badge bg-primary-subtle text-primary badge-status">SHIPPED</span>';
+    if (s === 'cancelled') return '<span class="badge bg-danger-subtle text-danger badge-status">CANCELLED</span>';
+    return '<span class="badge bg-warning-subtle text-warning badge-status">PENDING</span>';
+  }
+
+  async function loadAccount() {
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (error || !user) {
+      window.location.href = 'index.html';
       return;
     }
 
     greetingEl.textContent = `Signed in as ${user.email}`;
+    statusEl.textContent = 'Loading orders…';
 
-    // Load orders
-    const { data: orders } = await supabaseClient
-      .from("Orders")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    const { data: orders, error: ordersError } = await supabaseClient
+      .from('Orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-    if (!orders || orders.length === 0) {
-      ordersEl.innerHTML = `<div class="alert alert-light">No orders yet.</div>`;
-    } else {
-      ordersEl.innerHTML = orders.map(o => `
-        <div class="order-card mb-2">
-          <strong>${o.reference || o.id}</strong><br>
-          £${Number(o.total_amount || 0).toFixed(2)}
-        </div>
-      `).join("");
-    }
-  }
-
-  // Password update
-  document.getElementById("pwForm").addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const a = pw1.value;
-    const b = pw2.value;
-
-    if (a !== b) {
-      pwMsg.textContent = "Passwords do not match.";
-      pwMsg.className = "text-danger small";
+    if (ordersError) {
+      statusEl.textContent = 'Could not load orders.';
+      console.error(ordersError);
       return;
     }
 
-    const { error } = await supabaseClient.auth.updateUser({ password: a });
+    if (!orders || orders.length === 0) {
+      statusEl.textContent = 'No orders found yet.';
+      ordersEl.innerHTML = `
+        <div class="alert alert-light border text-muted">
+          When you place an order while logged in, it will appear here for reference.
+        </div>
+      `;
+      return;
+    }
 
-    pwMsg.textContent = error ? error.message : "Password updated successfully.";
-    pwMsg.className = error ? "text-danger small" : "text-success small";
+    statusEl.textContent = `${orders.length} order${orders.length > 1 ? 's' : ''}`;
+
+    ordersEl.innerHTML = orders.map(order => {
+      const created = new Date(order.created_at).toLocaleString();
+      const total   = Number(order.total_amount || 0).toFixed(2);
+      const ref     = order.reference || (order.id ? order.id.slice(0,8) + '…' : 'N/A');
+
+      let itemsHtml = '';
+      if (order.details && order.details.items && Array.isArray(order.details.items)) {
+        itemsHtml = order.details.items.map(item => `
+          <div class="small text-muted">
+            ${item.qty} × ${item.name} – £${Number(item.price_each || 0).toFixed(2)} each
+          </div>
+        `.trim()).join('');
+      }
+
+      return `
+        <div class="order-card mb-3">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+              <div class="small text-muted">Order reference</div>
+              <div class="fw-semibold">${ref}</div>
+              <div class="small text-muted mt-1">${created}</div>
+            </div>
+            <div class="text-end">
+              ${getStatusBadge(order.status)}
+              <div class="fw-bold fs-5 mt-1">£${total}</div>
+            </div>
+          </div>
+          ${itemsHtml ? `<div class="mt-2">${itemsHtml}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Change password (new)
+  pwForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    pwMsg.textContent = '';
+
+    if (pw1.value !== pw2.value) {
+      pwMsg.textContent = 'Passwords do not match.';
+      pwMsg.className = 'text-danger small mt-2';
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: pw1.value });
+    if (error) {
+      pwMsg.textContent = error.message;
+      pwMsg.className = 'text-danger small mt-2';
+      return;
+    }
+
+    pwMsg.textContent = 'Password updated successfully.';
+    pwMsg.className = 'text-success small mt-2';
+    pw1.value = '';
+    pw2.value = '';
   });
 
-  document.getElementById("logout-btn").addEventListener("click", async () => {
+  logoutBtn.addEventListener('click', async () => {
     await supabaseClient.auth.signOut();
-    window.location.href = "index.html";
+    window.location.href = 'index.html';
   });
 
-  init();
+  loadAccount();
 </script>
 
 </body>
