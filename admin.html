@@ -244,35 +244,13 @@
       ? new Date(order.created_at).toLocaleString()
       : new Date().toLocaleString();
 
+    // IMPORTANT: these keys must match your EmailJS template variables:
+    // {{customer_name}} {{order_ref}} {{order_date}}
     return emailjs.send("service_i5zi096", "template_cancelled", {
       email: toEmail,
       customer_name: customerName,
       order_ref: ref,
       order_date: orderDate
-    });
-  }
-
-  // ---------- EMAIL: PAYMENT RECEIVED ----------
-  function sendPaidEmail(order) {
-    if (!order || !window.emailjs) return;
-
-    const customer = order.details?.customer || {};
-    const toEmail = customer.email || order.customer_email || order.email || "";
-    const customerName = customer.name || order.customer_name || order.name || "Customer";
-
-    if (!toEmail) {
-      alert("No email found on this order.");
-      return;
-    }
-
-    const ref = order.reference || order.id;
-    const total = `£${Number(order.total_amount || 0).toFixed(2)}`;
-
-    return emailjs.send("service_i5zi096", "template_paid", {
-      email: toEmail,
-      customer_name: customerName,
-      order_ref: ref,
-      order_total: total
     });
   }
 
@@ -424,7 +402,7 @@
                   onclick="markPaidAndSendById('${order.id}')">
                   💷 Send Payment Received
                 </button>
-
+                
                 <button class="btn btn-sm btn-primary"
                   onclick="sendShippedEmailById('${order.id}')">
                   📦 Send Shipped Email
