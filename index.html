@@ -114,7 +114,7 @@
   .product-price {font-size: 1.4rem;font-weight: 800;color: #0f172a;}
   .product-price span {font-size: .9rem;color: var(--lw-muted);font-weight: 500;}
   .pill-label {position: absolute;top: 14px;right: 16px;padding: 4px 12px;border-radius: 999px;font-size: 0.75rem;font-weight: 700;color: #ffffff;}
-  .pill-best-value {background: #f97316;}
+  
   .pill-popular {background: #22c55e;}
   .pill-premium {background: #6366f1;}
   .stock {font-size: 0.9rem;margin-top: 4px;}
@@ -614,51 +614,34 @@
   }
 
   function updateCart() {
-    const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
 
-    // Use bundle calculator
-    const bundle = calculateBundle(cart);
-    const total  = bundle.finalTotal;
+  document.getElementById('cart-count').textContent = totalItems;
+  document.getElementById('cart-items-count').textContent = totalItems;
+  document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
 
-    document.getElementById('cart-count').textContent = totalItems;
-    document.getElementById('cart-items-count').textContent = totalItems;
-    document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
-
-    const itemsEl = document.getElementById('cart-items');
-    if (!cart.length) {
-      itemsEl.innerHTML = '<p class="text-center text-muted m-0">Your cart is empty</p>';
-    } else {
-      itemsEl.innerHTML = cart.map((item,i) => `
-        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-          <div class="flex-grow-1">
-            <strong>${item.name}</strong><br>
-            <small>£${item.price} × ${item.qty}</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
-            <span class="fw-bold">${item.qty}</span>
-            <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
-            <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
-          </div>
-        </div>`).join('');
-    }
-
-    const bundleRow       = document.getElementById('cart-bundle-row');
-    const bundleAmountEl  = document.getElementById('cart-bundle-amount');
-    const bundleMessageEl = document.getElementById('cart-bundle-message');
-
-    if (bundleRow && bundleAmountEl && bundleMessageEl) {
-      if (!cart.length || bundle.discount <= 0) {
-        bundleRow.style.display = 'none';
-        bundleAmountEl.textContent = '-£0.00';
-        bundleMessageEl.textContent = '';
-      } else {
-        bundleRow.style.display = 'flex';
-        bundleAmountEl.textContent = `-£${bundle.discount.toFixed(2)}`;
-        bundleMessageEl.textContent = bundle.messages.join(' ');
-      }
-    }
+  const itemsEl = document.getElementById('cart-items');
+  if (!cart.length) {
+    itemsEl.innerHTML = '<p class="text-center text-muted m-0">Your cart is empty</p>';
+  } else {
+    itemsEl.innerHTML = cart.map((item,i) => `
+      <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+        <div class="flex-grow-1">
+          <strong>${item.name}</strong><br>
+          <small>£${item.price} × ${item.qty}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
+          <span class="fw-bold">${item.qty}</span>
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
+          <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
+        </div>
+      </div>
+    `).join('');
   }
+}
+
   updateCart();
 
   function toggleCart(force) {
