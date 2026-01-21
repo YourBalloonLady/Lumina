@@ -209,7 +209,7 @@
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#home">
-        <img src="LuminaLogoBlack.png" alt="Lumina Weight Logo">
+        <img src="/LuminaLogoBlack.png" alt="Lumina Weight Logo">
         <span>Lumina Weight</span>
       </a>
 
@@ -454,6 +454,19 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
+const SITE_ROOT = "https://luminaweight.co.uk";
+
+function imgSrc(image){
+  if(!image) return '';
+  image = String(image).trim();
+
+  // full URL already
+  if(/^https?:\/\//i.test(image)) return image;
+
+  // force to site root, encode spaces safely
+  return SITE_ROOT + "/" + encodeURIComponent(image);
+}
+  
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -480,7 +493,7 @@
         <div class="col-md-3">
           <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
             ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
-            <img src="${p.image}" class="w-100 p-4" alt="${p.name}">
+            <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
             <div class="product-body d-flex flex-column">
               <div class="text-start">
                 <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
@@ -559,7 +572,7 @@
     const modalStock = document.getElementById('modalStock');
     const descEl     = document.getElementById('modalDescription');
 
-    modalImg.src = currentProduct.image;
+    modalImg.src = imgSrc(currentProduct.image);
     modalTitle.textContent = currentProduct.name;
     modalName.textContent  = currentProduct.name;
     modalPrice.textContent = `£${currentProduct.price}`;
