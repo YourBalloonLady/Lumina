@@ -1,1 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Dilution Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --ink:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#2bb673;
+      --line:rgba(148,163,184,.2);
+    }
+    body{ background:#f3f4f6; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .hero{
+      background: radial-gradient(circle at top left, rgba(43,182,115,.25), transparent 40%),
+                  radial-gradient(circle at top right, rgba(59,130,246,.25), transparent 40%),
+                  var(--bg);
+      color: var(--ink);
+      padding: 56px 0;
+    }
+    .hero h1{ font-weight: 800; letter-spacing:-.02em; }
+    .hero p{ color: var(--muted); max-width: 680px; margin: 10px auto 0; }
+    .cardx{
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+      border:1px solid rgba(15,23,42,.08);
+      overflow:hidden;
+    }
+    .cardx .head{
+      background:#fff;
+      border-bottom:1px solid rgba(15,23,42,.08);
+      padding:16px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .pill{
+      font-size:.85rem;
+      padding:.35rem .7rem;
+      border-radius:999px;
+      background: rgba(43,182,115,.12);
+      color:#166534;
+      font-weight:700;
+    }
+    label{ font-weight: 700; }
+    .smallnote{ color:#6b7280; font-size:.9rem; }
+    .resultbox{
+      background:#0b1220;
+      color:#e5e7eb;
+      border-radius:16px;
+      padding:16px;
+    }
+    .resultbox .k{ color:#94a3b8; font-size:.85rem; }
+    .resultbox .v{ font-size:1.25rem; font-weight:800; }
+    .table thead th{
+      font-size:.85rem;
+      color:#6b7280;
+      border-bottom:1px solid rgba(15,23,42,.1);
+    }
+    .table td{ vertical-align:middle; }
+    .footer{
+      color:#6b7280;
+      font-size:.85rem;
+      text-align:center;
+      padding:18px 0 30px;
+    }
+    .warn{
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#9a3412;
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:.9rem;
+    }
+  </style>
+</head>
+<body>
 
+<section class="hero text-center">
+  <div class="container">
+    <h1 class="display-6 mb-2">Research Dilution Calculator</h1>
+    <p>Enter vial mass and added liquid to calculate concentration, draw volume, and syringe unit conversions. For research/education only.</p>
+  </div>
+</section>
+
+<div class="container my-4">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="cardx">
+        <div class="head">
+          <div class="fw-bold">Inputs</div>
+          <div class="pill">U-100 units supported</div>
+        </div>
+        <div class="p-3 p-md-4">
+          <div class="mb-3">
+            <label class="form-label">Vial amount (mg)</label>
+            <input id="mgTotal" type="number" class="form-control form-control-lg" placeholder="e.g. 10" min="0" step="0.01">
+            <div class="smallnote mt-1">Total mass in the vial.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Added liquid (mL)</label>
+            <input id="mlTotal" type="number" class="form-control form-control-lg" placeholder="e.g. 2" min="0" step="0.01">
+            <div class="smallnote mt-1">Total volume added.</div>
+          </div>
+
+          <hr>
+
+          <div class="mb-3">
+            <label class="form-label">Target amount (mg)</label>
+            <input id="mgTarget" type="number" class="form-control form-control-lg" placeholder="e.g. 2.5" min="0" step="0.01">
+            <div class="smallnote mt-1">How many mg you want to measure (math only).</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Syringe scale</label>
+            <select id="syringe" class="form-select form-select-lg">
+              <option value="100" selected>U-100 (100 units = 1 mL)</option>
+              <option value="50">U-50 (50 units = 1 mL)</option>
+              <option value="30">U-30 (30 units = 1 mL)</option>
+              <option value="10">mL only (no units)</option>
+            </select>
+            <div class="smallnote mt-1">Units are just a volume scale (no medical guidance).</div>
+          </div>
+
+          <button class="btn btn-success btn-lg w-100" id="calcBtn">Calculate</button>
+
+          <div id="warnBox" class="warn mt-3 d-none"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="cardx">
+        <div class="head">
+          <div class="fw-bold">Results</div>
+          <div class="text-muted small">Updates when you press Calculate</div>
+        </div>
+        <div class="p-3 p-md-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="resultbox">
+                <div class="k">Concentration</div>
+                <div class="v" id="concOut">—</div>
+                <div class="k">mg per mL</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="resultbox">
+                <div class="k">Draw volume</div>
+                <div class="v" id="mlOut">—</div>
+                <div class="k">mL for target mg</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="resultbox">
+                <div class="k">Syringe units</div>
+                <div class="v" id="unitsOut">—</div>
+                <div class="k" id="unitsNote">units</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="d-flex justify-content-between align-items-end">
+            <div>
+              <div class="fw-bold">Quick table</div>
+              <div class="text-muted small">Common targets based on your inputs</div>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" id="fillExample">Fill example</button>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Target (mg)</th>
+                  <th>mL</th>
+                  <th id="unitsHead">Units</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <tr><td colspan="3" class="text-muted">Enter values and press Calculate.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="smallnote mt-2">
+            Research/education only. Always follow applicable laws, safety protocols, and professional guidance for any real-world handling.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © Research Dilution Calculator • Built for simple concentration/volume maths
+  </div>
+</div>
+
+<script>
+  const mgTotal   = document.getElementById('mgTotal');
+  const mlTotal   = document.getElementById('mlTotal');
+  const mgTarget  = document.getElementById('mgTarget');
+  const syringe   = document.getElementById('syringe');
+
+  const concOut   = document.getElementById('concOut');
+  const mlOut     = document.getElementById('mlOut');
+  const unitsOut  = document.getElementById('unitsOut');
+  const unitsNote = document.getElementById('unitsNote');
+  const unitsHead = document.getElementById('unitsHead');
+  const rows      = document.getElementById('rows');
+  const warnBox   = document.getElementById('warnBox');
+
+  const calcBtn   = document.getElementById('calcBtn');
+  const fillExample = document.getElementById('fillExample');
+
+  function fmt(n, dp=2){
+    if (!isFinite(n)) return '—';
+    return Number(n).toFixed(dp);
+  }
+
+  function showWarn(msg){
+    warnBox.textContent = msg;
+    warnBox.classList.remove('d-none');
+  }
+  function hideWarn(){
+    warnBox.classList.add('d-none');
+    warnBox.textContent = '';
+  }
+
+  function compute(){
+    hideWarn();
+
+    const totalMg = parseFloat(mgTotal.value);
+    const totalMl = parseFloat(mlTotal.value);
+    const targetMg = parseFloat(mgTarget.value);
+    const scale = parseFloat(syringe.value);
+
+    if (!totalMg || !totalMl || totalMg <= 0 || totalMl <= 0){
+      showWarn("Enter a vial amount (mg) and added liquid (mL) greater than 0.");
+      concOut.textContent = '—';
+      mlOut.textContent = '—';
+      unitsOut.textContent = '—';
+      rows.innerHTML = `<tr><td colspan="3" class="text-muted">Enter values and press Calculate.</td></tr>`;
+      return;
+    }
+
+    const conc = totalMg / totalMl; // mg per mL
+
+    // Target mg optional — if empty, just show concentration + table
+    const hasTarget = isFinite(targetMg) && targetMg > 0;
+
+    concOut.textContent = fmt(conc, 2);
+
+    // Units labeling
+    if (scale === 10){
+      unitsNote.textContent = 'mL only';
+      unitsHead.textContent = 'Units';
+    } else {
+      unitsNote.textContent = `on U-${scale}`;
+      unitsHead.textContent = `Units (U-${scale})`;
+    }
+
+    if (hasTarget){
+      const drawMl = targetMg / conc;
+      mlOut.textContent = fmt(drawMl, 3);
+
+      if (scale === 10){
+        unitsOut.textContent = '—';
+      } else {
+        const units = drawMl * scale; // since scale units = 1mL
+        unitsOut.textContent = fmt(units, 1);
+        if (drawMl > 1){
+          showWarn("Note: draw volume exceeds 1.0 mL. This is only a math warning.");
+        }
+      }
+    } else {
+      mlOut.textContent = '—';
+      unitsOut.textContent = '—';
+    }
+
+    // Quick table targets
+    const targets = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
+    rows.innerHTML = targets.map(t => {
+      const drawMl = t / conc;
+      const units = (scale === 10) ? null : drawMl * scale;
+      return `
+        <tr>
+          <td><strong>${t} mg</strong></td>
+          <td>${fmt(drawMl, 3)} mL</td>
+          <td>${scale === 10 ? '—' : fmt(units, 1)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  calcBtn.addEventListener('click', compute);
+
+  fillExample.addEventListener('click', () => {
+    mgTotal.value = 10;
+    mlTotal.value = 2;
+    mgTarget.value = 2.5;
+    syringe.value = 100;
+    compute();
+  });
+
+  // Optional: hit Enter to calculate
+  [mgTotal, mlTotal, mgTarget].forEach(el => el.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter') compute();
+  }));
+</script>
+
+</body>
+</html>
