@@ -24,6 +24,18 @@
     }
     .hero h1{ font-weight: 800; letter-spacing:-.02em; }
     .hero p{ color: var(--muted); max-width: 680px; margin: 10px auto 0; }
+
+    /* NEW: hero back button */
+    .btn-outline-light{
+      border-radius:999px;
+      border-color: rgba(148,163,184,0.55);
+      color: #e5e7eb;
+    }
+    .btn-outline-light:hover{
+      background:#ffffff;
+      color:#0f172a;
+    }
+
     .cardx{
       background:#fff;
       border-radius:18px;
@@ -83,6 +95,11 @@
   <div class="container">
     <h1 class="display-6 mb-2">Research Dilution Calculator</h1>
     <p>Enter vial mass and added liquid to calculate concentration, draw volume, and syringe unit conversions. For research/education only.</p>
+
+    <!-- NEW: back button -->
+    <div class="d-flex justify-content-center gap-2 mt-3">
+      <button class="btn btn-outline-light btn-sm" onclick="goHome()">← Back to Home</button>
+    </div>
   </div>
 </section>
 
@@ -203,6 +220,11 @@
 </div>
 
 <script>
+  // NEW: home navigation
+  function goHome(){
+    window.location.href = "index.html";
+  }
+
   const mgTotal   = document.getElementById('mgTotal');
   const mlTotal   = document.getElementById('mlTotal');
   const mgTarget  = document.getElementById('mgTarget');
@@ -251,13 +273,10 @@
     }
 
     const conc = totalMg / totalMl; // mg per mL
-
-    // Target mg optional — if empty, just show concentration + table
     const hasTarget = isFinite(targetMg) && targetMg > 0;
 
     concOut.textContent = fmt(conc, 2);
 
-    // Units labeling
     if (scale === 10){
       unitsNote.textContent = 'mL only';
       unitsHead.textContent = 'Units';
@@ -273,7 +292,7 @@
       if (scale === 10){
         unitsOut.textContent = '—';
       } else {
-        const units = drawMl * scale; // since scale units = 1mL
+        const units = drawMl * scale;
         unitsOut.textContent = fmt(units, 1);
         if (drawMl > 1){
           showWarn("Note: draw volume exceeds 1.0 mL. This is only a math warning.");
@@ -284,7 +303,6 @@
       unitsOut.textContent = '—';
     }
 
-    // Quick table targets
     const targets = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
     rows.innerHTML = targets.map(t => {
       const drawMl = t / conc;
@@ -309,7 +327,6 @@
     compute();
   });
 
-  // Optional: hit Enter to calculate
   [mgTotal, mlTotal, mgTarget].forEach(el => el.addEventListener('keydown', (e)=>{
     if (e.key === 'Enter') compute();
   }));
