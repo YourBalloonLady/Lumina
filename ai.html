@@ -1,1 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Research Guide | Lumina Weight</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<style>
+  :root {
+    --lw-mint: #22c55e;
+    --lw-mint-soft: #ecfdf5;
+    --lw-blue-soft: #e0f2fe;
+    --lw-purple-soft: #eef2ff;
+    --lw-dark: #0f172a;
+    --lw-muted: #64748b;
+    --lw-bg: #f3f4f6;
+  }
+  body {
+    background: var(--lw-bg);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .hero {
+    background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
+    color: var(--lw-dark);
+    padding: 70px 0 55px;
+    text-align: center;
+  }
+  .hero h1 { font-weight: 900; }
+  .hero p { color: var(--lw-muted); max-width: 720px; margin: 0 auto; }
+  .card {
+    border-radius: 24px;
+    border: 0;
+    box-shadow: 0 20px 45px rgba(15,23,42,0.10);
+  }
+  .pill {
+    border-radius: 999px;
+  }
+  .chat {
+    height: 420px;
+    overflow: auto;
+    background: #ffffff;
+    border: 1px solid rgba(15,23,42,.08);
+    border-radius: 18px;
+    padding: 14px;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 10px 12px;
+    border-radius: 14px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+  }
+  .me { margin-left: auto; background: var(--lw-blue-soft); }
+  .ai { margin-right: auto; background: #f8fafc; border: 1px solid rgba(15,23,42,.06); }
+  .meta { font-size: .8rem; color: var(--lw-muted); }
+  .small-note { font-size:.9rem; color: var(--lw-muted); }
+</style>
+</head>
+
+<body>
+<div class="hero">
+  <div class="container">
+    <h1 class="display-6">AI Research Guide</h1>
+    <p class="mt-2">
+      Educational info only (not medical advice). The assistant will not provide dosing, reconstitution,
+      injection guidance, sourcing, or “how to use” instructions.
+    </p>
+    <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+      <a class="btn btn-outline-dark pill btn-sm" href="index.html">← Back to shop</a>
+      <a class="btn btn-outline-dark pill btn-sm" href="account.html">My account</a>
+    </div>
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+
+      <div class="card">
+        <div class="card-body p-4 p-md-5">
+
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label fw-semibold">Select a product</label>
+              <select id="productSelect" class="form-select pill">
+                <option value="">Choose…</option>
+                <option>Semaglutide</option>
+                <option>Tirzepatide</option>
+                <option>Retatrutide</option>
+                <option>HGH</option>
+                <option>Cagrilintide</option>
+                <option>Cagrilintide 5mg + Semaglutide 5mg</option>
+                <option>Mazdutide</option>
+                <option>Survodutide</option>
+                <option>BPC-157</option>
+                <option>TB-500</option>
+                <option>BPC-157 5mg + TB-500 5mg</option>
+                <option>BPC-157 10mg + TB-500 10mg</option>
+                <option>GHK-CU</option>
+                <option>AHK-CU</option>
+                <option>KPV</option>
+                <option>Melanotan</option>
+                <option>MT-2 (melanotan 2 acetate)</option>
+                <option>Semax</option>
+                <option>Selank</option>
+                <option>DSIP</option>
+                <option>Ipamorelin</option>
+                <option>AOD</option>
+                <option>Tesamorelin</option>
+                <option>Semorelin Acetate</option>
+                <option>IGF-1LR3</option>
+                <option>IGF-DES</option>
+                <option>GHRP-2</option>
+                <option>GHRP-6 Acetate</option>
+                <option>CJC-1295 W/Dac</option>
+                <option>CJC-1295 WO/Dac</option>
+                <option>CJC-1295 WO/Dac 5mg + Ipamorelin 5mg</option>
+                <option>HCG</option>
+                <option>Hmg</option>
+                <option>SS-31</option>
+                <option>MOTS-C</option>
+                <option>PT-141</option>
+                <option>Oxytocin</option>
+                <option>Epithalon</option>
+                <option>AICAR</option>
+                <option>ARA290 (Cibinetide)</option>
+                <option>Adipotide</option>
+                <option>KissPeptin-10</option>
+                <option>Thymosin Alpha-1</option>
+                <option>LL37</option>
+                <option>Melatonin</option>
+                <option>NAD+</option>
+                <option>Dermorphin</option>
+                <option>Glutathione</option>
+                <option>5-amino-1mq</option>
+                <option>cerebroprotein</option>
+                <option>Snap-8</option>
+                <option>LC120</option>
+                <option>Lipo-C with vitamins B12</option>
+                <option>B12 1mg/ml</option>
+                <option>L-Carnitine 600mg/ml</option>
+                <option>Pinealon</option>
+                <option>Lemon Bottle</option>
+                <option>Vasoactive Intestinal Peptide</option>
+                <option>SLU-PP-322</option>
+              </select>
+              <div class="small-note mt-2">Tip: pick a product, then ask “What is it?” or “What are the risks?”</div>
+            </div>
+
+            <div class="col-md-7">
+              <label class="form-label fw-semibold">Ask a question</label>
+              <div class="input-group">
+                <input id="userInput" class="form-control pill" placeholder="Ask about mechanism, studies, risks, etc. (no dosing/how-to)" />
+                <button id="sendBtn" class="btn btn-success pill px-4">Send</button>
+              </div>
+              <div id="status" class="meta mt-2"></div>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div id="chat" class="chat" aria-live="polite"></div>
+
+          <div class="alert alert-warning mt-4 mb-0" style="border-radius:18px;">
+            <strong>Reminder:</strong> This is general education only. If someone asks for dosing, mixing, injection/reconstitution,
+            sourcing, or protocols — the assistant should refuse.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const chat = document.getElementById("chat");
+  const statusEl = document.getElementById("status");
+  const sendBtn = document.getElementById("sendBtn");
+  const userInput = document.getElementById("userInput");
+  const productSelect = document.getElementById("productSelect");
+
+  function addMsg(text, who="ai") {
+    const div = document.createElement("div");
+    div.className = `msg ${who === "me" ? "me" : "ai"}`;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function send() {
+    const message = userInput.value.trim();
+    const product = productSelect.value.trim();
+
+    if (!message) return;
+
+    addMsg(message, "me");
+    userInput.value = "";
+    statusEl.textContent = "Thinking…";
+
+    sendBtn.disabled = true;
+
+    try {
+      const r = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, product })
+      });
+
+      const data = await r.json();
+
+      if (!r.ok) {
+        addMsg("Sorry — something went wrong on the server. Check console / Cloudflare logs.");
+        console.error(data);
+      } else {
+        addMsg(data.reply || "No reply.");
+      }
+    } catch (e) {
+      console.error(e);
+      addMsg("Network error — couldn’t reach /api/ai-chat.");
+    } finally {
+      statusEl.textContent = "";
+      sendBtn.disabled = false;
+      userInput.focus();
+    }
+  }
+
+  sendBtn.addEventListener("click", send);
+  userInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") send();
+  });
+
+  addMsg("Hi — pick a product and ask what it is, what it does (high-level), what the research says, and general risks. I won’t provide dosing or how-to guidance.");
+</script>
+
+</body>
+</html>
