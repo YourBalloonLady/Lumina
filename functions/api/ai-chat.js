@@ -1,64 +1,55 @@
 export async function onRequestPost({ request, env }) {
   try {
-    const { message, product } = await request.json();
-
-    // Basic input clamp
-    const userMsg = String(message || "").slice(0, 2000);
+    const body = await request.json().catch(() => ({}));
+    const message = String(body.message || "").slice(0, 2000);
+    const product = String(body.product || "").slice(0, 200);
 
     const system = `
 You are Lumina Weight's Research Info Assistant.
 Rules:
-- Educational info only. No medical advice.
-- Do NOT provide dosing, protocols, injection instructions, reconstitution steps, mixing volumes, “how to use”, stacks, cycles, or purchasing advice.
+- Educational information only. Not medical advice.
+- Do NOT provide dosing, protocols, “how to use”, injection guidance, reconstitution, mixing volumes, stacks/cycles, sourcing, or purchasing advice.
 - If asked for any of the above, refuse briefly and suggest speaking to a licensed clinician.
-- Focus on: high-level mechanism, research status, general risks, study context, definitions (e.g. DAC), and general storage/handling concepts without instructions.
-- Keep answers concise and clear.
-`;
+- You can explain: what it is, mechanism at a high level, research status, typical study context, common risks/side effects at a high level, contraindication themes, and red-flag symptoms.
+- Keep it clear and concise.`;
 
     const catalogHint = product
-      ? `User selected product: ${product}. If you have specific info for it, summarise at a high level.`
-      : `No product selected. Offer to choose one from the list.`;
+      ? `User selected product: ${product}. Provide high-level info only, following the rules.`
+      : `No product selected. Encourage selecting a product.`;
 
     const payload = {
       model: "gpt-4.1-mini",
       input: [
         { role: "system", content: system },
         { role: "system", content: catalogHint },
-        { role: "user", content: userMsg }
+        { role: "user", content: message }
       ],
-      // extra safety belt
-      max_output_tokens: 300
+      max_output_tokens: 350
     };
 
     const r = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
 
     if (!r.ok) {
-      const errText = await r.text();
-      return new Response(JSON.stringify({ error: "AI request failed", detail: errText }), {
+      const detail = await r.text();
+      return new Response(JSON.stringify({ error: "AI request failed", detail }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
     }
 
     const data = await r.json();
+    const reply = data.output_text || "No response.";
 
-    // Responses API returns text across output items; this is a simple extractor:
-    const text =
-      (data.output_text) ||
-      (data.output?.map(o => o.content?.map(c => c.text).join("")).join("\n")) ||
-      "No response.";
-
-    return new Response(JSON.stringify({ reply: text }), {
+    return new Response(JSON.stringify({ reply }), {
       headers: { "Content-Type": "application/json" }
     });
-
   } catch (e) {
     return new Response(JSON.stringify({ error: "Bad request", detail: String(e) }), {
       status: 400,
