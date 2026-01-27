@@ -249,50 +249,6 @@ function validateAccessories() {
   return missing;
 }
 
-// ---------- BUNDLE CALCULATOR ----------
-function calculateBundle(cart) {
-  let vialQty = 0, penQty = 0;
-  let vialTotal = 0, penTotal = 0, otherTotal = 0;
-
-  cart.forEach(item => {
-    const line = (item.price || 0) * (item.qty || 0);
-    const name = (item.name || '').toLowerCase();
-
-    if (name.includes('vial')) {
-      vialQty  += item.qty;
-      vialTotal += line;
-    } else if (name.includes('pen')) {
-      penQty   += item.qty;
-      penTotal += line;
-    } else {
-      otherTotal += line;
-    }
-  });
-
-  const baseTotal = vialTotal + penTotal + otherTotal;
-  let discount = 0;
-  const messages = [];
-
-  if (vialQty >= 3) {
-    const d = vialTotal * 0.10;
-    discount += d;
-    messages.push('10% multi-vial bundle discount applied.');
-  } else if (vialQty === 2) {
-    const d = vialTotal * 0.05;
-    discount += d;
-    messages.push('5% vial bundle discount applied (2 vials).');
-  }
-
-  if (penQty >= 2) {
-    const d = penTotal * 0.05;
-    discount += d;
-    messages.push('5% pen bundle discount applied (2+ pens).');
-  }
-
-  const finalTotal = Math.max(0, baseTotal - discount);
-
-  return { baseTotal, discount, finalTotal, messages };
-}
 
 // ---------- CART / RECOVERY HELPERS ----------
 function getCartFromUrlOrStorage() {
