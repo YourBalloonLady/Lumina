@@ -218,7 +218,7 @@
     `;
   }
 
-  // ---------- ADDRESS (NEW) ----------
+  // ---------- ADDRESS ----------
   function getCustomer(order){
     return order?.details?.customer || {};
   }
@@ -271,7 +271,7 @@
       .replaceAll("'","&#039;");
   }
 
-  // ---------- COPY ADDRESS (NEW) ----------
+  // ---------- COPY ADDRESS ----------
   async function copyAddressById(orderId){
     const order = ordersCache[orderId];
     if(!order) return alert("Order not found.");
@@ -299,7 +299,7 @@
     }
   }
 
-  // ---------- PRINT PACKING SLIP (NEW) ----------
+  // ---------- PRINT PACKING SLIP ----------
   function printPackingSlipById(orderId){
     const order = ordersCache[orderId];
     if(!order) return alert("Order not found.");
@@ -395,7 +395,7 @@
     w.print();
   }
 
-  // ---------- MARK PACKED (NEW) ----------
+  // ---------- MARK PACKED ----------
   async function markPackedById(orderId){
     const order = ordersCache[orderId];
     if(!order) return alert("Order not found.");
@@ -555,6 +555,132 @@
     }
   }
 
+  // ---------- ✅ CANCEL + RESTOCK (NEW) ----------
+  async function cancelAndRestockById(orderId){
+    if(!orderId) return;
+
+    if(!confirm("Cancel this order AND add items back to stock?")) return;
+
+    try{
+      // Re-fetch fresh order to avoid stale cache / double clicks
+      const { data: order, error: fetchErr } = await supabaseClient
+        .from("Orders")
+        .select("id, status, details, reference, total_amount, created_at")
+        .eq("id", orderId)
+        .single();
+
+      if(fetchErr || !order){
+        console.error("Could not fetch order", fetchErr);
+        alert("Could not fetch order — check console.");
+        return;
+      }
+
+      const details = order.details || {};
+      const meta = details.meta || {};
+      const alreadyRestocked = !!meta.restocked_at;
+
+      if(alreadyRestocked){
+        alert("This order was already restocked before. Stopping to prevent double stock.");
+        return;
+      }
+
+      const items = details.items || [];
+      if(!Array.isArray(items) || items.length === 0){
+        alert("No items found in this order to restock.");
+        return;
+      }
+
+      const nameQty = items.map(i => ({
+        name: String(i.name || "").trim(),
+        qty: Number(i.qty || 0)
+      })).filter(x => x.name && x.qty > 0);
+
+      if(!nameQty.length){
+        alert("Order items had no usable name/qty to restock.");
+        return;
+      }
+
+      // Fetch matching products by name
+      const productNames = nameQty.map(x => x.name);
+
+      const { data: products, error: prodErr } = await supabaseClient
+        .from("Products")
+        .select("id, name, stock")
+        .in("name", productNames);
+
+      if(prodErr){
+        console.error("Error fetching products", prodErr);
+        alert("Could not fetch products to restock — check console.");
+        return;
+      }
+
+      // Update each product stock (+ qty)
+      for(const line of nameQty){
+        const p = (products || []).find(pp => pp.name === line.name);
+        if(!p){
+          console.warn("Product not found for restock:", line.name);
+          continue; // skip missing names (doesn't hard-fail)
+        }
+
+        const currentStock = Number(p.stock || 0);
+        const newStock = Math.max(0, currentStock + line.qty);
+
+        const { error: upErr } = await supabaseClient
+          .from("Products")
+          .update({ stock: newStock })
+          .eq("id", p.id);
+
+        if(upErr){
+          console.error("Stock update failed for", line.name, upErr);
+          alert(`Failed to restock: ${line.name} — stopping. Check console.`);
+          return;
+        }
+      }
+
+      // Mark order cancelled + set restock meta flag
+      const session = await supabaseClient.auth.getSession();
+      const who = session?.data?.session?.user?.email || "admin";
+
+      const updatedDetails = {
+        ...details,
+        meta: {
+          ...(details.meta || {}),
+          restocked_at: new Date().toISOString(),
+          restocked_by: who
+        }
+      };
+
+      const { error: ordUpErr } = await supabaseClient
+        .from("Orders")
+        .update({ status: "Cancelled", details: updatedDetails })
+        .eq("id", orderId);
+
+      if(ordUpErr){
+        console.error("Order update failed (after stock restock!)", ordUpErr);
+        alert("Stock was restocked, but order status update failed. Check Supabase policies/console.");
+        return;
+      }
+
+      // Send cancelled email after success
+      try{
+        const emailOrder = { ...order, status: "Cancelled", details: updatedDetails };
+        await sendCancelledEmail(emailOrder);
+      }catch(emailErr){
+        console.error("Cancelled email failed (but order was cancelled/restocked)", emailErr);
+        alert("Order cancelled + restocked, but cancelled email failed. Check console.");
+        loadOrders();
+        return;
+      }
+
+      alert("Order cancelled + stock restored + email sent ✅");
+      loadOrders();
+
+    }catch(e){
+      console.error("Cancel+Restock failed", e);
+      alert("Cancel + Restock failed — check console.");
+    }
+  }
+
   // ---------- STATUS UPDATE ----------
   async function updateStatus(id, value) {
     const { error } = await supabaseClient
@@ -613,6 +739,10 @@
 
       const statusLower = (status || "").toLowerCase();
       const isPaid = statusLower === "paid";
+      const isCancelled = statusLower === "cancelled";
+      const restockedAt = order.details?.meta?.restocked_at
+        ? new Date(order.details.meta.restocked_at).toLocaleString()
+        : "";
 
       return `
         <div class="order-card">
@@ -621,6 +751,7 @@
               <strong>${escapeHtml(ref)}</strong><br>
               <small>${escapeHtml(created)}</small><br>
               <small>${escapeHtml(name)} — ${escapeHtml(email)}</small>
+              ${restockedAt ? `<div class="muted-line mt-1">Restocked: ${escapeHtml(restockedAt)}</div>` : ``}
               ${buildAddressHtml(order)}
               ${buildItemsHtml(order)}
             </div>
@@ -670,6 +801,13 @@
                 <button class="btn btn-sm btn-danger"
                   onclick="sendCancelledEmailById('${order.id}')">
                   ❌ Send Cancelled Email
+                </button>
+
+                <!-- ✅ NEW: Cancel + Restock -->
+                <button class="btn btn-sm btn-outline-danger"
+                  ${isCancelled ? "disabled" : ""}
+                  onclick="cancelAndRestockById('${order.id}')">
+                  ↩️ Cancel + Restock
                 </button>
               </div>
             </div>
@@ -799,6 +937,8 @@
   window.copyAddressById = copyAddressById;
   window.printPackingSlipById = printPackingSlipById;
   window.markPackedById = markPackedById;
+
+  window.cancelAndRestockById = cancelAndRestockById;
 
   window.publishReview = publishReview;
   window.deleteReview = deleteReview;
