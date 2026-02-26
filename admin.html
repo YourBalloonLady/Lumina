@@ -417,8 +417,44 @@
     loadOrders();
   }
 
-  // ---------- EMAIL: SHIPPED ----------
-  function sendShippedEmail(order) {
+  // ===========================
+  // ✅ NEW: TRACKING SAVE HELPER
+  // ===========================
+  async function saveTrackingToOrder(orderId, trackingNumber){
+    const order = ordersCache[orderId];
+    if(!order) throw new Error("Order not found in cache");
+
+    const details = order.details || {};
+    const meta = details.meta || {};
+
+    const session = await supabaseClient.auth.getSession();
+    const who = session?.data?.session?.user?.email || "admin";
+
+    const updatedDetails = {
+      ...details,
+      meta: {
+        ...meta,
+        tracking_number: String(trackingNumber || "").trim(),
+        tracking_added_at: new Date().toISOString(),
+        tracking_added_by: who
+      }
+    };
+
+    const { error } = await supabaseClient
+      .from("Orders")
+      .update({ details: updatedDetails })
+      .eq("id", orderId);
+
+    if(error) throw error;
+
+    // keep cache in sync
+    ordersCache[orderId].details = updatedDetails;
+  }
+
+  // ===========================
+  // ✅ UPDATED: EMAIL: SHIPPED (NOW INCLUDES TRACKING)
+  // ===========================
+  function sendShippedEmail(order, trackingNumber) {
     if (!order || !window.emailjs) return;
 
     const customer = order.details?.customer || {};
@@ -434,12 +470,18 @@
     const total = `£${Number(order.total_amount || 0).toFixed(2)}`;
     const items = buildItemsText(order);
 
+    const tracking =
+      String(trackingNumber || "").trim() ||
+      String(order.details?.meta?.tracking_number || "").trim() ||
+      "Not provided";
+
     return emailjs.send("service_i5zi096", "template_shipped", {
       email: toEmail,
       customer_name: customerName,
       order_reference: ref,
       order_items: items,
       order_total: total,
+      tracking_number: tracking
     });
   }
 
@@ -526,11 +568,25 @@
 
     if (!confirm("Send SHIPPED email to customer and mark as SHIPPED?")) return;
 
-    try {
-      // 1) Send email
-      await sendShippedEmail(order);
+    // ✅ NEW: prompt for tracking number (pre-fills if already saved)
+    const existing = String(order.details?.meta?.tracking_number || "").trim();
+    const trackingNumber = prompt("Enter tracking number (leave blank if none):", existing);
 
-      // 2) Update status automatically
+    // If admin clicks Cancel, do nothing
+    if (trackingNumber === null) return;
+
+    const trackingClean = String(trackingNumber || "").trim();
+
+    try {
+      // 1) Save tracking (only if provided)
+      if (trackingClean) {
+        await saveTrackingToOrder(orderId, trackingClean);
+      }
+
+      // 2) Send email (includes tracking)
+      await sendShippedEmail(ordersCache[orderId], trackingClean);
+
+      // 3) Update status automatically
       const { error } = await supabaseClient
         .from("Orders")
         .update({ status: "Shipped" })
@@ -543,11 +599,11 @@
       }
 
       ordersCache[orderId].status = "Shipped";
-      alert("Shipped email sent + status set to SHIPPED ✅");
+      alert("Shipped email sent + tracking saved + status set to SHIPPED ✅");
       loadOrders();
     } catch (e) {
-      console.error("Shipped email failed", e);
-      alert("Shipped email failed — check console");
+      console.error("Shipped flow failed", e);
+      alert("Shipped flow failed — check console.");
     }
   }
 
@@ -803,6 +859,11 @@
         ? new Date(order.details.meta.restocked_at).toLocaleString()
         : "";
 
+      // ✅ NEW: show tracking number if saved
+      const tracking = order.details?.meta?.tracking_number
+        ? String(order.details.meta.tracking_number).trim()
+        : "";
+
       return `
         <div class="order-card">
           <div class="d-flex justify-content-between align-items-start">
@@ -810,7 +871,11 @@
               <strong>${escapeHtml(ref)}</strong><br>
               <small>${escapeHtml(created)}</small><br>
               <small>${escapeHtml(name)} — ${escapeHtml(email)}</small>
+
               ${restockedAt ? `<div class="muted-line mt-1">Restocked: ${escapeHtml(restockedAt)}</div>` : ``}
+
+              ${tracking ? `<div class="muted-line mt-1">Tracking: <strong>${escapeHtml(tracking)}</strong></div>` : ``}
+
               ${buildAddressHtml(order)}
               ${buildItemsHtml(order)}
             </div>
@@ -859,7 +924,7 @@
                   ⏰ 3PM Pay Reminder
                 </button>
 
-                <!-- ✅ UPDATED: shipped button now auto-sets status to Shipped -->
+                <!-- ✅ UPDATED: shipped button now prompts for tracking + saves + sends + sets status -->
                 <button class="btn btn-sm btn-primary"
                   ${isCancelled || isShipped ? "disabled" : ""}
                   onclick="sendShippedEmailById('${order.id}')">
