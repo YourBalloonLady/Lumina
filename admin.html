@@ -237,7 +237,7 @@ const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // keep safe!
 const ADMIN_EMAIL = "luminaweight@gmail.com";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 emailjs.init({ publicKey: "uZOuTrBdIAc6AmKjo" });
 
 let ordersCache = {};
