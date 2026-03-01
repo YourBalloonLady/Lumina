@@ -39,13 +39,15 @@
       margin-bottom:24px;
     }
 
-    .order-card{
+    .order-card, .review-card{
       background:#fff;
       border-radius:16px;
       padding:16px;
       box-shadow:0 10px 25px rgba(0,0,0,.08);
       margin-bottom:12px;
     }
+
+    .review-meta{ font-size:.85rem; color:#6b7280; }
 
     .items-box{
       margin-top:10px;
@@ -269,6 +271,7 @@
     <div class="offcanvas-body">
       <a href="index.html#home" class="d-block mb-2">Store Home</a>
       <a href="products.html" class="d-block mb-2">Products</a>
+      <a href="reviews.html" class="d-block mb-2">Reviews</a>
       <a href="account.html" class="d-block mb-2">My Account</a>
     </div>
   </div>
@@ -279,6 +282,7 @@
       <div class="fw-bold mb-3">🌙 Lumina Admin</div>
       <a href="index.html#home">Store Home</a>
       <a href="products.html">Products</a>
+      <a href="reviews.html">Reviews</a>
       <a href="account.html">My Account</a>
       <hr style="border-color:rgba(255,255,255,.12);">
       <button id="logout-btn-desktop" class="btn btn-sm btn-outline-light w-100">Logout</button>
@@ -425,6 +429,12 @@
           <div id="orders-list" class="mt-3"></div>
         </div>
 
+        <!-- REVIEWS -->
+        <div class="section-card">
+          <h3>Pending Reviews</h3>
+          <p class="text-muted" id="reviews-status">Loading pending reviews…</p>
+          <div id="reviews-list" class="mt-3"></div>
+        </div>
       </div>
     </main>
   </div>
@@ -468,7 +478,7 @@
     // CONFIG
     // ────────────────────────────────────────────────
     const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
     const ADMIN_EMAIL = "luminaweight@gmail.com";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -487,6 +497,8 @@
     const warningEl     = document.getElementById("admin-warning");
     const logoutBtn     = document.getElementById("logout-btn");
     const logoutBtnDesktop = document.getElementById("logout-btn-desktop");
+    const reviewsStatus = document.getElementById("reviews-status");
+    const reviewsEl     = document.getElementById("reviews-list");
     const kpiBar        = document.getElementById("kpi-bar");
     const quickStatsEl  = document.getElementById("quick-stats");
     const searchInput   = document.getElementById("order-search");
@@ -1793,126 +1805,130 @@
     }
 
     // ---------- ✅ CANCEL + RESTOCK ----------
-    async function cancelAndRestockById(orderId){
-      if(!orderId) return;
+  async function cancelAndRestockById(orderId){
+    if(!orderId) return;
 
-      if(!confirm("Cancel this order AND add items back to stock?")) return;
+    if(!confirm("Cancel this order AND add items back to stock?")) return;
 
-      try{
-        const { data: order, error: fetchErr } = await supabaseClient
-          .from("Orders")
-          .select("id, status, details, reference, total_amount, created_at")
-          .eq("id", orderId)
-          .single();
+    try{
+      // Re-fetch fresh order to avoid stale cache / double clicks
+      const { data: order, error: fetchErr } = await supabaseClient
+        .from("Orders")
+        .select("id, status, details, reference, total_amount, created_at")
+        .eq("id", orderId)
+        .single();
 
-        if(fetchErr || !order){
-          console.error("Could not fetch order", fetchErr);
-          alert("Could not fetch order — check console.");
-          return;
-        }
-
-        const details = order.details || {};
-        const meta = details.meta || {};
-        const alreadyRestocked = !!meta.restocked_at;
-
-        if(alreadyRestocked){
-          alert("This order was already restocked before. Stopping to prevent double stock.");
-          return;
-        }
-
-        const items = details.items || [];
-        if(!Array.isArray(items) || items.length === 0){
-          alert("No items found in this order to restock.");
-          return;
-        }
-
-        const nameQty = items.map(i => ({
-          name: String(i.name || "").trim(),
-          qty: Number(i.qty || 0)
-        })).filter(x => x.name && x.qty > 0);
-
-        if(!nameQty.length){
-          alert("Order items had no usable name/qty to restock.");
-          return;
-        }
-
-        const productNames = nameQty.map(x => x.name);
-
-        const { data: products, error: prodErr } = await supabaseClient
-          .from("Products")
-          .select("id, name, stock")
-          .in("name", productNames);
-
-        if(prodErr){
-          console.error("Error fetching products", prodErr);
-          alert("Could not fetch products to restock — check console.");
-          return;
-        }
-
-        for(const line of nameQty){
-          const p = (products || []).find(pp => pp.name === line.name);
-          if(!p){
-            console.warn("Product not found for restock:", line.name);
-            continue;
-          }
-
-          const currentStock = Number(p.stock || 0);
-          const newStock = Math.max(0, currentStock + line.qty);
-
-          const { error: upErr } = await supabaseClient
-            .from("Products")
-            .update({ stock: newStock })
-            .eq("id", p.id);
-
-          if(upErr){
-            console.error("Stock update failed for", line.name, upErr);
-            alert(`Failed to restock: ${line.name} — stopping. Check console.`);
-            return;
-          }
-        }
-
-        const session = await supabaseClient.auth.getSession();
-        const who = session?.data?.session?.user?.email || "admin";
-
-        const updatedDetails = {
-          ...details,
-          meta: {
-            ...(details.meta || {}),
-            restocked_at: new Date().toISOString(),
-            restocked_by: who
-          }
-        };
-
-        const { error: ordUpErr } = await supabaseClient
-          .from("Orders")
-          .update({ status: "Cancelled", details: updatedDetails })
-          .eq("id", orderId);
-
-        if(ordUpErr){
-          console.error("Order update failed (after stock restock!)", ordUpErr);
-          alert("Stock was restocked, but order status update failed. Check Supabase policies/console.");
-          return;
-        }
-
-        try{
-          const emailOrder = { ...order, status: "Cancelled", details: updatedDetails };
-          await sendCancelledEmail(emailOrder);
-        }catch(emailErr){
-          console.error("Cancelled email failed (but order was cancelled/restocked)", emailErr);
-          alert("Order cancelled + restocked, but cancelled email failed. Check console.");
-          loadOrders();
-          return;
-        }
-
-        alert("Order cancelled + stock restored + email sent ✅");
-        loadOrders();
-
-      }catch(e){
-        console.error("Cancel+Restock failed", e);
-        alert("Cancel + Restock failed — check console.");
+      if(fetchErr || !order){
+        console.error("Could not fetch order", fetchErr);
+        alert("Could not fetch order — check console.");
+        return;
       }
-    }
 
+      const details = order.details || {};
+      const meta = details.meta || {};
+      const alreadyRestocked = !!meta.restocked_at;
+
+      if(alreadyRestocked){
+        alert("This order was already restocked before. Stopping to prevent double stock.");
+        return;
+      }
+
+      const items = details.items || [];
+      if(!Array.isArray(items) || items.length === 0){
+        alert("No items found in this order to restock.");
+        return;
+      }
+
+      const nameQty = items.map(i => ({
+        name: String(i.name || "").trim(),
+        qty: Number(i.qty || 0)
+      })).filter(x => x.name && x.qty > 0);
+
+      if(!nameQty.length){
+        alert("Order items had no usable name/qty to restock.");
+        return;
+      }
+
+      // Fetch matching products by name
+      const productNames = nameQty.map(x => x.name);
+
+      const { data: products, error: prodErr } = await supabaseClient
+        .from("Products")
+        .select("id, name, stock")
+        .in("name", productNames);
+
+      if(prodErr){
+        console.error("Error fetching products", prodErr);
+        alert("Could not fetch products to restock — check console.");
+        return;
+      }
+
+      // Update each product stock (+ qty)
+      for(const line of nameQty){
+        const p = (products || []).find(pp => pp.name === line.name);
+        if(!p){
+          console.warn("Product not found for restock:", line.name);
+          continue; // skip missing names (doesn't hard-fail)
+        }
+
+        const currentStock = Number(p.stock || 0);
+        const newStock = Math.max(0, currentStock + line.qty);
+
+        const { error: upErr } = await supabaseClient
+          .from("Products")
+          .update({ stock: newStock })
+          .eq("id", p.id);
+
+        if(upErr){
+          console.error("Stock update failed for", line.name, upErr);
+          alert(`Failed to restock: ${line.name} — stopping. Check console.`);
+          return;
+        }
+      }
+
+      // Mark order cancelled + set restock meta flag
+      const session = await supabaseClient.auth.getSession();
+      const who = session?.data?.session?.user?.email || "admin";
+
+      const updatedDetails = {
+        ...details,
+        meta: {
+          ...(details.meta || {}),
+          restocked_at: new Date().toISOString(),
+          restocked_by: who
+        }
+      };
+
+      const { error: ordUpErr } = await supabaseClient
+        .from("Orders")
+        .update({ status: "Cancelled", details: updatedDetails })
+        .eq("id", orderId);
+
+      if(ordUpErr){
+        console.error("Order update failed (after stock restock!)", ordUpErr);
+        alert("Stock was restocked, but order status update failed. Check Supabase policies/console.");
+        return;
+      }
+
+      // Send cancelled email after success
+      try{
+        const emailOrder = { ...order, status: "Cancelled", details: updatedDetails };
+        await sendCancelledEmail(emailOrder);
+      }catch(emailErr){
+        console.error("Cancelled email failed (but order was cancelled/restocked)", emailErr);
+        alert("Order cancelled + restocked, but cancelled email failed. Check console.");
+        loadOrders();
+        return;
+      }
+
+      alert("Order cancelled + stock restored + email sent ✅");
+      loadOrders();
+
+    }catch(e){
+      console.error("Cancel+Restock failed", e);
+      alert("Cancel + Restock failed — check console.");
+    }
+  }
     // ────────────────────────────────────────────────
     // BULK ACTIONS
     // ────────────────────────────────────────────────
@@ -2137,10 +2153,10 @@
                     <strong>${escapeHtml(ref)}</strong><br>
                     <small>${escapeHtml(created)}</small><br>
                     <small>
-                      <a href="#" onclick="openCustomerView('${escapeHtml(email)}'); return false;">
-                        ${escapeHtml(name)} — ${escapeHtml(email)}
-                      </a>
-                    </small>
+  <a href="#" onclick="openCustomerView('${escapeHtml(email)}'); return false;">
+    ${escapeHtml(name)} — ${escapeHtml(email)}
+  </a>
+</small>
                   </div>
                 </div>
 
@@ -2213,7 +2229,9 @@
                   <button class="btn btn-sm btn-outline-dark" onclick="copyAddressById('${order.id}')">📋 Copy address</button>
                   <button class="btn btn-sm btn-outline-secondary" onclick="printPackingSlipById('${order.id}')">🖨️ Print slip</button>
                   <button class="btn btn-sm btn-secondary" onclick="markPackedById('${order.id}')">✅ Mark Packed</button>
-                  <button class="btn btn-sm btn-outline-purple" onclick="copyTimExcelTsvOne('${order.id}')">📋 Copy (Excel row)</button>
+                  <button class="btn btn-sm btn-outline-purple" onclick="copyTimExcelTsvOne('${order.id}')">
+  📋 Copy (Excel row)
+</button>
                 </div>
 
                 <div class="btn-row">
@@ -2252,63 +2270,67 @@
         `;
       }).join("");
     }
-
     async function copyTimExcelTsvOne(orderId){
-      const o = ordersCache[orderId];
-      if(!o) return alert("Order not found.");
+  const o = ordersCache[orderId];
+  if(!o) return alert("Order not found.");
 
-      const rows = (() => {
-        const c = o?.details?.customer || {};
-        const name = String(c.name || o.customer_name || o.name || "").trim();
-        const address = buildOneLineAddress(o);
-        const paid = paidFlagFromStatus(o.status);
-        const complete = completeFlagFromStatus(o.status);
-        const total = Number(o.total_amount || 0);
+  // Build rows for just this order (one per item)
+  const tempCache = { [orderId]: o };
+  const original = ordersCache[orderId];
 
-        const items = Array.isArray(o?.details?.items) ? o.details.items : [];
-        const out = [];
+  // Reuse existing builders
+  const rows = (() => {
+    const c = o?.details?.customer || {};
+    const name = String(c.name || o.customer_name || o.name || "").trim();
+    const address = buildOneLineAddress(o);
+    const paid = paidFlagFromStatus(o.status);
+    const complete = completeFlagFromStatus(o.status);
+    const total = Number(o.total_amount || 0);
 
-        if(!items.length){
-          out.push({
-            "Name": name, "Address": address, "Peptide": "", "Mg Amount": "",
-            "Pen/Vial": "", "H/S Quantity": "", "Paid": paid, "Cost": total, "Order Complete": complete
-          });
-          return out;
-        }
+    const items = Array.isArray(o?.details?.items) ? o.details.items : [];
+    const out = [];
 
-        for(const item of items){
-          const pv = penOrVial(item);
-          const hsQty =
-            pv === "Pen" ? (item?.pen_heads ?? "") :
-            pv === "Vial" ? (item?.syringes ?? "") :
-            "";
-
-          out.push({
-            "Name": name,
-            "Address": address,
-            "Peptide": classifyPeptide(item?.name),
-            "Mg Amount": extractMg(item?.name),
-            "Pen/Vial": pv,
-            "H/S Quantity": hsQty,
-            "Paid": paid,
-            "Cost": total,
-            "Order Complete": complete
-          });
-        }
-        return out;
-      })();
-
-      const headers = ["Name","Address","Peptide","Mg Amount","Pen/Vial","H/S Quantity","Paid","Cost","Order Complete"];
-      const esc = (v) => String(v ?? "").replace(/\r?\n/g, " ");
-      const tsv = rows.map(r => headers.map(h => esc(r[h])).join("\t")).join("\n");
-
-      try{
-        await navigator.clipboard.writeText(tsv);
-        showToast("Copied ✅ Paste into Excel", "success");
-      }catch(e){
-        alert("Copy failed — browser blocked clipboard. Use the XLSX export instead.");
-      }
+    if(!items.length){
+      out.push({
+        "Name": name, "Address": address, "Peptide": "", "Mg Amount": "",
+        "Pen/Vial": "", "H/S Quantity": "", "Paid": paid, "Cost": total, "Order Complete": complete
+      });
+      return out;
     }
+
+    for(const item of items){
+      const pv = penOrVial(item);
+      const hsQty =
+        pv === "Pen" ? (item?.pen_heads ?? "") :
+        pv === "Vial" ? (item?.syringes ?? "") :
+        "";
+
+      out.push({
+        "Name": name,
+        "Address": address,
+        "Peptide": classifyPeptide(item?.name),
+        "Mg Amount": extractMg(item?.name),
+        "Pen/Vial": pv,
+        "H/S Quantity": hsQty,
+        "Paid": paid,
+        "Cost": total,
+        "Order Complete": complete
+      });
+    }
+    return out;
+  })();
+
+  const headers = ["Name","Address","Peptide","Mg Amount","Pen/Vial","H/S Quantity","Paid","Cost","Order Complete"];
+  const esc = (v) => String(v ?? "").replace(/\r?\n/g, " ");
+  const tsv = rows.map(r => headers.map(h => esc(r[h])).join("\t")).join("\n");
+
+  try{
+    await navigator.clipboard.writeText(tsv);
+    showToast("Copied ✅ Paste into Excel", "success");
+  }catch(e){
+    alert("Copy failed — browser blocked clipboard. Use the XLSX export instead.");
+  }
+}
 
     // ────────────────────────────────────────────────
     // LOAD ORDERS (paginated server-side)
@@ -2360,7 +2382,7 @@
       renderQuickStats();
       refreshStatusCounts();
       renderOrdersFromCache();
-      renderCharts();
+renderCharts(); // ✅
     }
 
     async function loadAllOrdersForSearch(){
@@ -2399,7 +2421,7 @@
         renderQuickStats();
         refreshStatusCounts();
         renderOrdersFromCache();
-        renderCharts();
+renderCharts(); // ✅
         showToast("All orders loaded ✅", "success");
       }catch(e){
         console.error("Load all failed", e);
@@ -2409,6 +2431,71 @@
       }finally{
         setBusy(false);
       }
+    }
+
+    // ────────────────────────────────────────────────
+    // REVIEWS
+    // ────────────────────────────────────────────────
+    async function loadPendingReviews() {
+      reviewsStatus.textContent = "Loading pending reviews…";
+
+      const { data, error } = await supabaseClient
+        .from("Reviews")
+        .select("id, name, rating, review_text, approved, created_at")
+        .eq("approved", false)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading reviews", error);
+        reviewsStatus.textContent = "Could not load reviews.";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        reviewsStatus.textContent = "No pending reviews 🎉";
+        reviewsEl.innerHTML = "";
+        return;
+      }
+
+      reviewsStatus.textContent = `${data.length} review(s) pending`;
+
+      reviewsEl.innerHTML = data.map((review) => {
+        const created = review.created_at ? new Date(review.created_at).toLocaleString() : "";
+        const stars = review.rating ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating) : "";
+        const name = review.name || "Anonymous";
+        const message = review.review_text || "";
+
+        return `
+          <div class="review-card">
+            <div class="d-flex justify-content-between">
+              <div>
+                <strong>${escapeHtml(name)}</strong>
+                <div class="my-1">${escapeHtml(stars)}</div>
+                <p class="mb-1">${escapeHtml(message)}</p>
+                <small class="review-meta">${escapeHtml(created)}</small>
+              </div>
+              <div class="text-end" style="min-width: 140px;">
+                <button class="btn btn-sm btn-success mb-1" onclick="publishReview('${review.id}')">✅ Publish</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteReview('${review.id}')">🗑 Delete</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function publishReview(id) {
+      if (!confirm("Publish this review?")) return;
+      const { error } = await supabaseClient.from("Reviews").update({ approved: true }).eq("id", id);
+      if (error) { console.error(error); return alert("Failed to publish review."); }
+      loadPendingReviews();
+    }
+
+    async function deleteReview(id) {
+      if (!confirm("Delete this review permanently?")) return;
+      const { error } = await supabaseClient.from("Reviews").delete().eq("id", id);
+      if (error) { console.error(error); return alert("Could not delete review."); }
+      loadPendingReviews();
     }
 
     // ────────────────────────────────────────────────
@@ -2427,6 +2514,7 @@
       if ((user.email || "").toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
         warningEl.innerHTML = `<div class="alert alert-danger">Access denied.</div>`;
         statusEl.textContent = "Not authorised";
+        reviewsStatus.textContent = "Not authorised";
         return;
       }
 
@@ -2434,6 +2522,7 @@
       await cacheAdminEmail();
       await refreshStatusCounts();
       await loadOrders();
+      await loadPendingReviews();
     }
 
     logoutBtn.onclick = async () => {
@@ -2501,6 +2590,7 @@
     window.exportOrdersJson = exportOrdersJson;
     window.exportOrdersXlsx = exportOrdersXlsx;
 
+    // ✅ Added exports
     window.exportTimExcel = exportTimExcel;
     window.copyTimExcelTsv = copyTimExcelTsv;
 
@@ -2538,6 +2628,9 @@
 
     window.openMailto = openMailto;
     window.buildShippedEmailText = buildShippedEmailText;
+
+    window.publishReview = publishReview;
+    window.deleteReview = deleteReview;
 
     window.copyTimExcelTsvOne = copyTimExcelTsvOne;
 
