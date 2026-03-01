@@ -222,64 +222,65 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
-// ────────────────────────────────────────────────
-// CONFIG + GLOBALS (unchanged from your last version)
-// ────────────────────────────────────────────────
 const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+const SUPABASE_ANON_KEY = "YOUR_KEY";
 const ADMIN_EMAIL = "luminaweight@gmail.com";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 emailjs.init({ publicKey: "uZOuTrBdIAc6AmKjo" });
 
-let ordersCache = {};
-let PAGE_SIZE = 25;
-let currentPage = 0;
-let totalCount = 0;
-let statusFilter = "all";
-let packQueueOnly = false;
-let filteredOrderIds = [];
-const selectedIds = new Set();
+const statusEl  = document.getElementById("admin-status");
+const warningEl = document.getElementById("admin-warning");
 
-const statusEl     = document.getElementById("admin-status");
-const ordersEl     = document.getElementById("orders-list");
-const warningEl    = document.getElementById("admin-warning");
-const reviewsStatus = document.getElementById("reviews-status");
-const reviewsEl    = document.getElementById("reviews-list");
-const kpiBar       = document.getElementById("kpi-bar");
-const searchInput  = document.getElementById("order-search");
-const pageIndicator = document.getElementById("page-indicator");
-
-// ────────────────────────────────────────────────
-// HELPERS (MINIMUM REQUIRED so page doesn't crash)
-// ────────────────────────────────────────────────
+// Toast
 function showToast(message, type = "success") {
   const container = document.querySelector(".toast-container");
   if (!container) return;
 
   const id = "t" + Date.now();
-  const html = `
+  container.insertAdjacentHTML("beforeend", `
     <div id="${id}" class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">${message}</div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>
     </div>
-  `;
-  container.insertAdjacentHTML("beforeend", html);
+  `);
+
   const el = document.getElementById(id);
   const t = new bootstrap.Toast(el, { delay: 2500 });
   el.addEventListener("hidden.bs.toast", () => el.remove());
   t.show();
 }
 
+// Theme
 function initTheme() {
-  const root = document.documentElement; // <html>
+  const root = document.documentElement;
   const btn = document.getElementById("themeToggle");
   const saved = localStorage.getItem("lw_theme");
 
-  async function init() {
+  if (saved === "dark") root.setAttribute("data-bs-theme", "dark");
+  if (saved === "light") root.setAttribute("data-bs-theme", "light");
+
+  function updateBtn() {
+    const isDark = root.getAttribute("data-bs-theme") === "dark";
+    if (btn) btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+  }
+  updateBtn();
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const isDark = root.getAttribute("data-bs-theme") === "dark";
+      const next = isDark ? "light" : "dark";
+      root.setAttribute("data-bs-theme", next);
+      localStorage.setItem("lw_theme", next);
+      updateBtn();
+    });
+  }
+}
+
+// Auth / init
+async function init() {
   console.log("Admin init() running...");
   if (statusEl) statusEl.textContent = "Checking access…";
 
@@ -304,9 +305,9 @@ function initTheme() {
     if (statusEl) statusEl.textContent = "Admin verified ✅";
     showToast("Access granted", "success");
 
-    // IMPORTANT: if you haven’t pasted your full functions back yet,
-    // at least prove it’s working:
-    // await loadOrders(); // only if loadOrders exists
+    // call loadOrders() here once your loadOrders function exists
+    // await loadOrders();
+
   } catch (e) {
     console.error(e);
     if (statusEl) statusEl.textContent = "Auth check failed — see console";
@@ -314,7 +315,7 @@ function initTheme() {
   }
 }
 
-// Hook up logout button (optional but useful)
+// Logout
 const logoutBtn = document.getElementById("logout-btn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
@@ -326,26 +327,6 @@ if (logoutBtn) {
 // START
 initTheme();
 init();
-
-  if (saved === "dark") root.setAttribute("data-bs-theme", "dark");
-  if (saved === "light") root.setAttribute("data-bs-theme", "light");
-
-  function updateBtn() {
-    const isDark = root.getAttribute("data-bs-theme") === "dark";
-    if (btn) btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
-  }
-  updateBtn();
-
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const isDark = root.getAttribute("data-bs-theme") === "dark";
-      const next = isDark ? "light" : "dark";
-      root.setAttribute("data-bs-theme", next);
-      localStorage.setItem("lw_theme", next);
-      updateBtn();
-    });
-  }
-}
 </script>
 </body>
 </html>
