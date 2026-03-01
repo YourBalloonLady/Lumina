@@ -787,6 +787,11 @@ function imgSrc(image){
       console.error('Error checking admin user', e);
     }
   })();
+
+  logoutBtn.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'index.html';
+  });
 </script>
 </body>
 </html>
