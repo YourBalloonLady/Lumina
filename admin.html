@@ -279,6 +279,54 @@ function initTheme() {
   const btn = document.getElementById("themeToggle");
   const saved = localStorage.getItem("lw_theme");
 
+  async function init() {
+  console.log("Admin init() running...");
+  if (statusEl) statusEl.textContent = "Checking access…";
+
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+
+    const user = data?.session?.user;
+    if (!user) {
+      if (statusEl) statusEl.textContent = "Not logged in — redirecting…";
+      window.location.href = "index.html";
+      return;
+    }
+
+    const email = (user.email || "").toLowerCase().trim();
+    if (email !== ADMIN_EMAIL.toLowerCase().trim()) {
+      if (warningEl) warningEl.innerHTML = `<div class="alert alert-danger">Access denied (logged in as ${email})</div>`;
+      if (statusEl) statusEl.textContent = "Not authorised";
+      return;
+    }
+
+    if (statusEl) statusEl.textContent = "Admin verified ✅";
+    showToast("Access granted", "success");
+
+    // IMPORTANT: if you haven’t pasted your full functions back yet,
+    // at least prove it’s working:
+    // await loadOrders(); // only if loadOrders exists
+  } catch (e) {
+    console.error(e);
+    if (statusEl) statusEl.textContent = "Auth check failed — see console";
+    showToast("Auth check failed (see console)", "danger");
+  }
+}
+
+// Hook up logout button (optional but useful)
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await sb.auth.signOut();
+    window.location.href = "index.html";
+  });
+}
+
+// START
+initTheme();
+init();
+
   if (saved === "dark") root.setAttribute("data-bs-theme", "dark");
   if (saved === "light") root.setAttribute("data-bs-theme", "light");
 
