@@ -272,6 +272,9 @@
               <button id="btnShipped" class="btn btn-sm btn-outline-primary" onclick="setStatusFilter('Shipped')">Shipped <span id="ctShipped" class="filter-badge">…</span></button>
               <button id="btnCancelled" class="btn btn-sm btn-outline-danger" onclick="setStatusFilter('Cancelled')">Cancelled <span id="ctCancelled" class="filter-badge">…</span></button>
               <button id="btnPackQueue" class="btn btn-sm btn-dark" onclick="togglePackQueue()">✅ Pack Queue</button>
+              <button class="btn btn-sm btn-outline-purple" onclick="copyTimExcelTsvOne('${order.id}')">
+  📋 Copy (Excel row)
+</button>
             </div>
 
             <!-- Client-side toggles -->
@@ -312,6 +315,9 @@
               <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
               <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
               <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
+              <button class="btn btn-sm btn-outline-purple" onclick="copyTimExcelTsvOne('${order.id}')">
+  📋 Copy (Excel row)
+</button>
             </div>
 
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
