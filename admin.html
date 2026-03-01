@@ -1804,136 +1804,131 @@
       }
     }
 
-    // ────────────────────────────────────────────────
-// CANCEL + RESTOCK  (working version)
-// Restocks ONLY items that include item.product_id
-// Expects Products table with columns: id, stock (number)
-// ────────────────────────────────────────────────
-async function cancelAndRestockById(orderId){
-  const order = ordersCache[orderId];
-  if(!order) return alert("Order not found.");
+    // ---------- ✅ CANCEL + RESTOCK ----------
+  async function cancelAndRestockById(orderId){
+    if(!orderId) return;
 
-  const currentStatus = String(order.status || "Pending").toLowerCase();
-  if(currentStatus === "cancelled") return alert("This order is already cancelled.");
+    if(!confirm("Cancel this order AND add items back to stock?")) return;
 
-  if(!confirm("Cancel this order AND restock items?")) return;
-
-  // Optional: warn if we can't restock because product_id missing
-  const items = Array.isArray(order?.details?.items) ? order.details.items : [];
-  const missingProductIds = items.filter(i => !i?.product_id).length;
-  const restockable = items.filter(i => i?.product_id).length;
-
-  if(items.length && restockable === 0){
-    const ok = confirm(
-      "Heads up: none of the items have product_id, so I CAN cancel the order but I CANNOT restock automatically.\n\nContinue?"
-    );
-    if(!ok) return;
-  } else if(missingProductIds > 0){
-    const ok = confirm(
-      `Heads up: ${missingProductIds} item(s) are missing product_id so they will NOT be restocked.\n\nContinue?`
-    );
-    if(!ok) return;
-  }
-
-  setBusy(true, "Cancelling + restocking…", order.reference || order.id);
-
-  try{
-    // who did it
-    const session = await supabaseClient.auth.getSession();
-    const who = session?.data?.session?.user?.email || "admin";
-
-    // 1) RESTOCK (best effort)
-    let restockedCount = 0;
-    let skippedCount = 0;
-
-    for(const item of items){
-      const pid = item?.product_id;
-      const qty = Number(item?.qty || 0);
-
-      if(!pid || !qty || qty <= 0){
-        skippedCount++;
-        continue;
-      }
-
-      // read current stock
-      const { data: prod, error: prodErr } = await supabaseClient
-        .from("Products")
-        .select("id, stock")
-        .eq("id", pid)
+    try{
+      // Re-fetch fresh order to avoid stale cache / double clicks
+      const { data: order, error: fetchErr } = await supabaseClient
+        .from("Orders")
+        .select("id, status, details, reference, total_amount, created_at")
+        .eq("id", orderId)
         .single();
 
-      if(prodErr){
-        console.warn("Restock lookup failed", pid, prodErr);
-        skippedCount++;
-        continue;
+      if(fetchErr || !order){
+        console.error("Could not fetch order", fetchErr);
+        alert("Could not fetch order — check console.");
+        return;
       }
 
-      const currentStock = Number(prod?.stock || 0);
-      const newStock = currentStock + qty;
+      const details = order.details || {};
+      const meta = details.meta || {};
+      const alreadyRestocked = !!meta.restocked_at;
 
-      const { error: upErr } = await supabaseClient
+      if(alreadyRestocked){
+        alert("This order was already restocked before. Stopping to prevent double stock.");
+        return;
+      }
+
+      const items = details.items || [];
+      if(!Array.isArray(items) || items.length === 0){
+        alert("No items found in this order to restock.");
+        return;
+      }
+
+      const nameQty = items.map(i => ({
+        name: String(i.name || "").trim(),
+        qty: Number(i.qty || 0)
+      })).filter(x => x.name && x.qty > 0);
+
+      if(!nameQty.length){
+        alert("Order items had no usable name/qty to restock.");
+        return;
+      }
+
+      // Fetch matching products by name
+      const productNames = nameQty.map(x => x.name);
+
+      const { data: products, error: prodErr } = await supabaseClient
         .from("Products")
-        .update({ stock: newStock })
-        .eq("id", pid);
+        .select("id, name, stock")
+        .in("name", productNames);
 
-      if(upErr){
-        console.warn("Restock update failed", pid, upErr);
-        skippedCount++;
-        continue;
+      if(prodErr){
+        console.error("Error fetching products", prodErr);
+        alert("Could not fetch products to restock — check console.");
+        return;
       }
 
-      restockedCount++;
-      document.getElementById("busyMeta").textContent = `Restocked ${restockedCount}/${items.length}…`;
+      // Update each product stock (+ qty)
+      for(const line of nameQty){
+        const p = (products || []).find(pp => pp.name === line.name);
+        if(!p){
+          console.warn("Product not found for restock:", line.name);
+          continue; // skip missing names (doesn't hard-fail)
+        }
+
+        const currentStock = Number(p.stock || 0);
+        const newStock = Math.max(0, currentStock + line.qty);
+
+        const { error: upErr } = await supabaseClient
+          .from("Products")
+          .update({ stock: newStock })
+          .eq("id", p.id);
+
+        if(upErr){
+          console.error("Stock update failed for", line.name, upErr);
+          alert(`Failed to restock: ${line.name} — stopping. Check console.`);
+          return;
+        }
+      }
+
+      // Mark order cancelled + set restock meta flag
+      const session = await supabaseClient.auth.getSession();
+      const who = session?.data?.session?.user?.email || "admin";
+
+      const updatedDetails = {
+        ...details,
+        meta: {
+          ...(details.meta || {}),
+          restocked_at: new Date().toISOString(),
+          restocked_by: who
+        }
+      };
+
+      const { error: ordUpErr } = await supabaseClient
+        .from("Orders")
+        .update({ status: "Cancelled", details: updatedDetails })
+        .eq("id", orderId);
+
+      if(ordUpErr){
+        console.error("Order update failed (after stock restock!)", ordUpErr);
+        alert("Stock was restocked, but order status update failed. Check Supabase policies/console.");
+        return;
+      }
+
+      // Send cancelled email after success
+      try{
+        const emailOrder = { ...order, status: "Cancelled", details: updatedDetails };
+        await sendCancelledEmail(emailOrder);
+      }catch(emailErr){
+        console.error("Cancelled email failed (but order was cancelled/restocked)", emailErr);
+        alert("Order cancelled + restocked, but cancelled email failed. Check console.");
+        loadOrders();
+        return;
+      }
+
+      alert("Order cancelled + stock restored + email sent ✅");
+      loadOrders();
+
+    }catch(e){
+      console.error("Cancel+Restock failed", e);
+      alert("Cancel + Restock failed — check console.");
     }
-
-    // 2) UPDATE ORDER -> Cancelled + history
-    let updatedDetails = order.details || {};
-    updatedDetails = pushHistory(
-      { ...order, details: updatedDetails },
-      "status_cancelled_and_restocked",
-      {
-        note: `restocked:${restockedCount} skipped:${skippedCount}`,
-      }
-    );
-
-    updatedDetails = {
-      ...updatedDetails,
-      meta: {
-        ...(updatedDetails.meta || {}),
-        cancelled_at: new Date().toISOString(),
-        cancelled_by: who,
-        restocked_count: restockedCount,
-        restock_skipped_count: skippedCount
-      }
-    };
-
-    const { error: ordErr } = await supabaseClient
-      .from("Orders")
-      .update({ status: "Cancelled", details: updatedDetails })
-      .eq("id", orderId);
-
-    if(ordErr) throw ordErr;
-
-    // update cache
-    ordersCache[orderId].status = "Cancelled";
-    ordersCache[orderId].details = updatedDetails;
-
-    // 3) OPTIONAL: send cancelled email (or keep it manual)
-    // Uncomment if you want it automatic:
-    // try { await sendCancelledEmail(order); } catch(e){ console.warn("Cancelled email failed", e); }
-
-    showToast(`Cancelled ✅ Restocked: ${restockedCount} • Skipped: ${skippedCount}`, "success");
-    loadOrders();
-
-  }catch(e){
-    console.error("Cancel + restock failed", e);
-    showToast("Cancel + restock failed — check console", "danger");
-    alert("Cancel + restock failed — check console.");
-  }finally{
-    setBusy(false);
   }
-}
-
     // ────────────────────────────────────────────────
     // BULK ACTIONS
     // ────────────────────────────────────────────────
