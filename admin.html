@@ -229,6 +229,17 @@
 
   <!-- CONTENT -->
   <div class="container mt-4">
+
+    <!-- ✅ Added: your priority list -->
+    <div class="section-card mb-4">
+      <h3 class="mb-2">Next improvements</h3>
+      <ol class="mb-0">
+        <li>Sidebar (quick win)</li>
+        <li>Customer view (massive usefulness)</li>
+        <li>Charts (nice dashboard feel)</li>
+      </ol>
+    </div>
+
     <!-- ORDERS -->
     <div class="section-card mb-4">
       <div class="d-flex justify-content-between flex-wrap align-items-center gap-2">
@@ -2072,70 +2083,7 @@
       }
     }
 
-    // ────────────────────────────────────────────────
-    // REVIEWS
-    // ────────────────────────────────────────────────
-    async function loadPendingReviews() {
-      reviewsStatus.textContent = "Loading pending reviews…";
-
-      const { data, error } = await supabaseClient
-        .from("Reviews")
-        .select("id, name, rating, review_text, approved, created_at")
-        .eq("approved", false)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error loading reviews", error);
-        reviewsStatus.textContent = "Could not load reviews.";
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        reviewsStatus.textContent = "No pending reviews 🎉";
-        reviewsEl.innerHTML = "";
-        return;
-      }
-
-      reviewsStatus.textContent = `${data.length} review(s) pending`;
-
-      reviewsEl.innerHTML = data.map((review) => {
-        const created = review.created_at ? new Date(review.created_at).toLocaleString() : "";
-        const stars = review.rating ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating) : "";
-        const name = review.name || "Anonymous";
-        const message = review.review_text || "";
-
-        return `
-          <div class="review-card">
-            <div class="d-flex justify-content-between">
-              <div>
-                <strong>${escapeHtml(name)}</strong>
-                <div class="my-1">${escapeHtml(stars)}</div>
-                <p class="mb-1">${escapeHtml(message)}</p>
-                <small class="review-meta">${escapeHtml(created)}</small>
-              </div>
-              <div class="text-end" style="min-width: 140px;">
-                <button class="btn btn-sm btn-success mb-1" onclick="publishReview('${review.id}')">✅ Publish</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteReview('${review.id}')">🗑 Delete</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function publishReview(id) {
-      if (!confirm("Publish this review?")) return;
-      const { error } = await supabaseClient.from("Reviews").update({ approved: true }).eq("id", id);
-      if (error) { console.error(error); return alert("Failed to publish review."); }
-      loadPendingReviews();
-    }
-
-    async function deleteReview(id) {
-      if (!confirm("Delete this review permanently?")) return;
-      const { error } = await supabaseClient.from("Reviews").delete().eq("id", id);
-      if (error) { console.error(error); return alert("Could not delete review."); }
-      loadPendingReviews();
-    }
+    
 
     // ────────────────────────────────────────────────
     // AUTH INIT
