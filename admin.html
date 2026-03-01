@@ -2031,7 +2031,11 @@
                   <div>
                     <strong>${escapeHtml(ref)}</strong><br>
                     <small>${escapeHtml(created)}</small><br>
-                    <small>${escapeHtml(name)} — ${escapeHtml(email)}</small>
+                    <small>
+  <a href="#" onclick="openCustomerView('${escapeHtml(email)}'); return false;">
+    ${escapeHtml(name)} — ${escapeHtml(email)}
+  </a>
+</small>
                   </div>
                 </div>
 
