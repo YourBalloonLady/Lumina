@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- FAVICON / TAB ICON -->
-<link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=4">
-<link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=4">
-<link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
-  
+  <!-- FAVICON / TAB ICON -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=4">
+  <link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=4">
+  <link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
+
   <!-- SEO (neutral / research supply language) -->
   <title>Research Materials Catalogue UK | Lumina</title>
   <meta name="description" content="Browse all Lumina research materials in the UK. Product formats and quantities available with discreet UK dispatch — for laboratory research use only. Not for human consumption.">
@@ -19,7 +19,6 @@
   <meta property="og:description" content="Full UK range of research materials and accessories where applicable. Discreet packaging • UK dispatch • Research use only. Not for human consumption.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://luminaweight.co.uk/products.html">
-  
 
   <link rel="canonical" href="https://luminaweight.co.uk/products.html">
 
@@ -225,15 +224,14 @@
       body { padding-top: 0; }
     }
     #backToTop{
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 9999;
-  display: none;
-  border-radius: 999px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-}
-    
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9999;
+      display: none;
+      border-radius: 999px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    }
   </style>
 </head>
 
@@ -250,7 +248,6 @@
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html#home">
-        
         <span>Lumina</span>
       </a>
 
@@ -363,7 +360,6 @@
           </div>
         </div>
 
-       
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
             <div class="info-icon mb-3"><i class="fa-solid fa-shield-halved"></i></div>
@@ -376,9 +372,7 @@
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
             <div class="info-icon mb-3"><i class="fa-regular fa-star"></i></div>
-          
             <p class="small mb-3">Ordering experience, delivery speed, packaging and customer service feedback.</p>
-            
           </div>
         </div>
 
@@ -515,11 +509,10 @@
     }
 
     function imgSrc(image){
-  if(!image) return '';
-
-  // Always force image to site root
-  return 'https://luminaweight.co.uk/' + encodeURIComponent(image);
-}
+      if(!image) return '';
+      // Always force image to site root
+      return 'https://luminaweight.co.uk/' + encodeURIComponent(image);
+    }
 
     function renderProducts() {
       const listEl = document.getElementById('all-products-list');
@@ -561,9 +554,21 @@
 
         const unitSuffix = p.name.includes('Pen') ? '/unit' : '/unit';
 
+        // ✅ STOCK NUMBER + LABEL + COLOR (ADDED)
+        const stockNum = Number(p.stock ?? 0);
+        const stockLabel =
+          stockNum === 0 ? '<strong>Out of stock</strong>' :
+          stockNum <= 5 ? `<strong>Low stock</strong> • ${stockNum} left` :
+          `<strong>In stock</strong> • ${stockNum} available`;
+
+        const stockClass =
+          stockNum === 0 ? 'text-danger' :
+          stockNum <= 5 ? 'text-warning' :
+          'text-success';
+
         return `
           <div class="col-md-3">
-            <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
+            <div class="position-relative h-100 product-card ${stockNum===0?'out-of-stock':''}" onclick="${stockNum>0?'openModal('+i+')':''}">
               ${badge ? `<span class="pill-label ${badge.class}">${badge.text}</span>` : ''}
               <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
               <div class="product-body d-flex flex-column">
@@ -574,19 +579,21 @@
                     ${baseDesc + extraInfo}
                   </div>
                 </div>
+
                 <div class="d-flex justify-content-between align-items-center mt-2">
                   <div class="product-price">
                     £${Number(p.price || 0).toFixed(2)}
                     <span>${unitSuffix}</span>
                   </div>
                 </div>
-                <p class="stock ${p.stock===0 ? 'text-danger' : (p.stock<=5 ? 'text-warning' : 'text-success')} mb-1">
-  ${p.stock===0 ? '<strong>Out of stock</strong>' : (p.stock<=5 ? '<strong>Low stock</strong>' : '<strong>In stock</strong>')}
-</p>
+
+                <!-- ✅ show stock number -->
+                <p class="stock ${stockClass} mb-1">${stockLabel}</p>
+
                 <button class="btn btn-success btn-add mt-auto"
-                        ${p.stock===0?'disabled':''}
+                        ${stockNum===0?'disabled':''}
                         onclick="event.stopPropagation(); openModal(${i})">
-                  ${p.stock>0?'Add to cart':'Sold out'}
+                  ${stockNum>0?'Add to cart':'Sold out'}
                 </button>
               </div>
             </div>
@@ -624,11 +631,12 @@
     // ---------- MODAL ----------
     function openModal(i) {
       const p = products[i];
-      if (!p || p.stock === 0) return;
+      if (!p || Number(p.stock ?? 0) === 0) return;
 
       currentProduct = p;
 
       const accessoriesLine = 'Accessories (if applicable) are supplied for laboratory handling and measurement only.';
+      const stockNum = Number(p.stock ?? 0); // ✅ added
 
       let modal = document.getElementById('productModal');
       if (!modal) {
@@ -666,12 +674,14 @@
       document.getElementById('modalTitle').textContent = p.name;
       document.getElementById('modalName').textContent  = p.name;
       document.getElementById('modalPrice').textContent = `£${Number(p.price || 0).toFixed(2)}`;
+
+      // ✅ show stock number in modal
       document.getElementById('modalStock').innerHTML =
-  (p.stock === 0)
-    ? '<span class="text-danger fw-bold">Out of stock</span>'
-    : (p.stock <= 5)
-      ? '<span class="text-warning fw-bold">Low stock</span>'
-      : '<span class="text-success fw-bold">In stock</span>';
+        (stockNum === 0)
+          ? '<span class="text-danger fw-bold">Out of stock</span>'
+          : (stockNum <= 5)
+            ? `<span class="text-warning fw-bold">Low stock • ${stockNum} left</span>`
+            : `<span class="text-success fw-bold">In stock • ${stockNum} available</span>`;
 
       const descEl = document.getElementById('modalDescription');
       const nameLower = (p.name || '').toLowerCase();
@@ -703,10 +713,23 @@
         `;
       }
 
-      document.getElementById('modalQty').value = 1;
+      // ✅ clamp qty input to stock
+      const qtyInput = document.getElementById('modalQty');
+      qtyInput.value = 1;
+      qtyInput.max = stockNum;
 
+      // ✅ prevent adding more than stock (including what's already in cart)
       document.getElementById('modalAddBtn').onclick = () => {
-        const qty = parseInt(document.getElementById('modalQty').value) || 1;
+        let qty = parseInt(document.getElementById('modalQty').value) || 1;
+        qty = Math.max(1, Math.min(qty, stockNum));
+
+        const existing = cart.find(item => item.id === p.id);
+        const already = existing ? (existing.qty || 0) : 0;
+
+        if (already + qty > stockNum) {
+          return alert(`Only ${stockNum} available. You already have ${already} in your cart.`);
+        }
+
         addToCart(p, qty);
         bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
       };
@@ -714,10 +737,12 @@
       new bootstrap.Modal(modal).show();
     }
 
+    // ✅ clamp +/- buttons to stock too
     function changeQty(delta) {
       const input = document.getElementById('modalQty');
+      const max = parseInt(input.max) || 999999;
       let val = parseInt(input.value) || 1;
-      val = Math.max(1, val + delta);
+      val = Math.max(1, Math.min(max, val + delta));
       input.value = val;
     }
 
