@@ -305,8 +305,8 @@
 
   // Generates a code client-side (DB should enforce uniqueness; your trigger can override this if you have one)
   function makeCode() {
-    return "LUM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-  }
+  return "LUM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
 
   // Ensure customer row exists (creates one if missing)
   async function ensureCustomerRow(email, name=""){
@@ -1045,27 +1045,22 @@ async function ensureAffiliateCode() {
     pw2.value = '';
   });
 
+if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'index.html';
+    try {
+      console.log("Logout clicked");
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+      window.location.href = 'index.html';
+    } catch (e) {
+      console.error("Logout failed:", e);
+      alert("Logout failed: " + (e?.message || "Unknown error"));
+    }
   });
-
-    if (redeemBtn) {
-    redeemBtn.addEventListener("click", async () => {
-      redeemMsg.textContent = "";
-      redeemMsg.className = "small mt-2";
-
-      try {
-        const res = await redeemReferralCode(refInput.value, 10);
-        redeemMsg.textContent = `✅ £${res.added.toFixed(2)} added. Total credit: £${res.total_credit.toFixed(2)}`;
-        redeemMsg.classList.add("text-success");
-        refInput.value = "";
-      } catch (e) {
-        redeemMsg.textContent = `❌ ${e.message}`;
-        redeemMsg.classList.add("text-danger");
-      }
-    });
-  }
+} else {
+  console.warn("logout-btn not found");
+}
+  
 
   loadAccount();
 </script>
