@@ -95,6 +95,7 @@
               </div>
               <div class="col-12">
                 <input type="email" class="form-control" id="email" placeholder="Email address" required>
+                <div id="credit-status" class="small text-muted mt-1"></div>
               </div>
               <div class="col-12">
                 <input type="text" class="form-control" id="address1" placeholder="Address line 1" required>
@@ -200,9 +201,16 @@
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let cart = [];
-  let total = 0;            // ✅ payable total (after credit)
+  let total = 0;            // payable total (after credit)
   let discountApplied = 0;  // bundle discount
-  let lastBundleFinal = 0;  // ✅ total after bundle, before credit
+  let lastBundleFinal = 0;  // total after bundle, before credit
+
+  // credit runtime state
+  let lastCreditEmail = '';
+  let lastCreditBalance = 0;
+  let lastCreditUsed = 0;
+
+  function money(n){ return `£${Number(n || 0).toFixed(2)}`; }
 
   // Capture referral code if present
   (function captureReferralOnCheckout(){
@@ -261,7 +269,7 @@
     if (cart[index].sema_form === 'pen') cart[index].syringes = "";
     if (cart[index].sema_form === 'vial') cart[index].pen_heads = "";
     saveCartToStorage();
-    renderOrderSummary(); // preview totals (pre-credit)
+    renderOrderSummary(); // preview (will also apply credit if email has it)
   }
 
   function setAccessory(index, field, value) {
@@ -270,7 +278,7 @@
     if (field === 'pen_heads') cart[index].pen_heads = v;
     if (field === 'syringes')  cart[index].syringes  = v;
     saveCartToStorage();
-    renderOrderSummary(); // preview totals (pre-credit)
+    renderOrderSummary(); // preview (will also apply credit if email has it)
   }
 
   function validateAccessories() {
@@ -301,79 +309,105 @@
   }
 
   // ---------- CREDIT ----------
-async function getCreditBalance(email) {
-  const e = (email || '').trim().toLowerCase();
-  if (!e) return 0;
+  async function getCreditBalance(email) {
+    const e = (email || '').trim().toLowerCase();
+    if (!e) return 0;
 
-  // helper: safe numeric
-  const toNum = (v) => {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  };
+    const toNum = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    };
 
-  // 1) customers (lower-case) + credit_balance (your account page)
-  try {
-    const r1 = await supabaseClient
-      .from('customers')
-      .select('credit_balance')
-      .eq('email', e)
-      .maybeSingle();
+    // 1) customers (lower-case) credit_balance
+    try {
+      const r1 = await supabaseClient
+        .from('customers')
+        .select('credit_balance')
+        .eq('email', e)
+        .maybeSingle();
 
-    if (r1.error) console.warn('[credit] customers select blocked:', r1.error.message);
-    else if (r1.data) {
-      const bal = toNum(r1.data.credit_balance);
-      console.log('[credit] customers.credit_balance =', bal);
-      return bal;
-    }
-  } catch (err) {
-    console.warn('[credit] customers exception', err);
+      if (!r1.error && r1.data) return toNum(r1.data.credit_balance);
+    } catch (err) {}
+
+    // 2) Customers (capital C) fallback
+    try {
+      const r2 = await supabaseClient
+        .from('Customers')
+        .select('credit_balance')
+        .eq('email', e)
+        .maybeSingle();
+
+      if (!r2.error && r2.data) return toNum(r2.data.credit_balance);
+    } catch (err) {}
+
+    // 3) CustomerCredits table fallback (older schema)
+    try {
+      const r3 = await supabaseClient
+        .from('CustomerCredits')
+        .select('balance')
+        .eq('email', e)
+        .maybeSingle();
+
+      if (!r3.error && r3.data) return toNum(r3.data.balance);
+    } catch (err) {}
+
+    return 0;
   }
 
-  // 2) Customers (capital C) fallback
-  try {
-    const r2 = await supabaseClient
-      .from('Customers')
-      .select('credit_balance')
-      .eq('email', e)
-      .maybeSingle();
-
-    if (r2.error) console.warn('[credit] Customers select blocked:', r2.error.message);
-    else if (r2.data) {
-      const bal = toNum(r2.data.credit_balance);
-      console.log('[credit] Customers.credit_balance =', bal);
-      return bal;
-    }
-  } catch (err) {
-    console.warn('[credit] Customers exception', err);
+  async function applyCreditToTotal(email, rawTotal) {
+    const balance = await getCreditBalance(email);
+    const use = Math.max(0, Math.min(balance, rawTotal));
+    return { balance, use, final: rawTotal - use };
   }
 
-  // 3) CustomerCredits table fallback (older schema)
-  try {
-    const r3 = await supabaseClient
-      .from('CustomerCredits')
-      .select('balance')
-      .eq('email', e)
-      .maybeSingle();
+  // fetch + cache credit, then rerender
+  let creditFetchTimer = null;
+  function scheduleCreditPreviewFetch() {
+    clearTimeout(creditFetchTimer);
+    creditFetchTimer = setTimeout(async () => {
+      const email = (document.getElementById('email').value || '').trim().toLowerCase();
+      const statusEl = document.getElementById('credit-status');
 
-    if (r3.error) console.warn('[credit] CustomerCredits select blocked:', r3.error.message);
-    else if (r3.data) {
-      const bal = toNum(r3.data.balance);
-      console.log('[credit] CustomerCredits.balance =', bal);
-      return bal;
-    }
-  } catch (err) {
-    console.warn('[credit] CustomerCredits exception', err);
+      if (!email) {
+        lastCreditEmail = '';
+        lastCreditBalance = 0;
+        lastCreditUsed = 0;
+        statusEl.textContent = '';
+        renderOrderSummary();
+        return;
+      }
+
+      statusEl.textContent = 'Checking for credit...';
+
+      try {
+        // use current bundle total
+        const bundle = calculateBundle(cart);
+        const totalBeforeCredit = bundle.finalTotal;
+
+        const credit = await applyCreditToTotal(email, totalBeforeCredit);
+
+        lastCreditEmail = email;
+        lastCreditBalance = credit.balance;
+        lastCreditUsed = credit.use;
+
+        if (credit.balance > 0) {
+          statusEl.textContent = `Credit found: ${money(credit.balance)} (auto-applied)`;
+          statusEl.className = 'small text-success mt-1';
+        } else {
+          statusEl.textContent = '';
+          statusEl.className = 'small text-muted mt-1';
+        }
+
+        // show preview totals with credit applied
+        renderOrderSummary(credit.final, credit.use);
+      } catch (e) {
+        statusEl.textContent = '';
+        statusEl.className = 'small text-muted mt-1';
+        // fall back to normal render
+        renderOrderSummary();
+      }
+    }, 400);
   }
-
-  console.log('[credit] no credit row found (or blocked) -> 0');
-  return 0;
-}
-
-async function applyCreditToTotal(email, rawTotal) {
-  const balance = await getCreditBalance(email);
-  const use = Math.max(0, Math.min(balance, rawTotal));
-  return { balance, use, final: rawTotal - use };
-}
 
   // ---------- PRICE SYNC ----------
   async function syncCartPricesFromSupabase() {
@@ -533,8 +567,10 @@ async function applyCreditToTotal(email, rawTotal) {
     return '';
   }
 
-  // ✅ FIX: render should NOT overwrite `total` (payable) after credit
-  function renderOrderSummary(payableOverride = null, creditUsedOverride = 0) {
+  // ✅ IMPORTANT FIX:
+  // renderOrderSummary must NEVER overwrite the payable `total` unless we intend it to.
+  // It can show a "payableOverride" (after credit) and a "creditUsedOverride".
+  function renderOrderSummary(payableOverride = null, creditUsedOverride = null) {
     const bundle = calculateBundle(cart);
     lastBundleFinal = bundle.finalTotal;
     discountApplied = bundle.discount;
@@ -569,10 +605,14 @@ async function applyCreditToTotal(email, rawTotal) {
       bundleMessageEl.textContent = '';
     }
 
+    const creditToShow = (typeof creditUsedOverride === 'number' && isFinite(creditUsedOverride))
+      ? creditUsedOverride
+      : lastCreditUsed;
+
     // show/hide credit line
-    if (Number(creditUsedOverride || 0) > 0) {
+    if (Number(creditToShow || 0) > 0) {
       creditRow.style.display = 'flex';
-      creditAmount.textContent = `-£${Number(creditUsedOverride).toFixed(2)}`;
+      creditAmount.textContent = `-£${Number(creditToShow).toFixed(2)}`;
     } else {
       creditRow.style.display = 'none';
       creditAmount.textContent = '-£0.00';
@@ -581,6 +621,10 @@ async function applyCreditToTotal(email, rawTotal) {
     const shownTotal = (typeof payableOverride === 'number' && isFinite(payableOverride))
       ? payableOverride
       : bundle.finalTotal;
+
+    // update payable total ONLY if we're showing an override OR we're in pure preview mode
+    // (preview mode = no override, so payable is bundle total)
+    total = shownTotal;
 
     totalEl.textContent = `£${shownTotal.toFixed(2)}`;
   }
@@ -635,7 +679,7 @@ async function applyCreditToTotal(email, rawTotal) {
         .from('Orders')
         .insert({
           user_id: userId,
-          total_amount: total,                 // ✅ payable after credit
+          total_amount: Number(total || 0),     // payable after credit
           status: 'Pending',
           reference: details.ref,
           details: orderDetails,
@@ -707,7 +751,7 @@ async function applyCreditToTotal(email, rawTotal) {
       customer_address: buildAddressText(details),
       order_reference: details.ref,
       order_items: buildItemsText(),
-      order_total: `£${total.toFixed(2)}`
+      order_total: `£${Number(total || 0).toFixed(2)}`
     });
   }
 
@@ -719,7 +763,7 @@ async function applyCreditToTotal(email, rawTotal) {
       customer_address: buildAddressText(details),
       order_reference: details.ref,
       order_items: buildItemsText(),
-      order_total: `£${total.toFixed(2)}`
+      order_total: `£${Number(total || 0).toFixed(2)}`
     });
   }
 
@@ -766,24 +810,28 @@ async function applyCreditToTotal(email, rawTotal) {
       discountApplied = bundle.discount;
       const totalBeforeCredit = bundle.finalTotal;
 
-      // 3) apply credit (based on buyer email)
+      // 3) apply credit (based on typed email)
       const creditEmail = email.trim().toLowerCase();
       const credit = await applyCreditToTotal(creditEmail, totalBeforeCredit);
-      const creditUsed = credit.use;
+
+      // cache for UI + saving
+      lastCreditEmail = creditEmail;
+      lastCreditBalance = credit.balance;
+      lastCreditUsed = credit.use;
 
       // ✅ payable total
       total = credit.final;
 
-      // 4) re-render summary WITHOUT clobbering `total`
-      renderOrderSummary(total, creditUsed);
+      // 4) render summary using payable total (prevents clobbering)
+      renderOrderSummary(total, lastCreditUsed);
 
       const details = { name, phone, email, address1, address2, city, postcode, ref };
 
       // 5) log referral event using pre-credit total (pending)
       await logReferralEventIfAny(ref, email, totalBeforeCredit);
 
-      // 6) save order (includes referral_code + credit fields)
-      await saveOrderToSupabase(details, creditEmail, creditUsed);
+      // 6) save order
+      await saveOrderToSupabase(details, creditEmail, lastCreditUsed);
 
       // 7) deduct stock
       await deductStock(cart);
@@ -800,7 +848,7 @@ async function applyCreditToTotal(email, rawTotal) {
         </div>
       `).join('');
 
-      document.getElementById('payment-total').textContent = `£${total.toFixed(2)}`;
+      document.getElementById('payment-total').textContent = `£${Number(total || 0).toFixed(2)}`;
       document.getElementById('order-ref').textContent = ref;
 
       const paymentDiscountEl = document.getElementById('payment-discount');
@@ -813,9 +861,9 @@ async function applyCreditToTotal(email, rawTotal) {
       }
 
       const paymentCreditEl = document.getElementById('payment-credit');
-      if (creditUsed > 0) {
+      if (lastCreditUsed > 0) {
         paymentCreditEl.style.display = 'block';
-        paymentCreditEl.textContent = `Credit applied: -£${creditUsed.toFixed(2)}`;
+        paymentCreditEl.textContent = `Credit applied: -£${Number(lastCreditUsed).toFixed(2)}`;
       } else {
         paymentCreditEl.style.display = 'none';
         paymentCreditEl.textContent = '';
@@ -863,6 +911,11 @@ async function applyCreditToTotal(email, rawTotal) {
 
     await syncCartPricesFromSupabase();
     renderOrderSummary(); // preview pre-credit
+
+    // auto-check credit when email is entered/changed
+    const emailEl = document.getElementById('email');
+    emailEl.addEventListener('input', scheduleCreditPreviewFetch);
+    emailEl.addEventListener('blur', scheduleCreditPreviewFetch);
   })();
 </script>
 
