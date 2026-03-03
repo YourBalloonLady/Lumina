@@ -301,30 +301,79 @@
   }
 
   // ---------- CREDIT ----------
-  // ✅ FIX: read credit from the same table/column used on the account page: customers.credit_balance
-  async function getCreditBalance(email) {
-    const e = (email || '').trim().toLowerCase();
-    if (!e) return 0;
+async function getCreditBalance(email) {
+  const e = (email || '').trim().toLowerCase();
+  if (!e) return 0;
 
-    try {
-      const { data, error } = await supabaseClient
-        .from('customers')                 // ✅ lower-case
-        .select('credit_balance')          // ✅ column used in account.html
-        .eq('email', e)
-        .maybeSingle();
+  // helper: safe numeric
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
 
-      if (error) return 0;
-      return Number(data?.credit_balance || 0);
-    } catch (e) {
-      return 0;
+  // 1) customers (lower-case) + credit_balance (your account page)
+  try {
+    const r1 = await supabaseClient
+      .from('customers')
+      .select('credit_balance')
+      .eq('email', e)
+      .maybeSingle();
+
+    if (r1.error) console.warn('[credit] customers select blocked:', r1.error.message);
+    else if (r1.data) {
+      const bal = toNum(r1.data.credit_balance);
+      console.log('[credit] customers.credit_balance =', bal);
+      return bal;
     }
+  } catch (err) {
+    console.warn('[credit] customers exception', err);
   }
 
-  async function applyCreditToTotal(email, rawTotal) {
-    const balance = await getCreditBalance(email);
-    const use = Math.max(0, Math.min(balance, rawTotal)); // clamp
-    return { balance, use, final: rawTotal - use };
+  // 2) Customers (capital C) fallback
+  try {
+    const r2 = await supabaseClient
+      .from('Customers')
+      .select('credit_balance')
+      .eq('email', e)
+      .maybeSingle();
+
+    if (r2.error) console.warn('[credit] Customers select blocked:', r2.error.message);
+    else if (r2.data) {
+      const bal = toNum(r2.data.credit_balance);
+      console.log('[credit] Customers.credit_balance =', bal);
+      return bal;
+    }
+  } catch (err) {
+    console.warn('[credit] Customers exception', err);
   }
+
+  // 3) CustomerCredits table fallback (older schema)
+  try {
+    const r3 = await supabaseClient
+      .from('CustomerCredits')
+      .select('balance')
+      .eq('email', e)
+      .maybeSingle();
+
+    if (r3.error) console.warn('[credit] CustomerCredits select blocked:', r3.error.message);
+    else if (r3.data) {
+      const bal = toNum(r3.data.balance);
+      console.log('[credit] CustomerCredits.balance =', bal);
+      return bal;
+    }
+  } catch (err) {
+    console.warn('[credit] CustomerCredits exception', err);
+  }
+
+  console.log('[credit] no credit row found (or blocked) -> 0');
+  return 0;
+}
+
+async function applyCreditToTotal(email, rawTotal) {
+  const balance = await getCreditBalance(email);
+  const use = Math.max(0, Math.min(balance, rawTotal));
+  return { balance, use, final: rawTotal - use };
+}
 
   // ---------- PRICE SYNC ----------
   async function syncCartPricesFromSupabase() {
