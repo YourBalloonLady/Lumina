@@ -204,7 +204,16 @@
       <h2 class="h5 mb-2">Store Credit</h2>
       <div class="text-muted small">Available credit:</div>
       <div class="fs-4 fw-bold" id="credit-balance">£0.00</div>
+<hr>
 
+<h3 class="h6 mb-1">Your referral code</h3>
+<div class="d-flex align-items-center gap-2 flex-wrap">
+  <div class="fw-bold" id="my-ref-code">—</div>
+  <button class="btn btn-sm btn-outline-dark" id="copy-my-ref">Copy</button>
+</div>
+<div class="text-muted small">Share this code with friends. You’ll both get credit on their first paid order.</div>
+
+<hr>
       <hr>
 
       <h3 class="h6 mb-2">Redeem referral code</h3>
@@ -283,9 +292,7 @@
     }
   })();
 
-  function makeCode() {
-  return "LUM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-}
+
 
 async function ensureAffiliateCode() {
   const { data: u } = await supabaseClient.auth.getUser();
