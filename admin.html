@@ -481,6 +481,20 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
     const ADMIN_EMAIL = "luminaweight@gmail.com";
 
+    // ────────────────────────────────────────────────
+// STORE CREDIT CONFIG
+// ────────────────────────────────────────────────
+const CUSTOMERS_TABLE = "Customers";
+const CREDIT_BALANCE_COL = "credit_balance";
+
+// % of order total to award as credit when marked paid
+// e.g. 0.05 = 5%
+const CREDIT_RATE = 10.00;
+
+// optional safety caps (set null to disable)
+const CREDIT_MIN = 10.00;
+const CREDIT_MAX = 150.00; // e.g. 20.00
+
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // EmailJS init (safe)
@@ -702,6 +716,126 @@
     // ORDER HELPERS
     // ────────────────────────────────────────────────
     function getCustomer(order){ return order?.details?.customer || {}; }
+
+    function getOrderEmail(order){
+  const c = order?.details?.customer || {};
+  return String(c.email || order.customer_email || order.email || "").trim().toLowerCase();
+}
+
+function round2(n){
+  return Math.floor((Number(n || 0) + Number.EPSILON) * 100) / 100;
+}
+
+function calcCreditAmount(order){
+  const total = Number(order?.total_amount || 0);
+  let credit = total * CREDIT_RATE;
+
+  // allow manual override per-order if you ever want it:
+  // set order.details.meta.credit_override = 10 to force £10
+  const override = order?.details?.meta?.credit_override;
+  if (override !== undefined && override !== null && String(override).trim() !== "") {
+    credit = Number(override);
+  }
+
+  if (CREDIT_MIN !== null) credit = Math.max(CREDIT_MIN, credit);
+  if (CREDIT_MAX !== null) credit = Math.min(CREDIT_MAX, credit);
+
+  return round2(credit);
+}
+
+function hasCreditAlready(order){
+  const meta = order?.details?.meta || {};
+  return !!meta.credit_awarded_at || !!meta.credit_awarded_amount;
+}
+
+async function awardCreditToCustomerByEmail(email, name, amount){
+  if(!email) throw new Error("No customer email");
+  if(!(amount > 0)) return; // nothing to award
+
+  // fetch existing balance
+  const { data: existing, error: selErr } = await supabaseClient
+    .from(CUSTOMERS_TABLE)
+    .select(`email, name, ${CREDIT_BALANCE_COL}`)
+    .eq("email", email)
+    .maybeSingle();
+
+  if(selErr) throw selErr;
+
+  if(!existing){
+    // create customer row
+    const { error: insErr } = await supabaseClient
+      .from(CUSTOMERS_TABLE)
+      .insert({
+        email,
+        name: name || "",
+        [CREDIT_BALANCE_COL]: amount
+      });
+
+    if(insErr) throw insErr;
+    return;
+  }
+
+  const current = Number(existing?.[CREDIT_BALANCE_COL] || 0);
+  const next = round2(current + amount);
+
+  const { error: upErr } = await supabaseClient
+    .from(CUSTOMERS_TABLE)
+    .update({
+      name: name || existing.name || "",
+      [CREDIT_BALANCE_COL]: next
+    })
+    .eq("email", email);
+
+  if(upErr) throw upErr;
+}
+
+async function awardCreditForPaidOrder(orderId){
+  const order = ordersCache[orderId];
+  if(!order) throw new Error("Order not found in cache");
+
+  // safety: only award when paid/packed/shipped (i.e. payment confirmed)
+  const st = String(order.status || "").toLowerCase();
+  if(!(st === "paid" || st === "packed" || st === "shipped")) return;
+
+  if(hasCreditAlready(order)) return;
+
+  const email = getOrderEmail(order);
+  const c = order?.details?.customer || {};
+  const name = String(c.name || order.customer_name || order.name || "").trim();
+  const amount = calcCreditAmount(order);
+
+  if(!email || !(amount > 0)) return;
+
+  // award to customer
+  await awardCreditToCustomerByEmail(email, name, amount);
+
+  // mark on order meta + history (idempotency flag lives here)
+  const session = await supabaseClient.auth.getSession();
+  const who = session?.data?.session?.user?.email || "admin";
+
+  let updatedDetails = order.details || {};
+  updatedDetails = pushHistory({ ...order, details: updatedDetails }, "credit_awarded", { note: `£${amount.toFixed(2)}` });
+
+  updatedDetails = {
+    ...updatedDetails,
+    meta: {
+      ...(updatedDetails.meta || {}),
+      credit_awarded_amount: amount,
+      credit_awarded_at: new Date().toISOString(),
+      credit_awarded_by: who
+    }
+  };
+
+  const { error } = await supabaseClient
+    .from("Orders")
+    .update({ details: updatedDetails })
+    .eq("id", orderId);
+
+  if(error) throw error;
+
+  // update cache
+  ordersCache[orderId].details = updatedDetails;
+}
 
     function extrasLabel(item) {
       const n = (item?.name || "").toLowerCase();
@@ -1443,8 +1577,21 @@
       }
 
       ordersCache[id].status = value;
-      ordersCache[id].details = updatedDetails;
-      loadOrders();
+ordersCache[id].details = updatedDetails;
+
+// ✅ If admin manually sets to Paid, award credit too
+if(String(value || "").toLowerCase() === "paid"){
+  try{
+    await awardCreditForPaidOrder(id);
+    const amt = Number(ordersCache[id]?.details?.meta?.credit_awarded_amount || 0);
+    if(amt > 0) showToast(`Credit awarded ✅ (£${amt.toFixed(2)})`, "success");
+  }catch(e){
+    console.error("Credit award failed", e);
+    showToast("Status updated but credit failed (check console)", "warning");
+  }
+}
+
+loadOrders();
     }
 
     async function copyAddressById(orderId){
@@ -1560,10 +1707,21 @@
         const { error } = await supabaseClient.from("Orders").update({ status: "Packed", details: updatedDetails }).eq("id", orderId);
         if(error){ console.error(error); alert("Packed update failed."); return; }
 
-        ordersCache[orderId].status = "Packed";
-        ordersCache[orderId].details = updatedDetails;
-        showToast("Packed ✅", "success");
-        loadOrders();
+        ordersCache[orderId].status = "Paid";
+ordersCache[orderId].details = updatedDetails;
+
+// ✅ Award store credit (safe + idempotent)
+try{
+  await awardCreditForPaidOrder(orderId);
+  const amt = Number(ordersCache[orderId]?.details?.meta?.credit_awarded_amount || 0);
+  if(amt > 0) showToast(`Credit awarded ✅ (£${amt.toFixed(2)})`, "success");
+}catch(e){
+  console.error("Credit award failed", e);
+  showToast("Paid ✅ but credit failed (check console)", "warning");
+}
+
+showToast("Marked paid ✅", "success");
+loadOrders();
       }finally{
         setBusy(false);
       }
@@ -2035,6 +2193,8 @@
     function renderOrdersFromCache(){
       const orders = Object.values(ordersCache || {}).sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
 
+      const creditAmt = Number(order.details?.meta?.credit_awarded_amount || 0);
+      const creditAt  = String(order.details?.meta?.credit_awarded_at || "").trim();
       const parsed = parseSearch(searchInput.value);
       const qText = parsed.text;
       const qFilters = parsed.filters;
@@ -2216,6 +2376,8 @@
               <div class="text-end" style="min-width: 280px;">
                 <div class="mb-1">${badge(status)}</div>
                 <div class="fw-bold">£${escapeHtml(total)}</div>
+
+            
 
                 <select class="form-select form-select-sm mt-2" onchange="updateStatus('${order.id}', this.value)">
                   <option ${status === "Pending" ? "selected" : ""}>Pending</option>
