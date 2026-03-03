@@ -289,6 +289,26 @@
     return missing;
   }
 
+async function getCreditBalance(email) {
+  const e = (email || '').trim().toLowerCase();
+  if (!e) return 0;
+
+  const { data, error } = await supabaseClient
+    .from('CustomerCredits')
+    .select('balance')
+    .eq('email', e)
+    .maybeSingle();
+
+  if (error) return 0;
+  return Number(data?.balance || 0);
+}
+
+async function applyCreditToTotal(email, rawTotal) {
+  const balance = await getCreditBalance(email);
+  const use = Math.max(0, Math.min(balance, rawTotal)); // don't go below £0
+  return { balance, use, final: rawTotal - use };
+}
+  
   // ---------- PRICE SYNC ----------
   async function syncCartPricesFromSupabase() {
     try {
@@ -533,7 +553,8 @@
           reference: details.ref,
           details: orderDetails,
           referral_code: localStorage.getItem('referral_code') || null,
-          referral_source: localStorage.getItem('referral_source') || null,
+          credit_used: Number(creditUsed || 0),
+          credit_email: creditEmail,
         });
 
       if (insertError) console.error('Error saving order to Supabase:', insertError);
@@ -542,6 +563,22 @@
     }
   }
 
+async function logReferralEventIfAny(orderRef, buyerEmail, orderTotalBeforeCredit) {
+  const code = (localStorage.getItem('referral_code') || '').trim().toUpperCase();
+  if (!code) return;
+
+  await supabaseClient
+    .from('ReferralEvents')
+    .insert({
+      referral_code: code,
+      referred_email: buyerEmail.toLowerCase(),
+      order_reference: orderRef,
+      order_total: Number(orderTotalBeforeCredit || 0),
+      credit_amount: 10,
+      status: 'pending'
+    });
+}
+  
   async function deductStock(cartItems) {
     try {
       const ids = cartItems.map(i => i.id).filter(Boolean);
@@ -628,12 +665,20 @@
       return;
     }
 
+    await logReferralEventIfAny(ref, email, bundle.finalTotal); 
+
     await syncCartPricesFromSupabase();
     renderOrderSummary();
 
     const bundle = calculateBundle(cart);
     total = bundle.finalTotal;
     discountApplied = bundle.discount;
+
+    const creditEmail = email.trim().toLowerCase();
+const credit = await applyCreditToTotal(creditEmail, total);
+
+const creditUsed = credit.use;
+total = credit.final; // NEW total after credit
 
     const details = { name, phone, email, address1, address2, city, postcode, ref };
 
