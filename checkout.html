@@ -559,6 +559,10 @@
         reference: details.ref
       };
 
+            // ✅ Add referral code into details.meta
+      orderDetails.meta = orderDetails.meta || {};
+      orderDetails.meta.referral_code = (localStorage.getItem('referral_code') || null);
+
       const { error: insertError } = await supabaseClient
         .from('Orders')
         .insert({
