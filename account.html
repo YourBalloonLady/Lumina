@@ -262,6 +262,36 @@
     }
   })();
 
+  function makeCode() {
+  return "LUM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+async function ensureAffiliateCode() {
+  const { data: u } = await supabaseClient.auth.getUser();
+  const user = u?.user;
+  if (!user) return null;
+
+  // try fetch existing
+  const { data: existing } = await supabaseClient
+    .from('Affiliates')
+    .select('code')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (existing?.code) return existing.code;
+
+  // create new
+  const code = makeCode();
+  const { data, error } = await supabaseClient
+    .from('Affiliates')
+    .insert([{ user_id: user.id, code }])
+    .select('code')
+    .single();
+
+  if (error) throw error;
+  return data.code;
+}
+
   function getStatusBadge(status) {
     const s = (status || 'Pending').toLowerCase();
     if (s === 'paid')      return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
