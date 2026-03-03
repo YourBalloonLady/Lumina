@@ -1530,35 +1530,10 @@ async function ensureAffiliateCode() {
     pw2.value = '';
   });
 
-  // Logout (hardened)
-if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
-    console.log("Logout clicked");
-
-    logoutBtn.disabled = true;
-    const oldText = logoutBtn.textContent;
-    logoutBtn.textContent = "Logging out…";
-
-    try {
-      const { error } = await supabaseClient.auth.signOut();
-      if (error) throw error;
-
-      // double-check session is cleared
-      const { data } = await supabaseClient.auth.getSession();
-      console.log("Session after signOut:", data?.session);
-
-      // hard redirect (prevents caching weirdness)
-      window.location.replace('index.html');
-    } catch (e) {
-      console.error("Logout failed:", e);
-      alert("Logout failed: " + (e?.message || "Unknown error"));
-      logoutBtn.disabled = false;
-      logoutBtn.textContent = oldText;
-    }
+    await supabaseClient.auth.signOut();
+    window.location.href = 'index.html';
   });
-} else {
-  console.warn("logout-btn not found in DOM");
-}
 
   // Redeem referral
   if (redeemBtn) {
