@@ -123,7 +123,7 @@
               <span id="bundle-amount">-£0.00</span>
             </div>
 
-            <!-- NEW: credit row -->
+            <!-- credit row -->
             <div class="d-flex justify-content-between small text-success mt-1"
                  id="credit-row" style="display:none;">
               <span>Credit applied</span>
@@ -200,8 +200,9 @@
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let cart = [];
-  let total = 0;
-  let discountApplied = 0;
+  let total = 0;            // ✅ payable total (after credit)
+  let discountApplied = 0;  // bundle discount
+  let lastBundleFinal = 0;  // ✅ total after bundle, before credit
 
   // Capture referral code if present
   (function captureReferralOnCheckout(){
@@ -260,7 +261,7 @@
     if (cart[index].sema_form === 'pen') cart[index].syringes = "";
     if (cart[index].sema_form === 'vial') cart[index].pen_heads = "";
     saveCartToStorage();
-    renderOrderSummary();
+    renderOrderSummary(); // preview totals (pre-credit)
   }
 
   function setAccessory(index, field, value) {
@@ -269,7 +270,7 @@
     if (field === 'pen_heads') cart[index].pen_heads = v;
     if (field === 'syringes')  cart[index].syringes  = v;
     saveCartToStorage();
-    renderOrderSummary();
+    renderOrderSummary(); // preview totals (pre-credit)
   }
 
   function validateAccessories() {
@@ -300,18 +301,23 @@
   }
 
   // ---------- CREDIT ----------
+  // ✅ FIX: read credit from the same table/column used on the account page: customers.credit_balance
   async function getCreditBalance(email) {
     const e = (email || '').trim().toLowerCase();
     if (!e) return 0;
 
-    const { data, error } = await supabaseClient
-      .from('CustomerCredits')
-      .select('balance')
-      .eq('email', e)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabaseClient
+        .from('customers')                 // ✅ lower-case
+        .select('credit_balance')          // ✅ column used in account.html
+        .eq('email', e)
+        .maybeSingle();
 
-    if (error) return 0;
-    return Number(data?.balance || 0);
+      if (error) return 0;
+      return Number(data?.credit_balance || 0);
+    } catch (e) {
+      return 0;
+    }
   }
 
   async function applyCreditToTotal(email, rawTotal) {
@@ -478,9 +484,10 @@
     return '';
   }
 
-  function renderOrderSummary() {
+  // ✅ FIX: render should NOT overwrite `total` (payable) after credit
+  function renderOrderSummary(payableOverride = null, creditUsedOverride = 0) {
     const bundle = calculateBundle(cart);
-    total = bundle.finalTotal;
+    lastBundleFinal = bundle.finalTotal;
     discountApplied = bundle.discount;
 
     const summaryEl       = document.getElementById('order-summary');
@@ -489,9 +496,9 @@
     const bundleAmountEl  = document.getElementById('bundle-amount');
     const bundleMessageEl = document.getElementById('bundle-message');
 
-    // reset credit row (only shown at submit)
-    document.getElementById('credit-row').style.display = 'none';
-    document.getElementById('credit-amount').textContent = '-£0.00';
+    // credit row
+    const creditRow = document.getElementById('credit-row');
+    const creditAmount = document.getElementById('credit-amount');
 
     summaryEl.innerHTML = cart.map((i, idx) => `
       <div class="py-2 border-bottom">
@@ -513,7 +520,20 @@
       bundleMessageEl.textContent = '';
     }
 
-    totalEl.textContent = `£${bundle.finalTotal.toFixed(2)}`;
+    // show/hide credit line
+    if (Number(creditUsedOverride || 0) > 0) {
+      creditRow.style.display = 'flex';
+      creditAmount.textContent = `-£${Number(creditUsedOverride).toFixed(2)}`;
+    } else {
+      creditRow.style.display = 'none';
+      creditAmount.textContent = '-£0.00';
+    }
+
+    const shownTotal = (typeof payableOverride === 'number' && isFinite(payableOverride))
+      ? payableOverride
+      : bundle.finalTotal;
+
+    totalEl.textContent = `£${shownTotal.toFixed(2)}`;
   }
 
   function buildItemsText() {
@@ -559,7 +579,6 @@
         reference: details.ref
       };
 
-            // ✅ Add referral code into details.meta
       orderDetails.meta = orderDetails.meta || {};
       orderDetails.meta.referral_code = (localStorage.getItem('referral_code') || null);
 
@@ -567,7 +586,7 @@
         .from('Orders')
         .insert({
           user_id: userId,
-          total_amount: total,
+          total_amount: total,                 // ✅ payable after credit
           status: 'Pending',
           reference: details.ref,
           details: orderDetails,
@@ -703,19 +722,11 @@
       const credit = await applyCreditToTotal(creditEmail, totalBeforeCredit);
       const creditUsed = credit.use;
 
-      // final total saved/charged
+      // ✅ payable total
       total = credit.final;
 
-      // update UI total + show credit row if used
-      document.getElementById('final-total').textContent = `£${total.toFixed(2)}`;
-      if (creditUsed > 0) {
-        document.getElementById('credit-row').style.display = 'flex';
-        document.getElementById('credit-amount').textContent = `-£${creditUsed.toFixed(2)}`;
-      }
-
-      // 4) re-render order summary (shows bundle row; total handled above)
-      renderOrderSummary();
-      document.getElementById('final-total').textContent = `£${total.toFixed(2)}`; // keep post-credit total
+      // 4) re-render summary WITHOUT clobbering `total`
+      renderOrderSummary(total, creditUsed);
 
       const details = { name, phone, email, address1, address2, city, postcode, ref };
 
@@ -802,7 +813,7 @@
     saveCartToStorage();
 
     await syncCartPricesFromSupabase();
-    renderOrderSummary();
+    renderOrderSummary(); // preview pre-credit
   })();
 </script>
 
