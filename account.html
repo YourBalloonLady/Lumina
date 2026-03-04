@@ -530,10 +530,18 @@
       redeemMsg.className = "small mt-2";
 
       try {
-        const res = await redeemReferralCode(refInput.value, 10);
-        redeemMsg.textContent = `✅ £${res.added.toFixed(2)} added. Total credit: £${res.total_credit.toFixed(2)}`;
-        redeemMsg.classList.add("text-success");
-        refInput.value = "";
+  const code = refInput.value.trim().toUpperCase();
+
+  const res = await redeemReferralCode(code, 10);
+
+  // Save referral code so checkout attaches it to the order
+  localStorage.setItem('referral_code', code);
+
+  redeemMsg.textContent = `✅ £${res.added.toFixed(2)} added. Total credit: £${res.total_credit.toFixed(2)}`;
+  redeemMsg.classList.add("text-success");
+
+  refInput.value = "";
+}
 
         const { data: sess } = await supabaseClient.auth.getSession();
         const email = sess?.session?.user?.email;
