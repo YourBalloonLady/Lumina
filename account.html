@@ -525,34 +525,34 @@
 
   // Redeem referral
   if (redeemBtn) {
-    redeemBtn.addEventListener("click", async () => {
-      redeemMsg.textContent = "";
-      redeemMsg.className = "small mt-2";
+  redeemBtn.addEventListener("click", async () => {
+    redeemMsg.textContent = "";
+    redeemMsg.className = "small mt-2";
 
-      try {
-  const code = refInput.value.trim().toUpperCase();
+    try {
+      const code = refInput.value.trim().toUpperCase();
 
-  const res = await redeemReferralCode(code, 10);
+      const res = await redeemReferralCode(code, 10);
 
-  // Save referral code so checkout attaches it to the order
-  localStorage.setItem('referral_code', code);
+      // Save referral code so checkout attaches it to the order
+      localStorage.setItem("referral_code", code);
 
-  redeemMsg.textContent = `✅ £${res.added.toFixed(2)} added. Total credit: £${res.total_credit.toFixed(2)}`;
-  redeemMsg.classList.add("text-success");
+      redeemMsg.textContent = `✅ £${res.added.toFixed(2)} added. Total credit: £${res.total_credit.toFixed(2)}`;
+      redeemMsg.classList.add("text-success");
 
-  refInput.value = "";
+      refInput.value = "";
+
+      // Refresh displayed credit + code
+      const { data: sess } = await supabaseClient.auth.getSession();
+      const email = sess?.session?.user?.email;
+      if (email) await loadCreditAndCode(email);
+
+    } catch (e) {
+      redeemMsg.textContent = `❌ ${e.message}`;
+      redeemMsg.classList.add("text-danger");
+    }
+  });
 }
-
-        const { data: sess } = await supabaseClient.auth.getSession();
-        const email = sess?.session?.user?.email;
-        if(email) await loadCreditAndCode(email);
-
-      } catch (e) {
-        redeemMsg.textContent = `❌ ${e.message}`;
-        redeemMsg.classList.add("text-danger");
-      }
-    });
-  }
 
   // Copy my referral code
   if(copyMyRefBtn){
