@@ -1,165 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GHK-Cu Peptide Guide | Lumina</title>
+  <meta name="description" content="Educational guide to GHK-Cu covering what it is, how it is discussed in skin, tissue, and regenerative research, and the key limitations and safety context around this peptide." />
+  <meta name="robots" content="noindex, nofollow" />
 
-<title>GHK-Cu Peptide Guide | Lumina</title>
+  <meta property="og:title" content="GHK-Cu Peptide Guide | Lumina" />
+  <meta property="og:description" content="Learn what GHK-Cu is, how it is studied in skin, tissue, and regenerative research, and the important limitations and safety context around this peptide." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://luminaweight.co.uk/ghk-cu.html" />
 
-<meta name="description" content="Educational guide to GHK-Cu covering its role in skin regeneration, wound healing research, and tissue repair pathways." />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --lumina-green: #22c55e;
+      --lumina-green-dark: #16a34a;
+      --lumina-green-soft: #dcfce7;
+      --lumina-bg: #f8fafc;
+      --lumina-card: #ffffff;
+      --lumina-text: #0f172a;
+      --lumina-muted: #64748b;
+      --lumina-border: #e2e8f0;
+      --lumina-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+      --lumina-radius: 22px;
+    }
 
-<style>
-body{
-font-family: Inter, sans-serif;
-background:#f8fafc;
-color:#0f172a;
-line-height:1.7;
-}
+    * { box-sizing: border-box; }
 
-.section{
-padding:40px 0;
-}
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--lumina-bg);
+      color: var(--lumina-text);
+      line-height: 1.7;
+    }
 
-.page-card{
-background:#fff;
-border:1px solid #e2e8f0;
-border-radius:20px;
-padding:30px;
-box-shadow:0 10px 30px rgba(0,0,0,0.05);
-}
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-.section-title{
-font-weight:700;
-margin-bottom:12px;
-}
+    .navbar {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    }
 
-.pill{
-display:inline-block;
-padding:6px 12px;
-border-radius:20px;
-border:1px solid #e2e8f0;
-margin-right:6px;
-font-size:0.85rem;
-}
+    .navbar-brand {
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
 
-.btn-soft{
-border:1px solid #e2e8f0;
-border-radius:30px;
-padding:10px 18px;
-font-weight:600;
-background:white;
-}
+    .brand-dot {
+      color: var(--lumina-green);
+    }
 
-.btn-soft:hover{
-background:#f1f5f9;
-}
-</style>
+    .hero {
+      padding: 88px 0 42px;
+      background:
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(22, 163, 74, 0.08), transparent 24%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
 
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--lumina-green-soft);
+      color: var(--lumina-green-dark);
+      font-weight: 700;
+      font-size: 0.92rem;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.1rem, 4vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      max-width: 860px;
+    }
+
+    .hero p.lead {
+      color: var(--lumina-muted);
+      font-size: 1.05rem;
+      max-width: 850px;
+      margin-bottom: 0;
+    }
+
+    .section {
+      padding: 24px 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.45rem, 2.6vw, 2.15rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .page-card,
+    .info-card,
+    .faq-card,
+    .disclaimer-card {
+      background: var(--lumina-card);
+      border: 1px solid var(--lumina-border);
+      border-radius: var(--lumina-radius);
+      box-shadow: var(--lumina-shadow);
+    }
+
+    .page-card {
+      padding: 28px;
+    }
+
+    .info-card {
+      padding: 22px;
+      height: 100%;
+    }
+
+    .info-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .info-card p,
+    .page-card p,
+    .page-card li {
+      color: var(--lumina-muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--lumina-border);
+      background: #fff;
+      color: #334155;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .btn-soft {
+      background: #fff;
+      color: var(--lumina-text);
+      border: 1px solid var(--lumina-border);
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .btn-soft:hover {
+      background: #fff;
+      color: var(--lumina-text);
+      border-color: #cbd5e1;
+    }
+
+    .faq-item {
+      border: 1px solid var(--lumina-border);
+      border-radius: 18px !important;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: var(--lumina-shadow);
+      background: #fff;
+    }
+
+    .accordion-button {
+      font-weight: 700;
+      padding: 18px 20px;
+      background: #fff;
+      box-shadow: none !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: #fff;
+      color: var(--lumina-green-dark);
+    }
+
+    .accordion-body {
+      color: var(--lumina-muted);
+      padding: 0 20px 20px;
+    }
+
+    .disclaimer-card {
+      padding: 26px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .footer {
+      padding: 34px 0 56px;
+      color: var(--lumina-muted);
+      font-size: 0.95rem;
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "GHK-Cu Peptide Guide",
+    "description": "Educational guide to GHK-Cu covering what it is, how it is discussed in skin, tissue, and regenerative research, and the key limitations and safety context around this peptide.",
+    "author": {
+      "@type": "Organization",
+      "name": "Lumina"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Lumina"
+    }
+  }
+  </script>
 </head>
-
 <body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Lumina<span class="brand-dot">.</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="peptides.html">Peptide Library</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-<div class="container section">
+  <header class="hero">
+    <div class="container">
+      <a href="peptides.html" class="btn btn-soft mb-4">← Back to Peptide Library</a>
+      <div class="hero-badge">Regenerative research</div>
+      <h1>GHK-Cu Peptide Guide</h1>
+      <p class="lead">
+        GHK-Cu is a naturally occurring copper-binding peptide that has drawn long-standing interest in skin, tissue, and regenerative research. It is commonly discussed in relation to tissue remodelling, extracellular matrix signalling, cosmetic science, and broader questions around how repair-related pathways behave in controlled research settings.
+      </p>
+    </div>
+  </header>
 
-<a href="peptides.html" class="btn-soft mb-4">← Back to Peptide Library</a>
+  <section class="section">
+    <div class="container">
+      <div class="page-card">
+        <h2 class="section-title">What is GHK-Cu?</h2>
+        <p>
+          GHK-Cu stands for glycyl-L-histidyl-L-lysine copper. It is a naturally occurring peptide complex associated with copper ions and has been discussed for decades in research connected to tissue signalling and regenerative biology.
+        </p>
+        <p>
+          One reason GHK-Cu stands out is that it is not mainly associated with appetite, metabolism, or growth-hormone pathways like many other compounds in peptide libraries. Instead, it is more often linked to skin-related, cosmetic, and tissue-focused research discussions.
+        </p>
+        <div class="pill-row">
+          <span class="pill">Copper peptide</span>
+          <span class="pill">Skin research</span>
+          <span class="pill">Tissue signalling</span>
+          <span class="pill">Regenerative interest</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div class="page-card">
+  <section class="section pt-0">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="info-card">
+            <h3>Main interest</h3>
+            <p>Researchers are mainly interested in GHK-Cu because of its association with skin biology, tissue remodelling, and repair-related cellular signalling.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="info-card">
+            <h3>Why people care</h3>
+            <p>Because it is widely mentioned in cosmetic and dermatology-related research, GHK-Cu has become one of the better-known peptides outside the usual metabolic or hormone-focused categories.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="info-card">
+            <h3>Key reality check</h3>
+            <p>Cosmetic and regenerative compounds often attract confident claims quickly, so it is important to separate legitimate research interest from exaggerated promises.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<h1 class="section-title">GHK-Cu Peptide Guide</h1>
+  <section class="section">
+    <div class="container">
+      <div class="page-card">
+        <h2 class="section-title">How GHK-Cu works</h2>
+        <p>
+          GHK-Cu is generally discussed in relation to signalling pathways involved in tissue maintenance, extracellular matrix behaviour, and broader repair-related biology. Its copper-binding nature is part of why it is considered distinct within this research area.
+        </p>
+        <p>
+          In practical terms, the scientific interest is not that it sits in the same lane as metabolic or endocrine peptides, but that it belongs more naturally in discussions around skin research, tissue behaviour, and cosmetic science.
+        </p>
+      </div>
+    </div>
+  </section>
 
-<p>
-GHK-Cu is a naturally occurring copper peptide that has gained significant attention in research related to skin regeneration, wound healing, and tissue repair. It is one of the most widely studied peptides in cosmetic and dermatological research due to its potential role in supporting cellular repair and collagen production.
-</p>
+  <section class="section pt-0">
+    <div class="container">
+      <div class="page-card">
+        <h2 class="section-title">What researchers are interested in</h2>
+        <ul>
+          <li>Skin-related and dermatology-focused research</li>
+          <li>Tissue remodelling and extracellular matrix signalling</li>
+          <li>Repair-related cellular pathways</li>
+          <li>Cosmetic science and topical research discussions</li>
+          <li>How copper peptides differ from other peptide categories</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-<div class="mt-3">
-<span class="pill">Skin regeneration</span>
-<span class="pill">Tissue repair</span>
-<span class="pill">Wound healing research</span>
-<span class="pill">Collagen support</span>
-</div>
+  <section class="section pt-0">
+    <div class="container">
+      <div class="page-card">
+        <h2 class="section-title">Where GHK-Cu is commonly discussed</h2>
+        <p>
+          Unlike peptides mainly discussed for metabolic regulation or growth-hormone signalling, GHK-Cu is most often mentioned in skin, dermatology, and tissue-related conversations. That gives it a very different research identity from compounds such as tirzepatide, ipamorelin, or MOTS-C.
+        </p>
+        <p>
+          It is also one of the more recognisable names in cosmetic peptide circles, which is why it often appears in topical and appearance-related discussions as well as broader regenerative research.
+        </p>
+      </div>
+    </div>
+  </section>
 
-</div>
-</div>
+  <section class="section pt-0">
+    <div class="container">
+      <div class="page-card">
+        <h2 class="section-title">Why it gets so much attention</h2>
+        <p>
+          GHK-Cu gets attention because anything linked to skin, appearance, and tissue-related improvement tends to spread quickly. The subject feels tangible to people in a way that abstract metabolic or endocrine research often does not.
+        </p>
+        <p>
+          That same visibility creates a downside: once a compound becomes popular in cosmetic or regenerative discussions, the claims often become much broader than the evidence can comfortably support. That is why grounded wording matters here.
+        </p>
+      </div>
+    </div>
+  </section>
 
-<div class="container section pt-0">
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Frequently asked questions</h2>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item faq-item">
+          <h2 class="accordion-header" id="faqOneHeading">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
+              What is GHK-Cu mainly studied for?
+            </button>
+          </h2>
+          <div id="faqOne" class="accordion-collapse collapse show" aria-labelledby="faqOneHeading" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Mainly for skin, tissue, and regenerative research, including discussions around repair-related signalling and cosmetic science.
+            </div>
+          </div>
+        </div>
 
-<div class="page-card">
+        <div class="accordion-item faq-item">
+          <h2 class="accordion-header" id="faqTwoHeading">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+              Is GHK-Cu a copper peptide?
+            </button>
+          </h2>
+          <div id="faqTwo" class="accordion-collapse collapse" aria-labelledby="faqTwoHeading" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Yes. GHK-Cu is commonly described as a copper-binding peptide, which is part of what makes it distinct within skin and tissue research conversations.
+            </div>
+          </div>
+        </div>
 
-<h2 class="section-title">What is GHK-Cu?</h2>
+        <div class="accordion-item faq-item">
+          <h2 class="accordion-header" id="faqThreeHeading">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
+              Why is GHK-Cu discussed differently from metabolic peptides?
+            </button>
+          </h2>
+          <div id="faqThree" class="accordion-collapse collapse" aria-labelledby="faqThreeHeading" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Because it is most often associated with skin, tissue, and cosmetic research rather than appetite, metabolism, or growth-hormone-related pathways.
+            </div>
+          </div>
+        </div>
 
-<p>
-GHK-Cu (glycyl-L-histidyl-L-lysine copper) is a naturally occurring peptide found in human plasma, saliva, and urine. It binds to copper ions and is involved in various biological processes related to tissue repair and regeneration.
-</p>
+        <div class="accordion-item faq-item">
+          <h2 class="accordion-header" id="faqFourHeading">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
+              Is this page medical advice?
+            </button>
+          </h2>
+          <div id="faqFour" class="accordion-collapse collapse" aria-labelledby="faqFourHeading" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              No. This page is for educational and research discussion purposes only. It is not medical advice, diagnosis, or treatment guidance.
+            </div>
+          </div>
+        </div>
+      </div>
 
-<p>
-The peptide was first identified in the 1970s and has since been studied extensively for its role in promoting wound healing, improving skin elasticity, and supporting collagen synthesis.
-</p>
+      <div class="mt-5 pt-4 border-top">
+        <h3 class="fw-bold mb-3">Related guides</h3>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="bpc-157.html" class="btn btn-outline-success rounded-pill">BPC-157</a>
+          <a href="tb-500.html" class="btn btn-outline-success rounded-pill">TB-500</a>
+          <a href="tesamorelin.html" class="btn btn-outline-success rounded-pill">Tesamorelin</a>
+          <a href="ipamorelin.html" class="btn btn-outline-success rounded-pill">Ipamorelin</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-</div>
+  <section class="section pt-0" id="disclaimer">
+    <div class="container">
+      <div class="disclaimer-card">
+        <h3>Research disclaimer</h3>
+        <p>
+          The information provided on this page is intended for educational and research discussion purposes only.
+        </p>
+        <p>
+          Nothing on this page should be interpreted as medical advice, diagnosis, treatment guidance, or a recommendation for human use.
+        </p>
+        <p>
+          Compounds discussed in research circles may have limited human data, mixed evidence quality, and varying regulatory status.
+        </p>
+      </div>
+    </div>
+  </section>
 
-</div>
+  <footer class="footer">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+      <div>© 2026 Lumina. Educational peptide research content.</div>
+      <div>Built for clarity, trust, and scalable SEO.</div>
+    </div>
+  </footer>
 
-<div class="container section pt-0">
-
-<div class="page-card">
-
-<h2 class="section-title">Why researchers study GHK-Cu</h2>
-
-<ul>
-
-<li>Skin regeneration and wound healing pathways</li>
-<li>Collagen and elastin production</li>
-<li>Tissue repair and remodeling</li>
-<li>Hair follicle health research</li>
-<li>Anti-inflammatory signaling pathways</li>
-
-</ul>
-
-<p>
-Because of these potential effects, GHK-Cu has become popular in dermatology research and is frequently discussed in cosmetic science and regenerative medicine conversations.
-</p>
-
-</div>
-
-</div>
-
-<div class="container section pt-0">
-
-<div class="page-card">
-
-<h2 class="section-title">Where GHK-Cu is commonly discussed</h2>
-
-<p>
-Unlike many peptides that focus primarily on metabolism or hormone signaling, GHK-Cu is usually discussed in the context of skin health and tissue repair. It is often associated with research into topical applications for skin rejuvenation and wound recovery.
-</p>
-
-<p>
-In addition to dermatology research, some discussions also explore its potential effects on hair growth and inflammatory pathways involved in tissue healing.
-</p>
-
-</div>
-
-</div>
-
-<div class="container section">
-
-<h3 class="section-title">Related guides</h3>
-
-<div class="d-flex flex-wrap gap-2">
-
-<a href="bpc-157.html" class="btn btn-outline-success rounded-pill">BPC-157</a>
-
-<a href="tb-500.html" class="btn btn-outline-success rounded-pill">TB-500</a>
-
-<a href="tesamorelin.html" class="btn btn-outline-success rounded-pill">Tesamorelin</a>
-
-<a href="ipamorelin.html" class="btn btn-outline-success rounded-pill">Ipamorelin</a>
-
-</div>
-
-</div>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
