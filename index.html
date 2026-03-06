@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- SEO fixes (UPDATED: neutral research supplier language) -->
+<!-- SEO -->
 <title>UK Research Materials Supplier | Lumina</title>
-<meta name="description" content="UK-based supplier of research materials. Tirzepatide and Retatrutide products supplied strictly for laboratory research use only (not for human consumption). Discreet UK dispatch.">
+<meta name="description" content="UK-based supplier of research materials. Tirzepatide, Retatrutide, and related materials supplied strictly for laboratory research use only (not for human consumption). Discreet UK dispatch.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="UK Research Materials Supplier | Lumina">
 <meta property="og:description" content="UK supplier of research materials. Laboratory research use only • Not for human consumption • Discreet UK dispatch.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://luminaweight.co.uk/">
 
-  <!-- FAVICON / TAB ICON -->
-<link rel="icon" href="/favicon.ico?v=3">
-<link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=3">
-<link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=3">
-<link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=3">
+<!-- FAVICON / TAB ICON -->
+<link rel="icon" href="/favicon.ico?v=4">
+<link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=4">
+<link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=4">
+<link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -31,52 +31,375 @@
     --lw-dark: #0f172a;
     --lw-muted: #64748b;
     --lw-bg: #f3f4f6;
+    --lw-card: #ffffff;
+    --lw-border: rgba(148, 163, 184, 0.18);
   }
+
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: var(--lw-bg);
     color: var(--lw-dark);
     margin: 0;
-    padding-top: 80px;
+    padding-top: 112px;
   }
+
   #trust-bar {
     position: fixed;
     top: 0;
     width: 100%;
     background: linear-gradient(90deg, #22c55e, #16a34a);
-    color: white;
+    color: #fff;
     font-size: 0.85rem;
     font-weight: 600;
     padding: 6px 0;
     z-index: 1100;
     text-align: center;
   }
-  #trust-bar span {white-space: nowrap;}
+
+  #trust-bar .container {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  #trust-bar span {
+    white-space: nowrap;
+  }
 
   .navbar {
     background: #ffffff !important;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
   }
 
-  /* desktop: fixed nav under trust bar */
   .navbar.fixed-top {
     top: 32px;
   }
 
-  /* desktop only – keep nav fixed */
-  @media (min-width: 769px) {
-    .navbar.fixed-top {
-      position: fixed;
-      left: 0;
-      right: 0;
-    }
-
-    body {
-      padding-top: 80px; /* space for trust bar + nav */
-    }
+  .navbar-brand img {
+    height: 36px;
+    margin-right: 10px;
   }
 
-  /* mobile: no fixed elements, everything scrolls */
+  .navbar-brand span {
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  .nav-link {
+    font-weight: 500;
+    color: var(--lw-muted) !important;
+  }
+
+  .nav-link.active,
+  .nav-link:hover {
+    color: var(--lw-dark) !important;
+  }
+
+  .cart-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--lw-dark);
+  }
+
+  .hero {
+    background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
+    padding: 110px 0 70px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.08);
+    color: #15803d;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 3.35rem);
+    font-weight: 800;
+    line-height: 1.08;
+    margin-top: 18px;
+  }
+
+  .hero-title span.highlight {
+    color: #0f766e;
+  }
+
+  .hero-subtitle {
+    color: var(--lw-muted);
+    font-size: 1.05rem;
+    max-width: 690px;
+    margin: 16px auto 0;
+  }
+
+  .hero-cta {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .hero-trust {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--lw-dark);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+  }
+
+  .btn-primary-lw {
+    background: var(--lw-mint);
+    border-color: var(--lw-mint);
+    font-weight: 600;
+    padding-inline: 32px;
+    border-radius: 999px;
+  }
+
+  .btn-primary-lw:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+  }
+
+  .btn-ghost {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    font-weight: 500;
+    color: var(--lw-muted);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .btn-ghost:hover {
+    background: #ffffff;
+    color: var(--lw-dark);
+  }
+
+  .section-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 0.78rem;
+    color: #0f766e;
+    font-weight: 700;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  .section-subtitle {
+    color: var(--lw-muted);
+    max-width: 650px;
+    margin: 10px auto 0;
+  }
+
+  #why-lumina {
+    padding: 12px 0 20px;
+  }
+
+  .why-card {
+    background: var(--lw-card);
+    border: 1px solid var(--lw-border);
+    border-radius: 22px;
+    padding: 24px;
+    height: 100%;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+  }
+
+  .why-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lw-mint-soft);
+    color: #15803d;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+
+  .why-card h3 {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .why-card p {
+    margin: 0;
+    color: var(--lw-muted);
+    font-size: 0.95rem;
+  }
+
+  #products {
+    padding: 60px 0 80px;
+  }
+
+  .product-card {
+    border: 0;
+    border-radius: 24px;
+    background: #ffffff;
+    padding-top: 4px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    transition: transform .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+  }
+
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 60px rgba(15, 23, 42, 0.12);
+  }
+
+  .product-card.out-of-stock {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .product-card img {
+    height: 220px;
+    object-fit: contain;
+  }
+
+  .product-body {
+    padding: 1.5rem 1.6rem 1.6rem;
+  }
+
+  .product-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: .15rem;
+  }
+
+  .product-price {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .product-price span {
+    font-size: .9rem;
+    color: var(--lw-muted);
+    font-weight: 500;
+  }
+
+  .pill-label {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .pill-popular {
+    background: #22c55e;
+  }
+
+  .pill-premium {
+    background: #6366f1;
+  }
+
+  .stock {
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  .btn-add {
+    border-radius: 999px;
+    font-weight: 600;
+    padding-inline: 24px;
+    margin-top: 10px;
+  }
+
+  .cart-sidebar {
+    height: 100vh;
+    width: 420px;
+    position: fixed;
+    top: 0;
+    right: -420px;
+    background: #ffffff;
+    box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18);
+    transition: 0.35s;
+    z-index: 9999;
+    overflow-y: auto;
+  }
+
+  .cart-sidebar.open {
+    right: 0;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 9998;
+  }
+
+  .overlay.show {
+    display: block;
+  }
+
+  #contact {
+    padding: 70px 0;
+  }
+
+  .contact-card {
+    background: #ffffff;
+    border: 1px solid var(--lw-border);
+    border-radius: 24px;
+    box-shadow: 0 14px 35px rgba(15,23,42,0.05);
+  }
+
+  .contact-note {
+    color: var(--lw-muted);
+    font-size: 0.95rem;
+  }
+
+  .review-card {
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 24px;
+    box-shadow: 0 12px 32px rgba(15,23,42,0.06);
+  }
+
+  footer {
+    background: #020617;
+    color: #9ca3af;
+    padding: 22px 0;
+    font-size: 0.9rem;
+  }
+
+  footer a {
+    color: #cbd5e1;
+  }
+
+  footer a:hover {
+    color: #ffffff;
+  }
+
   @media (max-width: 768px) {
     #trust-bar {
       position: static;
@@ -90,53 +413,41 @@
     body {
       padding-top: 0;
     }
-  }
 
-  .navbar-brand img {height: 36px;margin-right: 10px;}
-  .navbar-brand span {font-weight: 700;font-size: 1.15rem;}
-  .nav-link {font-weight: 500;color: var(--lw-muted) !important;}
-  .nav-link.active,.nav-link:hover {color: var(--lw-dark) !important;}
-  .cart-icon {cursor: pointer;font-size: 1.5rem;color: var(--lw-dark);}
-  .hero {background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);padding: 120px 0 140px;}
-  .hero-eyebrow {display: inline-flex;align-items: center;gap: 8px;padding: 6px 14px;border-radius: 999px;background: rgba(34, 197, 94, 0.08);color: #15803d;font-size: 0.85rem;font-weight: 600;}
-  .hero-title {font-size: clamp(2.5rem, 5vw, 3.2rem);font-weight: 800;line-height: 1.1;margin-top: 18px;}
-  .hero-title span.highlight {color: #0f766e;}
-  .hero-subtitle {color: var(--lw-muted);font-size: 1.05rem;max-width: 550px;margin: 16px auto 0;}
-  .hero-cta {margin-top: 30px;display: flex;justify-content: center;gap: 14px;flex-wrap: wrap;}
-  .btn-primary-lw {background: var(--lw-mint);border-color: var(--lw-mint);font-weight: 600;padding-inline: 32px;border-radius: 999px;}
-  .btn-primary-lw:hover {background: #16a34a;border-color: #16a34a;}
-  .btn-ghost {border-radius: 999px;border: 1px solid rgba(148, 163, 184, 0.5);font-weight: 500;color: var(--lw-muted);background: rgba(255, 255, 255, 0.8);}
-  .btn-ghost:hover {background: #ffffff;color: var(--lw-dark);}
-  #products {padding: 70px 0 80px;}
-  .section-eyebrow {text-transform: uppercase;letter-spacing: .08em;font-size: 0.78rem;color: #0f766e;font-weight: 700;}
-  .section-title {font-size: 2rem;font-weight: 800;}
-  .section-subtitle {color: var(--lw-muted);max-width: 560px;margin: 10px auto 0;}
-  .product-card {border: 0;border-radius: 24px;background: #ffffff;padding-top: 4px;overflow: hidden;box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);transition: transform .2s ease, box-shadow .2s ease;cursor: pointer;}
-  .product-card:hover {transform: translateY(-6px);box-shadow: 0 26px 60px rgba(15, 23, 42, 0.12);}
-  .product-card.out-of-stock {opacity: 0.55;cursor: not-allowed;}
-  .product-card img {height: 220px;object-fit: contain;}
-  .product-body {padding: 1.5rem 1.6rem 1.6rem;}
-  .product-name {font-weight: 700;font-size: 1.1rem;margin-bottom: .15rem;}
-  .product-price {font-size: 1.4rem;font-weight: 800;color: #0f172a;}
-  .product-price span {font-size: .9rem;color: var(--lw-muted);font-weight: 500;}
-  .pill-label {position: absolute;top: 14px;right: 16px;padding: 4px 12px;border-radius: 999px;font-size: 0.75rem;font-weight: 700;color: #ffffff;}
-  
-  .pill-popular {background: #22c55e;}
-  .pill-premium {background: #6366f1;}
-  .stock {font-size: 0.9rem;margin-top: 4px;}
-  .btn-add {border-radius: 999px;font-weight: 600;padding-inline: 24px;margin-top: 10px;}
-  .cart-sidebar {height: 100vh;width: 420px;position: fixed;top: 0;right: -420px;background: #ffffff;box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18);transition: 0.35s;z-index: 9999;overflow-y: auto;}
-  .cart-sidebar.open {right: 0;}
-  .overlay {display: none;position: fixed;inset: 0;background: rgba(15, 23, 42, 0.45);z-index: 9998;}
-  .overlay.show {display: block;}
-  #contact {padding: 70px 0;}
-  .review-card {border-radius: 20px;background: #ffffff;padding: 24px;box-shadow: 0 12px 32px rgba(15,23,42,0.06);}
-  footer {background: #020617;color: #9ca3af;padding: 22px 0;font-size: 0.9rem;}
+    .hero {
+      padding-top: 70px;
+      padding-bottom: 50px;
+    }
+
+    .cart-sidebar {
+      width: 100%;
+      right: -100%;
+    }
+
+    .hero-trust {
+      gap: 10px;
+    }
+
+    .hero-chip {
+      font-size: 0.88rem;
+      padding: 9px 12px;
+    }
+  }
 </style>
 </head>
+<body>
+
+<div id="trust-bar">
+  <div class="container">
+    <span>🚚 Next Day Delivery on orders before 3PM</span>
+    <span>🔒 Secure Bank Transfer</span>
+    <span>🇬🇧 UK Dispatch</span>
+    <span>📦 Discreet Packaging</span>
+  </div>
+</div>
 
 <!-- FAQ MODAL -->
-<div class="modal fade" id="faqModal" tabindex="-1">
+<div class="modal fade" id="faqModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-light">
@@ -144,7 +455,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-
         <h6 class="fw-semibold">Are your products for human consumption?</h6>
         <p class="small text-muted">
           No. All products sold by Lumina are strictly supplied for <strong>laboratory research purposes only</strong>.
@@ -190,7 +500,6 @@
         <p class="small text-muted">
           Currently we <strong>only ship within the UK</strong> to ensure fast delivery and reliability.
         </p>
-
       </div>
       <div class="modal-footer">
         <button class="btn btn-success rounded-pill" data-bs-dismiss="modal">Close</button>
@@ -199,602 +508,670 @@
   </div>
 </div>
 
- 
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html#home">
+      <span>Lumina</span>
+    </a>
 
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#home">
-        
-        <span>Lumina</span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="peptides.html">Peptide Library</a></li>
+        <li class="nav-item"><a class="nav-link" href="calculator.html">Calculator</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+
+        <li class="nav-item" id="logout-nav-item" style="display:none;">
+          <a class="nav-link" href="#" id="logout-btn">Logout</a>
+        </li>
+
+        <li class="nav-item" id="admin-nav-item" style="display:none;">
+          <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="account-link" data-bs-toggle="modal" data-bs-target="#authModal">
+            Login
+          </a>
+        </li>
+
+        <li class="nav-item ms-lg-3">
+          <div class="position-relative">
+            <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()" aria-label="Open cart"></i>
+            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="overlay" onclick="toggleCart()"></div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
+    <button class="btn-close" onclick="toggleCart()" aria-label="Close cart"></button>
+  </div>
+
+  <div id="cart-items" class="p-4" style="min-height: 60vh;">
+    <p class="text-center text-muted m-0">Your cart is empty</p>
+  </div>
+
+  <div class="p-4 border-top bg-light">
+    <div class="d-flex justify-content-between fs-5 mb-3">
+      <span class="fw-semibold">Total:</span>
+      <span id="cart-total" class="fw-bold">£0.00</span>
+    </div>
+
+    <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
+    <small class="text-muted d-block mt-2 text-center">
+      Enter delivery details → get payment instructions by email
+    </small>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="home" class="hero text-center">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <i class="fa-solid fa-flask"></i>
+      Laboratory Research Supply Only
+    </div>
+
+    <h1 class="hero-title">
+      UK Research Materials Supplier<br>
+      <span class="highlight">Tirzepatide, Retatrutide &amp; More</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      High-purity research materials supplied from the UK with discreet packaging and clear product information.
+      All materials are supplied strictly for <strong>laboratory research purposes only</strong> and are
+      <strong>not for human consumption or medical use</strong>.
+    </p>
+
+    <div class="hero-cta">
+      <a href="products.html" class="btn btn-primary-lw btn-lg">
+        View Products <i class="fa-solid fa-arrow-right ms-1"></i>
       </a>
+      <a href="#contact" class="btn btn-ghost btn-lg">
+        Contact Us
+      </a>
+    </div>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <div class="hero-trust">
+      <div class="hero-chip"><i class="fa-solid fa-truck-fast text-success"></i> UK Dispatch</div>
+      <div class="hero-chip"><i class="fa-solid fa-box text-success"></i> Discreet Packaging</div>
+      <div class="hero-chip"><i class="fa-solid fa-clock text-success"></i> Same Day Dispatch before 3PM</div>
+      <div class="hero-chip"><i class="fa-solid fa-building-columns text-success"></i> Secure Bank Transfer</div>
+    </div>
+  </div>
+</section>
 
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-          <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
-<li class="nav-item"><a class="nav-link" href="peptides.html">Peptide Library</a></li>
-<li class="nav-item"><a class="nav-link" href="calculator.html">Calculator</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <!-- Logout (hidden by default) -->
-<li class="nav-item" id="logout-nav-item" style="display:none;">
-  <a class="nav-link" href="#" id="logout-btn">Logout</a>
-</li>
+<!-- WHY LUMINA -->
+<section id="why-lumina">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-eyebrow">Why Lumina</div>
+      <h2 class="section-title">Built for reliable UK research supply</h2>
+      <p class="section-subtitle">
+        Lumina focuses on reliability, discretion, and clarity for researchers sourcing materials within the UK.
+      </p>
+    </div>
 
-          <!-- Admin link (hidden by default) -->
-          <li class="nav-item" id="admin-nav-item" style="display:none;">
-            <a class="nav-link" href="admin.html">Admin</a>
-          </li>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="why-card">
+          <div class="why-icon"><i class="fa-solid fa-flag"></i></div>
+          <h3>UK-based dispatch</h3>
+          <p>Fast UK fulfilment designed to keep delivery straightforward and reliable.</p>
+        </div>
+      </div>
 
-          <!-- Login / My Account link -->
-          <li class="nav-item">
-            <a class="nav-link" href="#" id="account-link" data-bs-toggle="modal" data-bs-target="#authModal">
-              Login
-            </a>
-          </li>
+      <div class="col-md-6 col-lg-3">
+        <div class="why-card">
+          <div class="why-icon"><i class="fa-solid fa-box-open"></i></div>
+          <h3>Discreet packaging</h3>
+          <p>Plain, unbranded packaging with no unnecessary reference to contents on the outside.</p>
+        </div>
+      </div>
 
-          <li class="nav-item ms-lg-3">
-            <div class="position-relative">
-              <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
-              <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-            </div>
-          </li>
+      <div class="col-md-6 col-lg-3">
+        <div class="why-card">
+          <div class="why-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <h3>Clear product information</h3>
+          <p>Simple listings, clear strengths and formats, and straightforward ordering information.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="why-card">
+          <div class="why-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+          <h3>Responsive support</h3>
+          <p>Questions about orders, shipping, or documentation can be handled quickly through direct contact.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT MODAL -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 320px;" alt="">
+        <h3 id="modalName"></h3>
+        <p class="product-price fs-1" id="modalPrice"></p>
+        <p class="stock text-success mb-2" id="modalStock"></p>
+
+        <div id="modalDescription" class="text-start small text-muted mb-3"></div>
+
+        <div class="d-flex justify-content-center align-items-center gap-3 my-3">
+          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
+          <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input" style="max-width:100px;">
+          <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+
+        <button id="modalAddBtn" class="btn btn-primary-lw btn-lg">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-eyebrow">Featured</div>
+      <h2 class="section-title">Featured Research Materials</h2>
+      <p class="section-subtitle">
+        Selected items supplied strictly for <strong>laboratory research use only</strong> (not for human consumption).
+        For all products, strengths, and formats, head to the full products page.
+      </p>
+    </div>
+
+    <div class="row g-4" id="product-list"></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6">
+        <div class="section-eyebrow">Contact</div>
+        <h2 class="section-title mt-1">Questions about orders, shipping, or documentation?</h2>
+        <p class="section-subtitle text-start mx-0">
+          If you have questions about an order, dispatch, delivery, or available documentation, please get in touch.
+          We aim to respond within <strong>24 hours</strong>, often sooner during working hours.
+        </p>
+        <p class="contact-note mt-3 mb-2">
+          Please note we do <strong>not</strong> provide guidance on usage, dosing, administration, or protocols,
+          as all materials are supplied strictly for laboratory research purposes only.
+        </p>
+        <ul class="list-unstyled mt-3 mb-0">
+          <li><i class="fa-regular fa-envelope me-2 text-success"></i>Email: luminaweight@gmail.com</li>
         </ul>
       </div>
-    </div>
-  </nav>
 
-  <div class="overlay" onclick="toggleCart()"></div>
-
-  <!-- CART SIDEBAR -->
-  <div class="cart-sidebar" id="cart-sidebar">
-    <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
-      <button class="btn-close" onclick="toggleCart()"></button>
-    </div>
-    <div id="cart-items" class="p-4" style="min-height: 60vh;">
-      <p class="text-center text-muted m-0">Your cart is empty</p>
-    </div>
-    <div class="p-4 border-top bg-light">
-      
-
-      <!-- Final total -->
-      <div class="d-flex justify-content-between fs-5 mb-3">
-        <span class="fw-semibold">Total:</span>
-        <span id="cart-total" class="fw-bold">£0.00</span>
-      </div>
-
-      <button class="btn btn-success w-100 btn-lg rounded-pill" onclick="goToCheckout()">Proceed to Checkout</button>
-      <small class="text-muted d-block mt-2 text-center">
-        Enter delivery details → get payment instructions by email
-      </small>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <section id="home" class="hero text-center">
-    <div class="container">
-      <div class="hero-eyebrow">
-        <i class="fa-solid fa-flask"></i>
-        Laboratory Research Supply Only
-      </div>
-      <h1 class="hero-title">
-        Tirzepatide & Retatrutide<br>
-        <span class="highlight">Research Materials Supply</span>
-      </h1>
-      <p class="hero-subtitle">
-        UK-based supplier of research materials. All products are supplied strictly for <strong>laboratory research purposes only</strong>
-        and are <strong>not for human consumption</strong>.
-      </p>
-      <div class="hero-cta">
-        <a href="products.html" class="btn btn-primary-lw btn-lg">
-          View Products <i class="fa-solid fa-arrow-right ms-1"></i>
-        </a>
-        <a href="#contact" class="btn btn-ghost btn-lg">
-          Contact Us
-        </a>
-      </div>
-      <p class="text-muted mt-2" style="font-size:0.85rem;">
-        UK dispatch • Bank transfer only • Discreet packaging • Research use only • Not for human consumption
-      </p>
-    </div>
-  </section>
-
-  <!-- PRODUCT MODAL -->
-  <div class="modal fade" id="productModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body text-center">
-          <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 320px;">
-          <h3 id="modalName"></h3>
-          <p class="product-price fs-1" id="modalPrice"></p>
-          <p class="stock text-success mb-2" id="modalStock"></p>
-
-          <!-- DESCRIPTION BLOCK -->
-          <div id="modalDescription" class="text-start small text-muted mb-3"></div>
-
-          <div class="d-flex justify-content-center align-items-center gap-3 my-3">
-            <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
-            <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input">
-            <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(1)">+</button>
-          </div>
-          <button id="modalAddBtn" class="btn btn-primary-lw btn-lg">Add to Cart</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PRODUCTS (FEATURED ONLY) -->
-  <section id="products">
-    <div class="container">
-      <div class="text-center mb-5">
-        <div class="section-eyebrow">Featured</div>
-        <h2 class="section-title">Featured Research Materials</h2>
-        <p class="section-subtitle">
-          Selected items supplied strictly for <strong>laboratory research use only</strong> (not for human consumption).
-          For all products, strengths, and formats, head to the full products page.
-        </p>
-      </div>
-      <div class="row g-4" id="product-list"></div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6">
-          <div class="section-eyebrow">Contact</div>
-          <h2 class="section-title mt-1">Questions about orders or documentation?</h2>
-          <p class="section-subtitle text-start">
-            Drop us a message if you have questions regarding orders, shipping, or available documentation.
-            We do not provide usage, dosing, administration, or protocol guidance.
-          </p>
-          <ul class="list-unstyled mt-3">
-            <li><i class="fa-regular fa-envelope me-2 text-primary"></i>Email: luminaweight@gmail.com</li>
-          </ul>
-        </div>
-        <div class="col-lg-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-              <h5 class="fw-semibold mb-3">Quick message</h5>
-              <form id="quickMessageForm">
-                <div class="mb-3">
-                  <input type="text" class="form-control" id="qm-name" placeholder="Name" required>
-                </div>
-                <div class="mb-3">
-                  <input type="email" class="form-control" id="qm-email" placeholder="Email" required>
-                </div>
-                <div class="mb-3">
-                  <textarea class="form-control" id="qm-message" rows="3" placeholder="How can we help?" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary-lw w-100" id="qm-button">
-                  Send enquiry
-                </button>
-                <div id="qm-status" class="mt-2 small text-muted">
-                  We usually reply within 24 hours.
-                </div>
-              </form>
-            </div>
+      <div class="col-lg-6">
+        <div class="card contact-card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h5 class="fw-semibold mb-3">Quick message</h5>
+            <form id="quickMessageForm">
+              <div class="mb-3">
+                <input type="text" class="form-control" id="qm-name" placeholder="Name" required>
+              </div>
+              <div class="mb-3">
+                <input type="email" class="form-control" id="qm-email" placeholder="Email" required>
+              </div>
+              <div class="mb-3">
+                <textarea class="form-control" id="qm-message" rows="3" placeholder="How can we help?" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary-lw w-100" id="qm-button">
+                Send enquiry
+              </button>
+              <div id="qm-status" class="mt-2 small text-muted">
+                We usually reply within 24 hours.
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- LOGIN / SIGNUP MODAL -->
-  <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Sign in to Lumina</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Login -->
-          <form id="login-form" class="mb-4">
-            <h6 class="mb-3">Login</h6>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="login-email" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" class="form-control" id="login-password" required>
-            </div>
-            <button type="submit" class="btn btn-success w-100 rounded-pill">Login</button>
-          </form>
+<!-- LOGIN / SIGNUP MODAL -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sign in to Lumina</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="login-form" class="mb-4">
+          <h6 class="mb-3">Login</h6>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="login-email" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="login-password" required>
+          </div>
+          <div class="mb-3 text-end">
+            <a href="forgot-password.html" class="small text-decoration-none">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-success w-100 rounded-pill">Login</button>
+        </form>
 
-          <hr>
+        <hr>
 
-          <!-- Signup -->
-          <form id="signup-form">
-            <h6 class="mb-3">Create an account</h6>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="signup-email" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" class="form-control" id="signup-password" required>
-            </div>
-            <button type="submit" class="btn btn-outline-success w-100 rounded-pill">Sign up</button>
-          </form>
+        <form id="signup-form">
+          <h6 class="mb-3">Create an account</h6>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="signup-email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="signup-password" required>
+          </div>
+          <button type="submit" class="btn btn-outline-success w-100 rounded-pill">Sign up</button>
+        </form>
 
-          <div id="auth-message" class="mt-3 small text-muted"></div>
-        </div>
+        <div id="auth-message" class="mt-3 small text-muted"></div>
       </div>
     </div>
   </div>
+</div>
 
-  <footer class="text-center">
-    <div class="container">
-      <p class="mb-0">
-        © 2026 Lumina • Research Materials Supply • Research Purposes Only • Not For Human Consumption<br>
-        <a href="peptides.html">Peptide Library</a> •
-        <a href="privacy.html" class="text-decoration-none">Privacy</a> •
-        <a href="shipping.html" class="text-decoration-none">Shipping</a> •
-        <a href="terms.html" class="text-decoration-none">Terms</a> •
-        <a href="disclaimer.html" class="text-decoration-none">Disclaimer</a> •
-        <a href="returns.html" class="text-decoration-none">Returns</a> •
-        • <a href="#" data-bs-toggle="modal" data-bs-target="#faqModal" class="text-decoration-none">FAQ</a>
-      </p>
-    </div>
-  </footer>
+<footer class="text-center">
+  <div class="container">
+    <p class="mb-0">
+      © 2026 Lumina • UK Research Materials Supplier • Research Supply Only • Not For Human Consumption<br>
+      <a href="peptides.html" class="text-decoration-none">Peptide Library</a> •
+      <a href="privacy.html" class="text-decoration-none">Privacy</a> •
+      <a href="shipping.html" class="text-decoration-none">Shipping</a> •
+      <a href="terms.html" class="text-decoration-none">Terms</a> •
+      <a href="disclaimer.html" class="text-decoration-none">Disclaimer</a> •
+      <a href="returns.html" class="text-decoration-none">Returns</a> •
+      <a href="#" data-bs-toggle="modal" data-bs-target="#faqModal" class="text-decoration-none">FAQ</a>
+    </p>
+  </div>
+</footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-  <!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
 const SITE_ROOT = "https://luminaweight.co.uk";
 
-function imgSrc(image){
-  if(!image) return '';
+function imgSrc(image) {
+  if (!image) return "";
   image = String(image).trim();
 
-  // full URL already
-  if(/^https?:\/\//i.test(image)) return image;
-
-  // force to site root, encode spaces safely
+  if (/^https?:\/\//i.test(image)) return image;
   return SITE_ROOT + "/" + encodeURIComponent(image);
 }
-  
-  const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // -------- FEATURED PRODUCTS (FROM SUPABASE) --------
-  let products = []; // will be filled from Supabase
+const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let cart = [];
-  const savedCart = localStorage.getItem('cart');
-  if (savedCart) {
-    try { cart = JSON.parse(savedCart); } catch(e) { cart = []; }
-  }
-  let currentProduct = null;
+let products = [];
+let cart = [];
+const savedCart = localStorage.getItem("cart");
+if (savedCart) {
+  try { cart = JSON.parse(savedCart); } catch(e) { cart = []; }
+}
+let currentProduct = null;
 
-  function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
-  function renderProducts() {
-    const featured = products.filter(p => p.featured);
+function renderProducts() {
+  const featured = products.filter(p => p.featured);
 
-    document.getElementById('product-list').innerHTML =
-      featured.map((p, i) => `
-        <div class="col-md-3">
-          <div class="position-relative h-100 product-card ${p.stock===0?'out-of-stock':''}" onclick="${p.stock>0?'openModal('+i+')':''}">
-            ${p.badge ? `<span class="pill-label ${p.badgeClass || ''}">${p.badge}</span>` : ''}
-            <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
-            <div class="product-body d-flex flex-column">
-              <div class="text-start">
-                <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
-                  ${
-                    p.name.includes('Retatrutide')
-                      ? (p.name.includes('Pen') ? 'RETATRUTIDE PEN' : 'RETATRUTIDE VIAL')
-                      : (p.name.includes('Pen') ? 'TIRZEPATIDE PEN' : 'TIRZEPATIDE VIAL')
-                  }
-                </div>
-                <div class="product-name">${p.name}</div>
-                <div class="text-muted" style="font-size:0.85rem;">
-                  Research material supplied strictly for laboratory research use only.
-                </div>
+  document.getElementById("product-list").innerHTML =
+    featured.map((p, i) => `
+      <div class="col-md-6 col-lg-3">
+        <div class="position-relative h-100 product-card ${p.stock === 0 ? "out-of-stock" : ""}" onclick="${p.stock > 0 ? "openModal(" + i + ")" : ""}">
+          ${p.badge ? `<span class="pill-label ${p.badgeClass || ""}">${p.badge}</span>` : ""}
+          <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
+          <div class="product-body d-flex flex-column">
+            <div class="text-start">
+              <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">
+                ${
+                  p.name.includes("Retatrutide")
+                    ? (p.name.includes("Pen") ? "RETATRUTIDE PEN" : "RETATRUTIDE VIAL")
+                    : p.name.includes("Semaglutide")
+                      ? (p.name.includes("Pen") ? "SEMAGLUTIDE PEN" : "SEMAGLUTIDE VIAL")
+                      : (p.name.includes("Pen") ? "TIRZEPATIDE PEN" : "TIRZEPATIDE VIAL")
+                }
               </div>
-              <div class="d-flex justify-content-between align-items-center mt-2">
-                <div class="product-price">£${p.price}<span>${p.name.includes('Pen') ? '/pen' : '/vial'}</span></div>
+              <div class="product-name">${p.name}</div>
+              <div class="text-muted" style="font-size:0.85rem;">
+                Research material supplied strictly for laboratory research use only.
               </div>
-              <p class="stock ${p.stock<=5?'text-danger':'text-success'} mb-1">
-                ${p.stock>0 ? (p.stock<=5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} units`) : '<strong>Out of stock</strong>'}
-              </p>
-              <button class="btn btn-success btn-add mt-auto"
-                      ${p.stock===0?'disabled':''}
-                      onclick="event.stopPropagation(); openModal(${i})">
-                ${p.stock>0?'Add to cart':'Sold out'}
-              </button>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="product-price">£${p.price}<span>${p.name.includes("Pen") ? "/pen" : "/vial"}</span></div>
+            </div>
+
+            <p class="stock ${p.stock <= 5 ? "text-danger" : "text-success"} mb-1">
+              ${p.stock > 0 ? (p.stock <= 5 ? `Low stock: ${p.stock} left` : `In stock: ${p.stock} units`) : "<strong>Out of stock</strong>"}
+            </p>
+
+            <button
+              class="btn btn-success btn-add mt-auto"
+              ${p.stock === 0 ? "disabled" : ""}
+              onclick="event.stopPropagation(); openModal(${i})"
+            >
+              ${p.stock > 0 ? "Add to cart" : "Sold out"}
+            </button>
           </div>
         </div>
-      `).join('') +
-      `
+      </div>
+    `).join("") +
+    `
       <div class="col-12 text-center mt-3">
         <a href="products.html" class="btn btn-outline-success rounded-pill px-4">
           View all products
         </a>
       </div>
-      `;
+    `;
+}
+
+async function loadFeaturedProducts() {
+  const { data, error } = await supabaseClient
+    .from("Products")
+    .select("*")
+    .eq("featured", true)
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error loading featured products", error);
+    return;
   }
 
-  async function loadFeaturedProducts() {
-    const { data, error } = await supabaseClient
-      .from('Products')
-      .select('*')
-      .eq('featured', true)
-      .order('name', { ascending: true });
+  products = (data || []).map(p => ({
+    ...p,
+    badge: "Best Seller",
+    badgeClass: "pill-popular"
+  }));
+
+  renderProducts();
+}
+loadFeaturedProducts();
+
+function changeQty(delta) {
+  const input = document.getElementById("modalQty");
+  let val = parseInt(input.value) || 1;
+  val = Math.max(1, Math.min(val + delta, currentProduct.stock));
+  input.value = val;
+}
+
+function openModal(i) {
+  currentProduct = products[i];
+  if (!currentProduct || currentProduct.stock === 0) return;
+
+  const modalImg = document.getElementById("modalImg");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalName = document.getElementById("modalName");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalStock = document.getElementById("modalStock");
+  const descEl = document.getElementById("modalDescription");
+
+  modalImg.src = imgSrc(currentProduct.image);
+  modalImg.alt = currentProduct.name;
+  modalTitle.textContent = currentProduct.name;
+  modalName.textContent = currentProduct.name;
+  modalPrice.textContent = `£${currentProduct.price}`;
+  modalStock.innerHTML = `In stock – ${currentProduct.stock} units`;
+
+  descEl.innerHTML = `
+    <p><strong>Research use only.</strong> This product is supplied strictly for laboratory research purposes.</p>
+    <p>Not a medicine. Not a supplement. <strong>Not for human consumption.</strong></p>
+    <ul class="mb-0">
+      <li><strong>Category:</strong> Research material</li>
+      <li><strong>Dispatch:</strong> UK dispatch where applicable</li>
+      <li><strong>Packaging:</strong> Discreet</li>
+    </ul>
+  `;
+
+  document.getElementById("modalQty").value = 1;
+
+  document.getElementById("modalAddBtn").onclick = () => {
+    const qty = parseInt(document.getElementById("modalQty").value) || 1;
+    addToCart(currentProduct, qty);
+    bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+  };
+
+  new bootstrap.Modal(document.getElementById("productModal")).show();
+}
+
+function addToCart(product, qty) {
+  const existing = cart.find(item => item.name === product.name);
+  if (existing) existing.qty += qty;
+  else cart.push({ name: product.name, price: product.price, qty });
+
+  product.stock -= qty;
+  renderProducts();
+  updateCart();
+  saveCart();
+  toggleCart(true);
+}
+
+function updateQty(i, delta) {
+  cart[i].qty += delta;
+  if (cart[i].qty <= 0) {
+    cart.splice(i, 1);
+  }
+  updateCart();
+  saveCart();
+}
+
+function removeFromCart(i) {
+  cart.splice(i, 1);
+  updateCart();
+  saveCart();
+}
+
+function updateCart() {
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+  document.getElementById("cart-count").textContent = totalItems;
+  document.getElementById("cart-items-count").textContent = totalItems;
+  document.getElementById("cart-total").textContent = `£${total.toFixed(2)}`;
+
+  const itemsEl = document.getElementById("cart-items");
+  if (!cart.length) {
+    itemsEl.innerHTML = '<p class="text-center text-muted m-0">Your cart is empty</p>';
+  } else {
+    itemsEl.innerHTML = cart.map((item, i) => `
+      <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+        <div class="flex-grow-1">
+          <strong>${item.name}</strong><br>
+          <small>£${item.price} × ${item.qty}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
+          <span class="fw-bold">${item.qty}</span>
+          <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
+          <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+updateCart();
+
+function toggleCart(force) {
+  const sb = document.getElementById("cart-sidebar");
+  const ov = document.querySelector(".overlay");
+  const open = force !== undefined ? force : !sb.classList.contains("open");
+  sb.classList.toggle("open", open);
+  ov.classList.toggle("show", open);
+}
+
+function goToCheckout() {
+  if (cart.length === 0) return alert("Your cart is empty!");
+  const cartData = encodeURIComponent(JSON.stringify(cart));
+  window.location.href = `checkout.html?cart=${cartData}`;
+}
+
+(function () {
+  emailjs.init("uZOuTrBdIAc6AmKjo");
+})();
+
+const qmForm = document.getElementById("quickMessageForm");
+const qmBtn = document.getElementById("qm-button");
+const qmStatus = document.getElementById("qm-status");
+
+if (qmForm) {
+  qmForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("qm-name").value.trim();
+    const email = document.getElementById("qm-email").value.trim();
+    const message = document.getElementById("qm-message").value.trim();
+    if (!name || !email || !message) return;
+
+    qmBtn.disabled = true;
+    qmBtn.textContent = "Sending...";
+    qmStatus.textContent = "";
+
+    emailjs.send("service_i5zi096", "template_x5lnd1u", {
+      to_email: "luminaweight@gmail.com",
+      customer_name: name,
+      customer_phone: email,
+      customer_address: "Quick Message (No Address)",
+      order_reference: "ENQUIRY-" + Date.now().toString().slice(-5),
+      order_items: message,
+      order_total: "N/A"
+    }).then(() => {
+      qmStatus.textContent = "Thanks! Your message has been sent.";
+      qmForm.reset();
+    }).catch(() => {
+      qmStatus.textContent = "Error sending message. Please try again.";
+    }).finally(() => {
+      qmBtn.disabled = false;
+      qmBtn.textContent = "Send enquiry";
+    });
+  });
+}
+
+const authMessage = document.getElementById("auth-message");
+const accountLink = document.getElementById("account-link");
+const logoutNavItem = document.getElementById("logout-nav-item");
+const logoutBtn = document.getElementById("logout-btn");
+const adminNavItem = document.getElementById("admin-nav-item");
+const ADMIN_EMAIL = "luminaweight@gmail.com";
+
+async function updateAccountUI() {
+  try {
+    const { data } = await supabaseClient.auth.getUser();
+    const user = data?.user || null;
+
+    if (user) {
+      accountLink.textContent = "My Account";
+      accountLink.href = "account.html";
+      accountLink.removeAttribute("data-bs-toggle");
+      accountLink.removeAttribute("data-bs-target");
+      logoutNavItem.style.display = "block";
+    } else {
+      accountLink.textContent = "Login";
+      accountLink.href = "#";
+      accountLink.setAttribute("data-bs-toggle", "modal");
+      accountLink.setAttribute("data-bs-target", "#authModal");
+      logoutNavItem.style.display = "none";
+    }
+
+    if (adminNavItem) {
+      adminNavItem.style.display = (user && user.email === ADMIN_EMAIL) ? "block" : "none";
+    }
+  } catch (e) {
+    console.error("Error updating account UI", e);
+  }
+}
+updateAccountUI();
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await supabaseClient.auth.signOut();
+    window.location.href = "index.html";
+  });
+}
+
+const signupForm = document.getElementById("signup-form");
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    authMessage.textContent = "";
+    authMessage.classList.remove("text-danger", "text-success");
+
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+
+    const { error } = await supabaseClient.auth.signUp({ email, password });
 
     if (error) {
-      console.error('Error loading featured products', error);
-      return;
-    }
-
-    products = (data || []).map(p => ({
-      ...p,
-      badge: 'Best Seller',
-      badgeClass: 'pill-popular'
-    }));
-
-    renderProducts();
-  }
-  loadFeaturedProducts();
-
-  function changeQty(delta) {
-    const input = document.getElementById('modalQty');
-    let val = parseInt(input.value) || 1;
-    val = Math.max(1, Math.min(val + delta, currentProduct.stock));
-    input.value = val;
-  }
-
-  function openModal(i) {
-    currentProduct = products[i];
-    if (!currentProduct || currentProduct.stock === 0) return;
-
-    const modalImg = document.getElementById('modalImg');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalName  = document.getElementById('modalName');
-    const modalPrice = document.getElementById('modalPrice');
-    const modalStock = document.getElementById('modalStock');
-    const descEl     = document.getElementById('modalDescription');
-
-    modalImg.src = imgSrc(currentProduct.image);
-    modalTitle.textContent = currentProduct.name;
-    modalName.textContent  = currentProduct.name;
-    modalPrice.textContent = `£${currentProduct.price}`;
-    modalStock.innerHTML   = `In stock – ${currentProduct.stock} units`;
-
-    descEl.innerHTML = `
-      <p><strong>Research use only.</strong> This product is supplied strictly for laboratory research purposes.</p>
-      <p>Not a medicine. Not a supplement. <strong>Not for human consumption.</strong></p>
-      <ul class="mb-0">
-        <li><strong>Category:</strong> Research material</li>
-        <li><strong>Dispatch:</strong> UK dispatch where applicable</li>
-        <li><strong>Packaging:</strong> Discreet</li>
-      </ul>
-    `;
-
-    document.getElementById('modalQty').value = 1;
-
-    document.getElementById('modalAddBtn').onclick = () => {
-      const qty = parseInt(document.getElementById('modalQty').value) || 1;
-      addToCart(currentProduct, qty);
-      bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-    };
-
-    new bootstrap.Modal(document.getElementById('productModal')).show();
-  }
-
-  function addToCart(product, qty) {
-    const existing = cart.find(item => item.name === product.name);
-    if (existing) existing.qty += qty;
-    else cart.push({name: product.name, price: product.price, qty});
-    product.stock -= qty;
-    renderProducts();
-    updateCart();
-    saveCart();
-    toggleCart(true);
-  }
-
-  function updateQty(i, delta) {
-    cart[i].qty = Math.max(1, cart[i].qty + delta);
-    if (cart[i].qty === 0) cart.splice(i, 1);
-    updateCart();
-    saveCart();
-  }
-
-  function removeFromCart(i) {
-    cart.splice(i, 1);
-    updateCart();
-    saveCart();
-  }
-
-  function updateCart() {
-    const totalItems = cart.reduce((s, i) => s + i.qty, 0);
-    const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-
-    document.getElementById('cart-count').textContent = totalItems;
-    document.getElementById('cart-items-count').textContent = totalItems;
-    document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
-
-    const itemsEl = document.getElementById('cart-items');
-    if (!cart.length) {
-      itemsEl.innerHTML = '<p class="text-center text-muted m-0">Your cart is empty</p>';
+      authMessage.textContent = error.message;
+      authMessage.classList.add("text-danger");
     } else {
-      itemsEl.innerHTML = cart.map((item,i) => `
-        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-          <div class="flex-grow-1">
-            <strong>${item.name}</strong><br>
-            <small>£${item.price} × ${item.qty}</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},-1)">–</button>
-            <span class="fw-bold">${item.qty}</span>
-            <button class="btn btn-outline-secondary btn-sm" onclick="updateQty(${i},1)">+</button>
-            <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${i})">×</button>
-          </div>
-        </div>
-      `).join('');
+      authMessage.textContent = "Check your email to confirm your account.";
+      authMessage.classList.add("text-success");
     }
-  }
+  });
+}
 
-  updateCart();
+const loginForm = document.getElementById("login-form");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    authMessage.textContent = "";
+    authMessage.classList.remove("text-danger", "text-success");
 
-  function toggleCart(force) {
-    const sb = document.getElementById('cart-sidebar');
-    const ov = document.querySelector('.overlay');
-    const open = force !== undefined ? force : !sb.classList.contains('open');
-    sb.classList.toggle('open', open);
-    ov.classList.toggle('show', open);
-  }
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
 
-  function goToCheckout() {
-    if (cart.length === 0) return alert('Your cart is empty!');
-    const cartData = encodeURIComponent(JSON.stringify(cart));
-    window.location.href = `checkout.html?cart=${cartData}`;
-  }
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-  // -------- QUICK MESSAGE (EmailJS) --------
-  (function () { emailjs.init('uZOuTrBdIAc6AmKjo'); })();
-
-  const qmForm   = document.getElementById('quickMessageForm');
-  const qmBtn    = document.getElementById('qm-button');
-  const qmStatus = document.getElementById('qm-status');
-
-  if (qmForm) {
-    qmForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const name    = document.getElementById('qm-name').value.trim();
-      const email   = document.getElementById('qm-email').value.trim();
-      const message = document.getElementById('qm-message').value.trim();
-      if (!name || !email || !message) return;
-
-      qmBtn.disabled = true;
-      qmBtn.textContent = 'Sending...';
-      qmStatus.textContent = '';
-
-      emailjs.send('service_i5zi096','template_x5lnd1u', {
-        to_email: 'luminaweight@gmail.com',
-        customer_name: name,
-        customer_phone: email,
-        customer_address: 'Quick Message (No Address)',
-        order_reference: 'ENQUIRY-' + Date.now().toString().slice(-5),
-        order_items: message,
-        order_total: 'N/A'
-      }).then(() => {
-        qmStatus.textContent = 'Thanks! Your message has been sent.';
-        qmForm.reset();
-      }).catch(() => {
-        qmStatus.textContent = 'Error sending message. Please try again.';
-      }).finally(() => {
-        qmBtn.disabled = false;
-        qmBtn.textContent = 'Send enquiry';
-      });
-    });
-  }
-
-  // -------- AUTH (LOGIN / SIGNUP) --------
-  const authMessage = document.getElementById('auth-message');
-  const accountLink = document.getElementById('account-link');
-
-  async function updateAccountLink() {
-    if (!accountLink) return;
-    const { data } = await supabaseClient.auth.getUser();
-
-    if (data && data.user) {
-      accountLink.textContent = 'My Account';
-      accountLink.removeAttribute('data-bs-toggle');
-      accountLink.removeAttribute('data-bs-target');
-      accountLink.href = 'account.html';
+    if (error) {
+      authMessage.textContent = error.message;
+      authMessage.classList.add("text-danger");
     } else {
-      accountLink.textContent = 'Login';
-      accountLink.href = '#';
-      accountLink.setAttribute('data-bs-toggle', 'modal');
-      accountLink.setAttribute('data-bs-target', '#authModal');
+      authMessage.textContent = "Logged in successfully.";
+      authMessage.classList.add("text-success");
+      setTimeout(() => window.location.reload(), 600);
     }
-  }
-  updateAccountLink();
+  });
+}
 
-  const signupForm = document.getElementById('signup-form');
-  if (signupForm) {
-    signupForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authMessage.textContent = '';
-      authMessage.classList.remove('text-danger','text-success');
-
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-
-      if (error) {
-        authMessage.textContent = error.message;
-        authMessage.classList.add('text-danger');
-      } else {
-        authMessage.textContent = 'Check your email to confirm your account.';
-        authMessage.classList.add('text-success');
-      }
-    });
-  }
-
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authMessage.textContent = '';
-      authMessage.classList.remove('text-danger','text-success');
-
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        authMessage.textContent = error.message;
-        authMessage.classList.add('text-danger');
-      } else {
-        authMessage.textContent = 'Logged in successfully.';
-        authMessage.classList.add('text-success');
-        setTimeout(() => window.location.reload(), 600);
-      }
-    });
-  }
-
-  // --- Admin nav visibility ---
-  const ADMIN_EMAIL = 'luminaweight@gmail.com';
-  const adminNavItem = document.getElementById('admin-nav-item');
-
-  (async () => {
-    try {
-      const { data } = await supabaseClient.auth.getUser();
-      const user = data?.user || null;
-      if (adminNavItem) {
-        adminNavItem.style.display = (user && user.email === ADMIN_EMAIL) ? 'block' : 'none';
-      }
-    } catch (e) {
-      console.error('Error checking admin user', e);
-    }
-  })();
-
-
+supabaseClient.auth.onAuthStateChange(() => {
+  updateAccountUI();
+});
 </script>
 </body>
 </html>
