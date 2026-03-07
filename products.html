@@ -807,21 +807,8 @@
                 ? 'NAD+ (RESEARCH)'
                 : 'TIRZEPATIDE (RESEARCH)';
 
-        const baseDesc = isBlend
-          ? 'A research peptide blend supplied for controlled laboratory environments.'
-          : p.name.includes('Tirzepatide')
-            ? 'Tirzepatide research material supplied for laboratory study.'
-            : p.name.includes('Retatrutide')
-              ? 'Retatrutide research material supplied for laboratory study.'
-              : p.name.includes('Semaglutide')
-                ? 'Semaglutide research material supplied for laboratory study.'
-                : p.name.includes('NAD+')
-                  ? 'NAD+ research material supplied for laboratory environments.'
-                  : 'Research material supplied for laboratory environments.';
-
-        const extraInfo = isBlend
-          ? ' Accessories (if applicable) are supplied for laboratory handling and measurement.'
-          : ' Each unit includes accessories where applicable for laboratory handling and measurement.';
+        const baseDesc = p.description || 'Research material supplied for laboratory environments.';
+const extraInfo = ' Accessories (if applicable) are supplied for laboratory handling and measurement.';
 
         const unitSuffix = '/unit';
 
@@ -878,8 +865,8 @@
 
       const { data, error } = await supabaseClient
         .from('Products')
-        .select('id, name, price, image, stock')
-        .order('name', { ascending: true });
+.select('id, name, price, image, stock, description')
+.order('name', { ascending: true });
 
       if (error) {
         console.error('Error loading products', error);
@@ -888,12 +875,13 @@
       }
 
       products = (data || []).map(row => ({
-        id: row.id,
-        name: row.name,
-        price: Number(row.price || 0),
-        image: row.image || '20mg Tirz Vial.png',
-        stock: row.stock ?? 0
-      }));
+  id: row.id,
+  name: row.name,
+  price: Number(row.price || 0),
+  image: row.image || '20mg Tirz Vial.png',
+  stock: row.stock ?? 0,
+  description: row.description || ''
+}));
 
       renderProducts();
     }
@@ -962,11 +950,11 @@
 
       if (isBlend) {
         descEl.innerHTML = `
-          <p>This item is supplied as a <strong>research peptide blend</strong> for controlled laboratory study.</p>
-          <p><strong>${accessoriesLine}</strong></p>
-          <p class="mb-1"><em>Supplied strictly for laboratory research purposes only.</em></p>
-          <p class="mb-1"><em>Not for human consumption or medical use.</em></p>
-        `;
+  <p>${p.description || 'Research material supplied for laboratory environments.'}</p>
+  <p><strong>${accessoriesLine}</strong></p>
+  <p class="mb-1"><em>Supplied strictly for laboratory research purposes only.</em></p>
+  <p class="mb-1"><em>Not for human consumption or medical use.</em></p>
+`;
       } else if (p.name.includes('Tirzepatide')) {
         descEl.innerHTML = `
           <p>This item is supplied as a <strong>research material</strong> for controlled laboratory study.</p>
