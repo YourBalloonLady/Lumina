@@ -564,10 +564,14 @@ Lumina does not provide dosing, administration or medical advice.
       listEl.innerHTML = products.map((p, i) => {
         const badge = computeBadge(p);
         let restockBadge = null;
+const SHOW_RESTOCK_BADGE = false;
 
 if (
-  p.name.includes('Tirzepatide 60mg Pen') ||
-  p.name.includes('Tirzepatide 60mg Vial')
+  SHOW_RESTOCK_BADGE &&
+  (
+    p.name.includes('Tirzepatide 60mg Pen') ||
+    p.name.includes('Tirzepatide 60mg Vial')
+  )
 ) {
   restockBadge = { text: 'Back Monday', class: 'pill-restock' };
 }
