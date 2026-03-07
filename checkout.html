@@ -50,7 +50,9 @@
     box-shadow: 0 20px 45px rgba(15,23,42,0.10);
   }
 
-  .form-control { border-radius: 12px; }
+  .form-control,
+  .form-select { border-radius: 12px; }
+
   #final-total { color: #16a34a; }
 
   .modal-content { border-radius: 20px; }
@@ -64,6 +66,11 @@
     font-size: 0.85rem;
     color: var(--lw-muted);
     margin-right: 8px;
+  }
+
+  #credit-controls {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
   }
 </style>
 </head>
@@ -107,6 +114,33 @@
               </div>
               <div class="col-md-6">
                 <input type="text" class="form-control" id="postcode" placeholder="Postcode" required>
+              </div>
+            </div>
+
+            <div id="credit-controls" class="mt-3 p-3 rounded" style="display:none;">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="use-credit-toggle">
+                <label class="form-check-label fw-semibold" for="use-credit-toggle">
+                  Use store credit
+                </label>
+              </div>
+
+              <div id="credit-balance-text" class="small text-success mb-2"></div>
+
+              <div id="credit-amount-wrap" style="display:none;">
+                <label for="credit-amount-input" class="form-label small mb-1">Amount to use</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="credit-amount-input"
+                  min="0"
+                  step="0.01"
+                  value="0"
+                  placeholder="0.00"
+                >
+                <div class="small text-muted mt-1">
+                  Enter any amount up to your available credit or order total.
+                </div>
               </div>
             </div>
 
@@ -193,7 +227,7 @@
   emailjs.init('uZOuTrBdIAc6AmKjo');
 
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -208,6 +242,9 @@
   let lastCreditBalance = 0;
   let lastCreditUsed = 0;
 
+  let userWantsToUseCredit = false;
+  let userRequestedCreditAmount = 0;
+
   function money(n){ return `£${Number(n || 0).toFixed(2)}`; }
 
   (function captureReferralOnCheckout(){
@@ -218,7 +255,6 @@
 
   // ---------- AUTH HELPERS ----------
   async function getAuthedEmail() {
-    // getSession is local + fast; getUser can fail if network/RLS weirdness
     try {
       const { data } = await supabaseClient.auth.getSession();
       const e = data?.session?.user?.email ? String(data.session.user.email).toLowerCase() : null;
@@ -289,6 +325,15 @@
     }
 
     return { ok:true, reason:'' };
+  }
+
+  function getChosenCreditAmount(balance, orderTotal) {
+    if (!userWantsToUseCredit) return 0;
+
+    const requested = Number(userRequestedCreditAmount || 0);
+    if (!Number.isFinite(requested) || requested <= 0) return 0;
+
+    return Math.max(0, Math.min(requested, balance, orderTotal));
   }
 
   // ---------- ACCESSORY RULES ----------
@@ -392,7 +437,6 @@
       return Number.isFinite(n) ? n : 0;
     };
 
-    // Try customers first
     try {
       const r1 = await supabaseClient
         .from('customers')
@@ -401,7 +445,6 @@
         .maybeSingle();
 
       if (r1.error) {
-        // This is the BIG one: RLS/table/column mismatch – show it
         return { balance: 0, errorText: `Credit lookup blocked: ${r1.error.message || r1.error.code || 'unknown error'}` };
       }
 
@@ -488,8 +531,13 @@
     let discount = 0;
     const messages = [];
 
-    if (cartDiscount >= categoryDiscount && cartDiscount > 0) { discount = cartDiscount; messages.push(cartMessage); }
-    else if (categoryDiscount > 0) { discount = categoryDiscount; messages.push(...categoryMessages); }
+    if (cartDiscount >= categoryDiscount && cartDiscount > 0) {
+      discount = cartDiscount;
+      messages.push(cartMessage);
+    } else if (categoryDiscount > 0) {
+      discount = categoryDiscount;
+      messages.push(...categoryMessages);
+    }
 
     const finalTotal = Math.max(0, baseTotal - discount);
     return { baseTotal, discount, finalTotal, messages };
@@ -775,20 +823,29 @@
       const emailEl = document.getElementById('email');
       const email = (emailEl?.value || '').trim().toLowerCase();
 
+      const controls = document.getElementById('credit-controls');
+      const balanceText = document.getElementById('credit-balance-text');
+      const amountWrap = document.getElementById('credit-amount-wrap');
+      const amountInput = document.getElementById('credit-amount-input');
+
       lastCreditEmail = email;
       lastCreditBalance = 0;
       lastCreditUsed = 0;
 
-      // Always show some hint instead of blank
       if (!email) {
+        controls.style.display = 'none';
+        balanceText.textContent = '';
+        amountWrap.style.display = 'none';
         await setCreditHint();
         renderOrderSummary();
         return;
       }
 
-      // Gate credit usage to logged-in matching email
       const gate = await canUseCreditForEmail(email);
       if (!gate.ok) {
+        controls.style.display = 'none';
+        balanceText.textContent = '';
+        amountWrap.style.display = 'none';
         await setCreditHint(gate.reason, 'small text-warning mt-1');
         renderOrderSummary();
         return;
@@ -803,24 +860,60 @@
         const credit = await applyCreditToTotal(email, totalBeforeCredit);
 
         if (credit.errorText) {
-          // If RLS is blocking, show it right under the email so you KNOW what’s wrong
+          controls.style.display = 'none';
+          balanceText.textContent = '';
+          amountWrap.style.display = 'none';
           await setCreditHint(credit.errorText, 'small text-danger mt-1');
-          renderOrderSummary(); // no credit
+          renderOrderSummary();
           return;
         }
 
         lastCreditBalance = credit.balance;
-        lastCreditUsed = credit.use;
 
         if (credit.balance > 0) {
-          await setCreditHint(`Credit found: ${money(credit.balance)} (auto-applied)`, 'small text-success mt-1');
-        } else {
-          await setCreditHint('No credit available.', 'small text-muted mt-1');
-        }
+          controls.style.display = 'block';
+          balanceText.textContent = `Available credit: ${money(credit.balance)}`;
 
-        renderOrderSummary(credit.final, credit.use);
+          const maxUsable = Math.min(credit.balance, totalBeforeCredit);
+
+          if (!amountInput.dataset.initialised) {
+            amountInput.value = maxUsable.toFixed(2);
+            userRequestedCreditAmount = Number(amountInput.value);
+            amountInput.dataset.initialised = 'true';
+          }
+
+          if (Number(userRequestedCreditAmount || 0) > maxUsable) {
+            userRequestedCreditAmount = maxUsable;
+            amountInput.value = maxUsable.toFixed(2);
+          }
+
+          amountInput.max = maxUsable.toFixed(2);
+          amountWrap.style.display = userWantsToUseCredit ? 'block' : 'none';
+
+          const chosenCredit = getChosenCreditAmount(credit.balance, totalBeforeCredit);
+          lastCreditUsed = chosenCredit;
+
+          if (userWantsToUseCredit && chosenCredit > 0) {
+            await setCreditHint(`Credit available: ${money(credit.balance)}. Using ${money(chosenCredit)}.`, 'small text-success mt-1');
+          } else {
+            await setCreditHint(`Credit available: ${money(credit.balance)}.`, 'small text-success mt-1');
+          }
+
+          renderOrderSummary(totalBeforeCredit - chosenCredit, chosenCredit);
+        } else {
+          controls.style.display = 'none';
+          balanceText.textContent = '';
+          amountWrap.style.display = 'none';
+          lastCreditUsed = 0;
+
+          await setCreditHint('No credit available.', 'small text-muted mt-1');
+          renderOrderSummary(totalBeforeCredit, 0);
+        }
       } catch (e) {
         console.error('[credit] preview error', e);
+        controls.style.display = 'none';
+        balanceText.textContent = '';
+        amountWrap.style.display = 'none';
         await setCreditHint('Credit lookup failed (see console).', 'small text-danger mt-1');
         renderOrderSummary();
       }
@@ -876,15 +969,14 @@
         const credit = await applyCreditToTotal(creditEmail, totalBeforeCredit);
 
         if (credit.errorText) {
-          // If RLS is blocking, do NOT pretend credit is 0—tell you why
           await setCreditHint(credit.errorText, 'small text-danger mt-1');
           lastCreditUsed = 0;
           total = totalBeforeCredit;
         } else {
           lastCreditBalance = credit.balance;
-          creditUsed = credit.use;
+          creditUsed = getChosenCreditAmount(credit.balance, totalBeforeCredit);
           lastCreditUsed = creditUsed;
-          total = credit.final;
+          total = totalBeforeCredit - creditUsed;
         }
       } else {
         lastCreditUsed = 0;
@@ -971,7 +1063,6 @@
     await syncCartPricesFromSupabase();
     renderOrderSummary();
 
-    // Auto-fill email with logged-in email if empty (this stops your “blank email = no message” issue)
     const emailEl = document.getElementById('email');
     const authed = await getAuthedEmail();
     if (emailEl && authed && !String(emailEl.value || '').trim()) {
@@ -981,7 +1072,24 @@
     emailEl.addEventListener('input', scheduleCreditPreviewFetch);
     emailEl.addEventListener('blur', scheduleCreditPreviewFetch);
 
-    // Always show a hint on load
+    const creditToggle = document.getElementById('use-credit-toggle');
+    const creditAmountInput = document.getElementById('credit-amount-input');
+
+    if (creditToggle) {
+      creditToggle.addEventListener('change', () => {
+        userWantsToUseCredit = creditToggle.checked;
+        document.getElementById('credit-amount-wrap').style.display = userWantsToUseCredit ? 'block' : 'none';
+        scheduleCreditPreviewFetch();
+      });
+    }
+
+    if (creditAmountInput) {
+      creditAmountInput.addEventListener('input', () => {
+        userRequestedCreditAmount = Number(creditAmountInput.value || 0);
+        scheduleCreditPreviewFetch();
+      });
+    }
+
     await setCreditHint();
     scheduleCreditPreviewFetch();
   })();
