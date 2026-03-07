@@ -633,12 +633,21 @@ ${restockBadge ? `<span class="pill-label ${restockBadge.class}" style="left:16p
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mt-2">
-                  <div class="product-price">
-                    £${Number(p.price || 0).toFixed(2)}
-                    <span>${unitSuffix}</span>
-                  </div>
-                </div>
-
+                 <div class="product-price">
+  ${
+    p.name.includes('NAD+')
+      ? `
+        <span style="text-decoration:line-through; color:#9ca3af; font-weight:600;">
+          £160
+        </span>
+        <span style="margin-left:8px; color:#16a34a; font-weight:800;">
+          £120
+        </span>
+      `
+      : `£${Number(p.price || 0).toFixed(2)}`
+  }
+  <span>${unitSuffix}</span>
+</div>
                 <!-- ✅ show stock number -->
                 <p class="stock ${stockClass} mb-1">${stockLabel}</p>
 
