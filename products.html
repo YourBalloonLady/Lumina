@@ -798,14 +798,18 @@
         const isBlend = nameLower.includes('bpc-157') || nameLower.includes('tb500');
 
         const typeLabel = isBlend
-          ? 'RESEARCH PEPTIDE BLEND'
-          : p.name.includes('Retatrutide')
-            ? 'RETATRUTIDE (RESEARCH)'
-            : p.name.includes('Semaglutide')
-              ? 'SEMAGLUTIDE (RESEARCH)'
-              : p.name.includes('NAD+')
-                ? 'NAD+ (RESEARCH)'
-                : 'TIRZEPATIDE (RESEARCH)';
+  ? 'RESEARCH PEPTIDE BLEND'
+  : p.name.includes('Retatrutide')
+    ? 'RETATRUTIDE (RESEARCH)'
+    : p.name.includes('Semaglutide')
+      ? 'SEMAGLUTIDE (RESEARCH)'
+      : p.name.includes('Tirzepatide')
+        ? 'TIRZEPATIDE (RESEARCH)'
+        : p.name.includes('NAD+')
+          ? 'NAD+ (RESEARCH)'
+          : p.name.toLowerCase().includes('mots')
+            ? 'MOTS-c (RESEARCH)'
+            : 'RESEARCH PEPTIDE';
 
         const baseDesc = p.description || 'Research material supplied for laboratory environments.';
 const extraInfo = ' Accessories (if applicable) are supplied for laboratory handling and measurement.';
