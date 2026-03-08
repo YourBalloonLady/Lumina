@@ -258,6 +258,23 @@
     }
 
     .pill-restock {
+.pill-coming-soon {
+  position: absolute;
+  top: 16px;
+  left: -46px;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 64px;
+  transform: rotate(-35deg);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  z-index: 3;
+}
+
+      
       position: absolute;
       top: 16px;
       left: -40px;
@@ -719,36 +736,50 @@
     let currentProduct = null;
 
     function computeBadge(p) {
-      const name = (p.name || '').toLowerCase();
+  const name = (p.name || '').toLowerCase();
 
-      if (name.includes('bpc-157') || name.includes('tb500')) {
-        return { text: 'Wolverine Stack', class: 'pill-wolverine' };
-      }
+  // Wolverine stack
+  if (name.includes('bpc-157') || name.includes('tb500')) {
+    return { text: 'Wolverine Stack', class: 'pill-wolverine' };
+  }
 
-      if (name.includes('nad+')) {
-        return { text: 'Sale', class: 'pill-best-value' };
+  // NAD+ sale
+  if (name.includes('nad+')) {
+    return { text: 'Sale', class: 'pill-best-value' };
+  }
 
-        // Coming Soon products
-if (
+  // Coming Soon products
+  if (
   name.includes('cagrilintide') ||
   name.includes('mt2') ||
   name.includes('ghk-cu')
 ) {
-  return { text: 'Coming Soon', class: 'pill-premium' };
+  return null;
 }
-      }
 
-      if (p.name?.includes('20mg')) {
-        return { text: 'Most Popular', class: 'pill-popular' };
-      }
+  // Popular products
+  if (p.name?.includes('20mg')) {
+    return { text: 'Most Popular', class: 'pill-popular' };
+  }
 
-      if (p.price >= 130) {
-        return { text: 'Premium', class: 'pill-premium' };
-      }
+  // Premium products
+  if (p.price >= 130) {
+    return { text: 'Premium', class: 'pill-premium' };
+  }
 
-      return null;
-    }
+  return null;
 
+  
+}
+
+    function isComingSoonProduct(p) {
+  const name = String(p?.name || '').toLowerCase();
+  return (
+    name.includes('cagrilintide') ||
+    name.includes('mt2') ||
+    name.includes('ghk-cu')
+  );
+}
     function imgSrc(image) {
       if (!image) return '';
       return 'https://luminaweight.co.uk/' + encodeURIComponent(image);
@@ -809,9 +840,10 @@ if (
 
       listEl.innerHTML = products.map((p, i) => {
         const badge = computeBadge(p);
+const isComingSoon = isComingSoonProduct(p);
 
-        let restockBadge = null;
-        const SHOW_RESTOCK_BADGE = false;
+let restockBadge = null;
+const SHOW_RESTOCK_BADGE = false;
 
         if (
           SHOW_RESTOCK_BADGE &&
@@ -846,7 +878,8 @@ const extraInfo = ' Accessories (if applicable) are supplied for laboratory hand
           <div class="col-md-3">
             <div class="position-relative h-100 product-card ${stockNum === 0 ? 'out-of-stock' : ''}" onclick="${stockNum > 0 ? `openModal(${i})` : ''}">
               ${badge ? `<span class="pill-label ${badge.class}">${badge.text}</span>` : ''}
-              ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span>` : ''}
+${isComingSoon ? `<span class="pill-coming-soon">Coming Soon</span>` : ''}
+${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span>` : ''}
 
               <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
 
