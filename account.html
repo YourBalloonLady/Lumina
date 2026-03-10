@@ -423,11 +423,20 @@
       window.location.href = 'index.html';
       return;
     }
-await supabaseClient
-.from("Orders")
-.update({ user_id: user.id })
-.eq("credit_email", user.email)
-.is("user_id", null);
+const userEmail = String(user.email || '').trim().toLowerCase();
+
+// Auto-link guest orders to this account
+if (user.id && userEmail) {
+  const { error: linkOrdersError } = await supabaseClient
+    .from("Orders")
+    .update({ user_id: user.id })
+    .eq("credit_email", userEmail)
+    .is("user_id", null);
+
+  if (linkOrdersError) {
+    console.warn("Could not auto-link guest orders:", linkOrdersError);
+  }
+}
     
     greetingEl.textContent = `Signed in as ${user.email}`;
     statusEl.textContent = 'Loading orders…';
