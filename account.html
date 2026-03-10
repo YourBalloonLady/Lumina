@@ -423,7 +423,12 @@
       window.location.href = 'index.html';
       return;
     }
-
+await supabaseClient
+.from("Orders")
+.update({ user_id: user.id })
+.eq("credit_email", user.email)
+.is("user_id", null);
+    
     greetingEl.textContent = `Signed in as ${user.email}`;
     statusEl.textContent = 'Loading orders…';
 
