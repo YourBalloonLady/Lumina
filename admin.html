@@ -449,6 +449,7 @@
                   <button class="btn btn-sm btn-secondary" onclick="bulkMarkPacked()">✅ Bulk Mark Packed</button>
                   <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
                   <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
+                  <button class="btn btn-sm btn-outline-dark" onclick="copyOrderForText('${order.id}')">📱 Copy SMS</button>
                   <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
                 </div>
 
@@ -1082,6 +1083,50 @@ async function findCustomerByReferralCode(code){
       const tracking = String(order.details?.meta?.tracking_number || "").trim() || "Not provided";
       return `Hi ${customer.name || "there"},\n\nYour order ${ref} has been shipped.\n\nItems:\n${items}\n\nTotal: ${total}\nTracking: ${tracking}\n\nThanks,\nLumina Weight`;
     }
+
+    async function copyOrderForText(orderId){
+  const order = ordersCache[orderId];
+  if(!order){
+    alert("Order not found.");
+    return;
+  }
+
+  const c = getCustomer(order);
+  const ref = String(order.reference || order.id || "").trim();
+  const name = String(c.name || "").trim();
+  const phone = String(c.phone || "").trim();
+  const address = buildAddressText(order);
+
+  const items = Array.isArray(order?.details?.items) ? order.details.items : [];
+  const itemsText = items.length
+    ? items.map(i => {
+        const extras =
+          (String(i?.name || "").toLowerCase().includes("pen") && i?.pen_heads)
+            ? ` (Pen heads: ${i.pen_heads})`
+            : (String(i?.name || "").toLowerCase().includes("vial") && i?.syringes)
+              ? ` (Syringes: ${i.syringes})`
+              : "";
+        return `${Number(i?.qty || 0)} × ${String(i?.name || "").trim()}${extras}`;
+      }).join("\n")
+    : "No items recorded.";
+
+  const text = [
+    ref ? `Order: ${ref}` : "",
+    name ? `Name: ${name}` : "",
+    phone ? `Phone: ${phone}` : "",
+    address ? `Address:\n${address}` : "Address:\nNo address recorded.",
+    `Items:\n${itemsText}`
+  ].filter(Boolean).join("\n\n");
+
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast("Copied order summary ✅", "success");
+  }catch(e){
+    prompt("Copy this text:", text);
+  }
+}
+
+window.copyOrderForText = copyOrderForText;
 
     function buildPaidEmailText(order){
       const customer = order.details?.customer || {};
@@ -2579,6 +2624,7 @@ async function findCustomerByReferralCode(code){
 
                 <div class="mobile-secondary-actions mt-3">
                   <button class="btn btn-outline-dark btn-sm" onclick="copyAddressById('${order.id}')">📋 Copy address</button>
+                  <button class="btn btn-sm btn-outline-dark" onclick="copyOrderForText('${order.id}')">📱 Copy SMS</button>
                   <button class="btn btn-outline-secondary btn-sm" onclick="printPackingSlipById('${order.id}')">🖨️ Print slip</button>
                   <button class="btn btn-outline-purple btn-sm" onclick="copyTimExcelTsvOne('${order.id}')">📋 Copy Excel row</button>
                   <button class="btn btn-warning btn-sm" ${isCancelled || isShipped ? "disabled" : ""} onclick="sendPayBefore3pmById('${order.id}')">⏰ 3PM reminder</button>
