@@ -13,284 +13,363 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
 
   <style>
-    body{
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background:#f3f4f6;
-    }
-
-    #trust-bar{
-      background: linear-gradient(90deg, #22c55e, #16a34a);
-      color:#fff;
-      font-size:.85rem;
-      font-weight:600;
-      padding:6px 0;
-    }
-    #trust-bar span{ white-space: nowrap; }
-
-    .navbar{ background:#020617; }
-    .navbar .nav-link{ color:#e5e7eb; }
-    .navbar .nav-link:hover{ color:#fff; }
-
-    .section-card{
-      background:#fff;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 10px 25px rgba(0,0,0,.08);
-      margin-bottom:24px;
-    }
-
-    .order-card, .review-card{
-      background:#fff;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 10px 25px rgba(0,0,0,.08);
-      margin-bottom:12px;
-    }
-
-    .review-meta{ font-size:.85rem; color:#6b7280; }
-
-    .items-box{
-      margin-top:10px;
-      background:#f8fafc;
-      border:1px solid rgba(15,23,42,.08);
-      border-radius:12px;
-      padding:10px 12px;
-      font-size:.9rem;
-      color:#0f172a;
-      white-space: pre-line;
-    }
-    .items-box strong{
-      font-size:.85rem;
-      color:#334155;
-      display:block;
-      margin-bottom:6px;
-    }
-
-    .muted-line{ color:#64748b; font-size:.85rem; }
-
-    .mini-actions{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .btn-row{
-      display:grid;
-      gap:6px;
-      margin-top:8px;
-    }
-
-    .kpi-pill{
-      background:#0f172a;
-      color:#fff;
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:.85rem;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .kpi-pill span{ opacity:.9; font-weight:600; }
-
-    .controls-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
-    @media (min-width: 992px){
-      .controls-grid{ grid-template-columns: 1.4fr 1fr; align-items:start; }
-    }
-
-    .filter-row{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
-
-    .bulk-bar{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      background:#f8fafc;
-      border:1px solid rgba(15,23,42,.08);
-      border-radius:12px;
-      padding:10px;
-    }
-
-    .note-area{
-      width:100%;
-      min-height:64px;
-      resize:vertical;
-      font-size:.9rem;
-    }
-    .small-input{ font-size:.85rem; }
-
-    #backToTop{
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 9999;
-      display: none;
-      border-radius: 999px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-    }
-
-    /* Sticky controls (Improvement #1) */
-    .sticky-admin-controls{
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: #fff;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(15,23,42,.08);
-}
-
-@media (max-width: 991.98px){
-  .sticky-admin-controls{
-    position: static;
-    top: auto;
+  body{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:#f3f4f6;
   }
-}
 
-    /* Filter count badges (Improvement #4) */
-    .filter-badge{
-      margin-left: 6px;
-      font-size: .75rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(15,23,42,.08);
-    }
+  #trust-bar{
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    color:#fff;
+    font-size:.85rem;
+    font-weight:600;
+    padding:6px 0;
+  }
+  #trust-bar span{ white-space: nowrap; }
 
-    /* Busy overlay (Improvement #6) */
-    #busyOverlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      z-index:99999;
-      background: rgba(15,23,42,.35);
-      align-items:center;
-      justify-content:center;
-    }
-    #busyOverlay .box{
-      background:#fff;
-      border-radius:16px;
-      padding:16px 18px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.25);
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
+  .navbar{ background:#020617; }
+  .navbar .nav-link{ color:#e5e7eb; }
+  .navbar .nav-link:hover{ color:#fff; }
 
-    /* Added: purple outline button style for the new export buttons */
-    .btn-outline-purple{
-      --bs-btn-color:#6d28d9;
-      --bs-btn-border-color:#6d28d9;
-      --bs-btn-hover-color:#fff;
-      --bs-btn-hover-bg:#6d28d9;
-      --bs-btn-hover-border-color:#6d28d9;
-      --bs-btn-focus-shadow-rgb:109,40,217;
-      --bs-btn-active-color:#fff;
-      --bs-btn-active-bg:#5b21b6;
-      --bs-btn-active-border-color:#5b21b6;
-    }
+  .section-card{
+    background:#fff;
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin-bottom:24px;
+  }
 
-    /* ────────────────────────────────────────────────
-       ✅ SIDEBAR LAYOUT (Nice-to-have #1)
-       ──────────────────────────────────────────────── */
-    .admin-shell{
-      display:flex;
-      min-height:100vh;
-    }
-    .admin-sidebar{
-      width:260px;
-      background:#020617;
-      color:#e5e7eb;
-      position:sticky;
-      top:0;
-      height:100vh;
-      padding:16px;
-      display:none;
-    }
-    .admin-sidebar a{
-      color:#e5e7eb;
-      text-decoration:none;
-      display:block;
-      padding:10px 12px;
-      border-radius:12px;
-      margin-bottom:6px;
-    }
-    .admin-sidebar a:hover{
-      background: rgba(255,255,255,.08);
-      color:#fff;
-    }
-    .admin-main{
-      flex:1;
-      width:100%;
-    }
-    @media (min-width: 992px){
-      .admin-sidebar{ display:block; }
-    }
-    .mobile-topbar{
-      background:#020617;
-      color:#fff;
-      padding:10px 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    @media (min-width: 992px){
-      .mobile-topbar{ display:none; }
+  .order-card, .review-card{
+    background:#fff;
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin-bottom:12px;
+  }
 
-      .mobile-order-card{
-  border-radius:18px;
-}
+  .review-meta{ font-size:.85rem; color:#6b7280; }
 
-.mobile-primary-actions{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-}
+  .items-box{
+    margin-top:10px;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:.9rem;
+    color:#0f172a;
+    white-space: pre-line;
+  }
+  .items-box strong{
+    font-size:.85rem;
+    color:#334155;
+    display:block;
+    margin-bottom:6px;
+  }
 
-.mobile-primary-actions .btn{
-  width:100%;
-  font-weight:700;
-  border-radius:12px;
-  padding:10px 12px;
-}
+  .muted-line{ color:#64748b; font-size:.85rem; }
 
-.mobile-secondary-actions{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-}
+  .mini-actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
 
-.mobile-secondary-actions .btn{
-  width:100%;
-  border-radius:12px;
-}
+  .btn-row{
+    display:grid;
+    gap:6px;
+    margin-top:8px;
+  }
 
-@media (min-width: 992px){
+  .kpi-pill{
+    background:#0f172a;
+    color:#fff;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:.85rem;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .kpi-pill span{ opacity:.9; font-weight:600; }
+
+  .controls-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:10px;
+    margin-top:10px;
+  }
+  @media (min-width: 992px){
+    .controls-grid{ grid-template-columns: 1.4fr 1fr; align-items:start; }
+  }
+
+  .filter-row{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+
+  .bulk-bar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:12px;
+    padding:10px;
+  }
+
+  .note-area{
+    width:100%;
+    min-height:64px;
+    resize:vertical;
+    font-size:.9rem;
+  }
+  .small-input{ font-size:.85rem; }
+
+  #backToTop{
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    display: none;
+    border-radius: 999px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+  }
+
+  .sticky-admin-controls{
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(15,23,42,.08);
+  }
+
+  @media (max-width: 991.98px){
+    .sticky-admin-controls{
+      position: static;
+      top: auto;
+    }
+  }
+
+  .filter-badge{
+    margin-left: 6px;
+    font-size: .75rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(15,23,42,.08);
+  }
+
+  #busyOverlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background: rgba(15,23,42,.35);
+    align-items:center;
+    justify-content:center;
+  }
+  #busyOverlay .box{
+    background:#fff;
+    border-radius:16px;
+    padding:16px 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+
+  .btn-outline-purple{
+    --bs-btn-color:#6d28d9;
+    --bs-btn-border-color:#6d28d9;
+    --bs-btn-hover-color:#fff;
+    --bs-btn-hover-bg:#6d28d9;
+    --bs-btn-hover-border-color:#6d28d9;
+    --bs-btn-focus-shadow-rgb:109,40,217;
+    --bs-btn-active-color:#fff;
+    --bs-btn-active-bg:#5b21b6;
+    --bs-btn-active-border-color:#5b21b6;
+  }
+
+  .admin-shell{
+    display:flex;
+    min-height:100vh;
+  }
+  .admin-sidebar{
+    width:260px;
+    background:#020617;
+    color:#e5e7eb;
+    position:sticky;
+    top:0;
+    height:100vh;
+    padding:16px;
+    display:none;
+  }
+  .admin-sidebar a{
+    color:#e5e7eb;
+    text-decoration:none;
+    display:block;
+    padding:10px 12px;
+    border-radius:12px;
+    margin-bottom:6px;
+  }
+  .admin-sidebar a:hover{
+    background: rgba(255,255,255,.08);
+    color:#fff;
+  }
+  .admin-main{
+    flex:1;
+    width:100%;
+  }
+  @media (min-width: 992px){
+    .admin-sidebar{ display:block; }
+  }
+
+  .mobile-topbar{
+    background:#020617;
+    color:#fff;
+    padding:10px 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  @media (min-width: 992px){
+    .mobile-topbar{ display:none; }
+  }
+
+  .mobile-order-card{
+    border-radius:18px;
+  }
+
   .mobile-primary-actions{
-    grid-template-columns:repeat(3, 1fr);
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .mobile-primary-actions .btn{
+    width:100%;
+    font-weight:700;
+    border-radius:12px;
+    padding:10px 12px;
   }
 
   .mobile-secondary-actions{
-    grid-template-columns:repeat(2, 1fr);
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
   }
-}
 
-.min-w-0{
-  min-width:0;
-}
+  .mobile-secondary-actions .btn{
+    width:100%;
+    border-radius:12px;
+  }
+
+  @media (min-width: 992px){
+    .mobile-primary-actions{
+      grid-template-columns:repeat(3, 1fr);
     }
 
-    
-  </style>
+    .mobile-secondary-actions{
+      grid-template-columns:repeat(2, 1fr);
+    }
+  }
+
+  .min-w-0{
+    min-width:0;
+  }
+
+  /* ✅ PACKING MODE */
+  .admin-only{ display:block; }
+  .packing-only{ display:none; }
+
+  body.packing-mode .admin-only{ display:none !important; }
+  body.packing-mode .packing-only{ display:block !important; }
+
+  .view-toggle-bar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+    margin-bottom:12px;
+  }
+
+  .packing-card{
+    background:#fff;
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin-bottom:12px;
+    border:1px solid rgba(15,23,42,.08);
+  }
+
+  .packing-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+
+  .packing-name{
+    font-size:1rem;
+    font-weight:800;
+    color:#0f172a;
+  }
+
+  .packing-ref{
+    font-size:.85rem;
+    color:#64748b;
+    margin-top:2px;
+  }
+
+  .packing-items,
+  .packing-address{
+    margin-top:10px;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:.92rem;
+    white-space:pre-line;
+    color:#0f172a;
+  }
+
+  .packing-items strong,
+  .packing-address strong{
+    display:block;
+    margin-bottom:6px;
+    font-size:.82rem;
+    color:#334155;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+
+  .packing-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .packing-actions .btn{
+    width:100%;
+    font-weight:700;
+    border-radius:12px;
+    padding:10px 12px;
+  }
+
+  @media (min-width: 768px){
+    .packing-actions{
+      grid-template-columns:repeat(4, 1fr);
+    }
+  }
+</style>
 </head>
 
 <body>
@@ -342,40 +421,138 @@
       <div class="container mt-4">
         <!-- ORDERS -->
         <div class="section-card mb-4">
-          <div class="d-flex justify-content-between flex-wrap align-items-center gap-2">
-            <h3 class="mb-0">Orders</h3>
-            <div id="kpi-bar" class="d-flex gap-2 flex-wrap"></div>
+  <div class="d-flex justify-content-between flex-wrap align-items-center gap-2">
+    <h3 class="mb-0">Orders</h3>
+    <div id="kpi-bar" class="d-flex gap-2 flex-wrap"></div>
+  </div>
+
+  <div id="quick-stats" class="d-flex gap-2 flex-wrap mt-2"></div>
+
+  <div class="view-toggle-bar">
+    <button id="view-normal-btn" class="btn btn-sm btn-dark" onclick="setAdminView('normal')">Full Admin</button>
+    <button id="view-pack-btn" class="btn btn-sm btn-outline-dark" onclick="setAdminView('pack')">Packing Mode</button>
+  </div>
+
+  <div class="section-card mt-3 admin-only">
+    <h5 class="mb-2">Dashboard</h5>
+    <p class="text-muted small mb-2">Charts use loaded orders. For accurate charts across everything, click “Load all”.</p>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="p-3 bg-white rounded-4 shadow-sm">
+          <div class="fw-bold mb-2">Revenue (last 30 days)</div>
+          <canvas id="chartRevenue"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="p-3 bg-white rounded-4 shadow-sm">
+          <div class="fw-bold mb-2">Orders per day (last 30 days)</div>
+          <canvas id="chartOrders"></canvas>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="p-3 bg-white rounded-4 shadow-sm">
+          <div class="fw-bold mb-2">Top products (loaded)</div>
+          <canvas id="chartTopProducts"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap mt-3 admin-only">
+    <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('all')">⬇️ Export ALL (CSV)</button>
+    <button class="btn btn-sm btn-outline-primary" onclick="exportOrdersCsv('shipped')">⬇️ Export SHIPPED (CSV)</button>
+    <button class="btn btn-sm btn-outline-dark" onclick="exportOrdersCsv('selected')">⬇️ Export SELECTED (CSV)</button>
+    <button class="btn btn-sm btn-outline-info" onclick="exportOrdersJson('all')">⬇️ Export ALL (JSON)</button>
+    <button class="btn btn-sm btn-outline-info" onclick="exportOrdersXlsx('all')">⬇️ Export ALL (XLSX)</button>
+    <button class="btn btn-sm btn-outline-purple" onclick="exportTimExcel('all')">⬇️ Export Tim Excel (XLSX)</button>
+    <button class="btn btn-sm btn-outline-secondary" onclick="copyTimExcelTsv('all')">📋 Copy shown as Excel (TSV)</button>
+  </div>
+
+  <div class="sticky-admin-controls">
+    <div class="controls-grid">
+      <div>
+        <div class="input-group mt-3">
+          <span class="input-group-text">🔎</span>
+          <input id="order-search" class="form-control"
+                 placeholder="Search ref, name, email... OR status:paid tracking:missing email:@gmail" />
+          <button class="btn btn-outline-secondary" onclick="clearSearch()">Clear</button>
+        </div>
+
+        <div class="filter-row mt-2">
+          <button id="btnAll" class="btn btn-sm btn-outline-dark" onclick="setStatusFilter('all')">All <span id="ctAll" class="filter-badge">…</span></button>
+          <button id="btnPending" class="btn btn-sm btn-outline-warning" onclick="setStatusFilter('Pending')">Pending <span id="ctPending" class="filter-badge">…</span></button>
+          <button id="btnPaid" class="btn btn-sm btn-outline-success" onclick="setStatusFilter('Paid')">Paid <span id="ctPaid" class="filter-badge">…</span></button>
+          <button id="btnPacked" class="btn btn-sm btn-outline-secondary" onclick="setStatusFilter('Packed')">Packed <span id="ctPacked" class="filter-badge">…</span></button>
+          <button id="btnShipped" class="btn btn-sm btn-outline-primary" onclick="setStatusFilter('Shipped')">Shipped <span id="ctShipped" class="filter-badge">…</span></button>
+          <button id="btnCancelled" class="btn btn-sm btn-outline-danger" onclick="setStatusFilter('Cancelled')">Cancelled <span id="ctCancelled" class="filter-badge">…</span></button>
+          <button id="btnPackQueue" class="btn btn-sm btn-dark" onclick="togglePackQueue()">✅ Pack Queue</button>
+        </div>
+
+        <div class="d-flex gap-3 flex-wrap mt-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="flt-older24" onchange="applyClientFilters()">
+            <label class="form-check-label" for="flt-older24">Unpaid &gt; 24h</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="flt-noaddr" onchange="applyClientFilters()">
+            <label class="form-check-label" for="flt-noaddr">No address</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="flt-noemail" onchange="applyClientFilters()">
+            <label class="form-check-label" for="flt-noemail">No email</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="flt-notracking" onchange="applyClientFilters()">
+            <label class="form-check-label" for="flt-notracking">No tracking (shipped)</label>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <small class="text-muted">
+            Search/filters apply to <strong>loaded orders</strong>. For full search/export across everything, click “Load all”.
+          </small>
+        </div>
+      </div>
+
+      <div>
+        <div class="bulk-bar mt-3 admin-only">
+          <div class="d-flex align-items-center gap-2">
+            <input class="form-check-input" type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
+            <label class="form-check-label" for="select-all"><strong>Select all (shown)</strong></label>
           </div>
 
-          <!-- Quick stats row (Improvement #2) -->
-          <div id="quick-stats" class="d-flex gap-2 flex-wrap mt-2"></div>
+          <button class="btn btn-sm btn-secondary" onclick="bulkMarkPacked()">✅ Bulk Mark Packed</button>
+          <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
+          <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
+          <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
+        </div>
 
-          <!-- ✅ DASHBOARD CHARTS (Nice-to-have #3) -->
-          <div class="section-card mt-3">
-            <h5 class="mb-2">Dashboard</h5>
-            <p class="text-muted small mb-2">Charts use loaded orders. For accurate charts across everything, click “Load all”.</p>
-
-            <div class="row g-3">
-              <div class="col-12 col-lg-6">
-                <div class="p-3 bg-white rounded-4 shadow-sm">
-                  <div class="fw-bold mb-2">Revenue (last 30 days)</div>
-                  <canvas id="chartRevenue"></canvas>
-                </div>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="p-3 bg-white rounded-4 shadow-sm">
-                  <div class="fw-bold mb-2">Orders per day (last 30 days)</div>
-                  <canvas id="chartOrders"></canvas>
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="p-3 bg-white rounded-4 shadow-sm">
-                  <div class="fw-bold mb-2">Top products (loaded)</div>
-                  <canvas id="chartTopProducts"></canvas>
-                </div>
-              </div>
-            </div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-dark" onclick="prevPage()">◀ Prev</button>
+            <button class="btn btn-sm btn-outline-dark" onclick="nextPage()">Next ▶</button>
+            <span class="text-muted small" id="page-indicator">Page …</span>
           </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <select id="page-size" class="form-select form-select-sm" style="width:110px;" onchange="changePageSize(this.value)">
+              <option value="25" selected>25/page</option>
+              <option value="50">50/page</option>
+              <option value="100">100/page</option>
+            </select>
+
+            <button class="btn btn-sm btn-dark" onclick="loadAllOrdersForSearch()">⬇️ Load all</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p id="admin-status" class="text-muted mt-3">Checking access…</p>
+  <div id="admin-warning"></div>
+  <div id="orders-list" class="mt-3"></div>
+</div>
 
           <!-- Export buttons (Improvement #10) -->
           <div class="d-flex gap-2 flex-wrap mt-3">
@@ -449,7 +626,7 @@
                   <button class="btn btn-sm btn-secondary" onclick="bulkMarkPacked()">✅ Bulk Mark Packed</button>
                   <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
                   <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
-                  <button class="btn btn-sm btn-outline-dark" onclick="copyOrderForText('${order.id}')">📱 Copy SMS</button>
+                  
                   <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
                 </div>
 
@@ -1775,7 +1952,7 @@ window.copyOrderForText = copyOrderForText;
       if(String(value || "").toLowerCase() === "paid"){
         try{
           await awardCreditForPaidOrder(id);
-          const amt = Number(ordersCache[orderId]?.details?.meta?.referral_buyer_amount || 0);
+          const amt = Number(ordersCache[id]?.details?.meta?.referral_buyer_amount || 0);
           if(amt > 0) showToast(`Credit awarded ✅ (£${amt.toFixed(2)})`, "success");
         }catch(e){
           console.error("Credit award failed", e);
@@ -2403,6 +2580,111 @@ window.copyOrderForText = copyOrderForText;
       }
     }
 
+function setAdminView(view){
+  const normalBtn = document.getElementById("view-normal-btn");
+  const packBtn = document.getElementById("view-pack-btn");
+
+  if(view === "pack"){
+    document.body.classList.add("packing-mode");
+    localStorage.setItem("lumina_admin_view", "pack");
+
+    if(normalBtn){
+      normalBtn.classList.remove("btn-dark");
+      normalBtn.classList.add("btn-outline-dark");
+    }
+    if(packBtn){
+      packBtn.classList.remove("btn-outline-dark");
+      packBtn.classList.add("btn-dark");
+    }
+  } else {
+    document.body.classList.remove("packing-mode");
+    localStorage.setItem("lumina_admin_view", "normal");
+
+    if(normalBtn){
+      normalBtn.classList.remove("btn-outline-dark");
+      normalBtn.classList.add("btn-dark");
+    }
+    if(packBtn){
+      packBtn.classList.remove("btn-dark");
+      packBtn.classList.add("btn-outline-dark");
+    }
+  }
+}
+
+function initAdminView(){
+  const saved = localStorage.getItem("lumina_admin_view") || "normal";
+  setAdminView(saved);
+}
+
+function toggleOrderExpanded(orderId){
+  const el = document.getElementById(`packing-more-${orderId}`);
+  if(!el) return;
+  el.style.display = (el.style.display === "none" || !el.style.display) ? "block" : "none";
+}
+
+function renderPackingCards(orderIds){
+  if(!Array.isArray(orderIds) || !orderIds.length){
+    ordersEl.innerHTML = `<div class="alert alert-light border text-muted">No orders to show.</div>`;
+    return;
+  }
+
+  ordersEl.innerHTML = orderIds.map(id => {
+    const order = ordersCache[id];
+    if(!order) return "";
+
+    const c = getCustomer(order);
+    const ref = order.reference || (order.id ? order.id.slice(0, 8) : "No ref");
+    const created = order.created_at ? new Date(order.created_at).toLocaleString() : "";
+    const total = Number(order.total_amount || 0).toFixed(2);
+    const items = buildItemsText(order);
+    const address = buildAddressText(order) || "No address recorded.";
+
+    return `
+      <div class="packing-card">
+        <div class="packing-head">
+          <div>
+            <div class="packing-name">${escapeHtml(c.name || "No name")}</div>
+            <div class="packing-ref">${escapeHtml(ref)} • ${escapeHtml(created)}</div>
+          </div>
+          <div class="text-end">
+            ${badge(order.status)}
+            <div class="fw-bold mt-1">£${total}</div>
+          </div>
+        </div>
+
+        <div class="packing-items">
+          <strong>Items</strong>
+          ${escapeHtml(items)}
+        </div>
+
+        <div class="packing-address">
+          <strong>Address</strong>
+          ${escapeHtml(address)}
+          ${c.phone ? `\n📞 ${escapeHtml(c.phone)}` : ""}
+        </div>
+
+        <div class="packing-actions">
+          <button class="btn btn-outline-dark btn-sm" onclick="copyOrderForText('${order.id}')">📱 Copy for Shell</button>
+          <button class="btn btn-secondary btn-sm" onclick="markPackedById('${order.id}')">✅ Packed</button>
+          <button class="btn btn-primary btn-sm" onclick="sendShippedEmailById('${order.id}')">📦 Shipped</button>
+          <button class="btn btn-outline-dark btn-sm" onclick="toggleOrderExpanded('${order.id}')">More</button>
+        </div>
+
+        <div id="packing-more-${order.id}" style="display:none; margin-top:10px;">
+          ${buildItemsHtml(order)}
+          ${buildAddressHtml(order)}
+          <div class="mini-actions">
+            <button class="btn btn-sm btn-outline-dark" onclick="copyAddressById('${order.id}')">📋 Copy Address</button>
+            <button class="btn btn-sm btn-outline-dark" onclick="openCustomerView('${escapeHtml(getOrderEmail(order))}')">👤 Customer</button>
+            <button class="btn btn-sm btn-outline-success" onclick="markPaidAndSendById('${order.id}')">💷 Mark Paid</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="cancelAndRestockById('${order.id}')">↩️ Cancel + Restock</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+    
     function renderOrdersFromCache(){
   const orders = Object.values(ordersCache || {}).sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
 
@@ -2491,6 +2773,11 @@ window.copyOrderForText = copyOrderForText;
   document.getElementById("select-all").checked = allSelected;
 
   statusEl.textContent = `${list.length} order(s) shown`;
+
+  if(document.body.classList.contains("packing-mode")){
+    renderPackingCards(filteredOrderIds);
+    return;
+  }
 
   ordersEl.innerHTML = list.map((order) => {
     const created = order.created_at ? new Date(order.created_at).toLocaleString() : "";
@@ -2647,6 +2934,7 @@ window.copyOrderForText = copyOrderForText;
       </div>
     `;
   }).join("");
+
 }
 
     async function copyTimExcelTsvOne(orderId){
@@ -3012,8 +3300,14 @@ window.copyOrderForText = copyOrderForText;
     window.copyTimExcelTsvOne = copyTimExcelTsvOne;
     window.cancelAndRestockById = cancelAndRestockById;
 
-    // go
-    init();
+    window.setAdminView = setAdminView;
+window.toggleOrderExpanded = toggleOrderExpanded;
+
+// go
+initAdminView();
+init();
+
+  
   </script>
 </body>
 </html>
