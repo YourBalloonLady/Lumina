@@ -2819,6 +2819,8 @@ function renderPackingCards(orderIds){
               <div class="d-flex flex-wrap align-items-center gap-2">
                 <strong>${escapeHtml(ref)}</strong>
                 ${badge(status)}
+                ${needs3pmReminder(order) ? `<div class="priority-banner">⏰ 3PM reminder due</div>` : ``}
+
               </div>
               <div class="small text-muted mt-1">${escapeHtml(created)}</div>
               <div class="mt-1">
@@ -2845,24 +2847,34 @@ function renderPackingCards(orderIds){
         </div>
 
         <div class="mobile-primary-actions">
-          <button class="btn btn-success"
-            ${isPaid || isPacked || isShipped || isCancelled ? "disabled" : ""}
-            onclick="markPaidAndSendById('${order.id}')">
-            💷 Mark Paid
-          </button>
 
-          <button class="btn btn-danger"
-  ${isCancelled ? "disabled" : ""}
-  onclick="quickCancelAndRestock('${order.id}')">
-  ❌ Cancel + Restock
-</button>
+  <button class="btn btn-success"
+    ${isPaid || isPacked || isShipped || isCancelled ? "disabled" : ""}
+    onclick="markPaidAndSendById('${order.id}')">
+    💷 Mark Paid
+  </button>
 
-          <button class="btn btn-primary"
-            ${isShipped || isCancelled ? "disabled" : ""}
-            onclick="sendShippedEmailById('${order.id}')">
-            📦 Mark Shipped
-          </button>
-        </div>
+  <button class="btn btn-danger"
+    ${isCancelled ? "disabled" : ""}
+    onclick="quickCancelAndRestock('${order.id}')">
+    ❌ Cancel + Restock
+  </button>
+
+  <button class="btn btn-primary"
+    ${isShipped || isCancelled ? "disabled" : ""}
+    onclick="sendShippedEmailById('${order.id}')">
+    📦 Mark Shipped
+  </button>
+
+  <!-- ✅ ADD THIS -->
+  <button class="btn btn-warning"
+    ${!needs3pmReminder(order) ? "disabled" : ""}
+    onclick="quick3pmReminder('${order.id}')">
+    ⏰ 3PM Reminder
+  </button>
+
+</div>
+
 
         <div class="accordion mt-3" id="acc-${order.id}">
           <div class="accordion-item border-0">
