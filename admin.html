@@ -368,74 +368,6 @@
     .packing-actions{
       grid-template-columns:repeat(4, 1fr);
     }
-    .workflow-bar{
-  display:grid;
-  grid-template-columns:repeat(1,1fr);
-  gap:10px;
-  margin-top:14px;
-}
-@media (min-width:768px){
-  .workflow-bar{
-    grid-template-columns:repeat(4,1fr);
-  }
-}
-
-.workflow-btn{
-  border:none;
-  border-radius:16px;
-  padding:14px 16px;
-  font-weight:800;
-  text-align:left;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
-}
-.workflow-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 14px 28px rgba(0,0,0,.12);
-}
-.workflow-btn small{
-  display:block;
-  opacity:.9;
-  font-weight:600;
-  margin-top:2px;
-}
-
-.workflow-paid{ background:#16a34a; color:#fff; }
-.workflow-ship{ background:#2563eb; color:#fff; }
-.workflow-cancel{ background:#dc2626; color:#fff; }
-.workflow-remind{ background:#ea580c; color:#fff; }
-
-.workflow-summary{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.workflow-chip{
-  background:#f8fafc;
-  border:1px solid rgba(15,23,42,.08);
-  color:#0f172a;
-  border-radius:999px;
-  padding:8px 12px;
-  font-size:.85rem;
-  font-weight:700;
-}
-
-.priority-banner{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  background:#fff7ed;
-  color:#9a3412;
-  border:1px solid #fdba74;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:.78rem;
-  font-weight:800;
-  margin-top:8px;
-}
-
   }
 </style>
 </head>
@@ -495,35 +427,6 @@
   </div>
 
   <div id="quick-stats" class="d-flex gap-2 flex-wrap mt-2"></div>
-          <div class="workflow-summary admin-only">
-  <div class="workflow-chip" id="wf-selected-chip">0 selected</div>
-  <div class="workflow-chip" id="wf-pending-chip">Pending: …</div>
-  <div class="workflow-chip" id="wf-paid-chip">Paid: …</div>
-  <div class="workflow-chip" id="wf-reminder-chip">3PM reminders due: …</div>
-</div>
-
-<div class="workflow-bar admin-only">
-  <button class="workflow-btn workflow-paid" onclick="bulkMarkPaid()">
-    💰 Mark Paid
-    <small id="bulk-paid-meta">Apply to selected orders</small>
-  </button>
-
-  <button class="workflow-btn workflow-ship" onclick="bulkMarkShippedWorkflow()">
-    📦 Mark Shipped
-    <small id="bulk-ship-meta">Apply to selected orders</small>
-  </button>
-
-  <button class="workflow-btn workflow-cancel" onclick="bulkCancelAndRestockWorkflow()">
-    ❌ Cancel + Restock
-    <small id="bulk-cancel-meta">Apply to selected orders</small>
-  </button>
-
-  <button class="workflow-btn workflow-remind" onclick="bulkSend3pmReminder()">
-    ⏰ 3PM Reminder
-    <small id="bulk-reminder-meta">Send to selected orders</small>
-  </button>
-</div>
-
 
   <div class="view-toggle-bar">
     <button id="view-normal-btn" class="btn btn-sm btn-dark" onclick="setAdminView('normal')">Full Admin</button>
@@ -648,7 +551,109 @@
 
   <p id="admin-status" class="text-muted mt-3">Checking access…</p>
   <div id="admin-warning"></div>
-  
+  <div id="orders-list" class="mt-3"></div>
+</div>
+
+          <!-- Export buttons (Improvement #10) -->
+          <div class="d-flex gap-2 flex-wrap mt-3">
+            <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('all')">⬇️ Export ALL (CSV)</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="exportOrdersCsv('shipped')">⬇️ Export SHIPPED (CSV)</button>
+            <button class="btn btn-sm btn-outline-dark" onclick="exportOrdersCsv('selected')">⬇️ Export SELECTED (CSV)</button>
+            <button class="btn btn-sm btn-outline-info" onclick="exportOrdersJson('all')">⬇️ Export ALL (JSON)</button>
+            <button class="btn btn-sm btn-outline-info" onclick="exportOrdersXlsx('all')">⬇️ Export ALL (XLSX)</button>
+
+            <!-- ✅ Added: Excel-template exports that match your sheet columns -->
+            <button class="btn btn-sm btn-outline-purple" onclick="exportTimExcel('all')">⬇️ Export Tim Excel (XLSX)</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyTimExcelTsv('all')">📋 Copy shown as Excel (TSV)</button>
+          </div>
+
+          <!-- Sticky controls (Improvement #1) -->
+          <div class="sticky-admin-controls">
+            <div class="controls-grid">
+              <div>
+                <div class="input-group mt-3">
+                  <span class="input-group-text">🔎</span>
+                  <input id="order-search" class="form-control"
+                         placeholder="Search ref, name, email... OR status:paid tracking:missing email:@gmail" />
+                  <button class="btn btn-outline-secondary" onclick="clearSearch()">Clear</button>
+                </div>
+
+                <!-- Filter buttons w/ counts (Improvement #4) -->
+                <div class="filter-row mt-2">
+                  <button id="btnAll" class="btn btn-sm btn-outline-dark" onclick="setStatusFilter('all')">All <span id="ctAll" class="filter-badge">…</span></button>
+                  <button id="btnPending" class="btn btn-sm btn-outline-warning" onclick="setStatusFilter('Pending')">Pending <span id="ctPending" class="filter-badge">…</span></button>
+                  <button id="btnPaid" class="btn btn-sm btn-outline-success" onclick="setStatusFilter('Paid')">Paid <span id="ctPaid" class="filter-badge">…</span></button>
+                  <button id="btnPacked" class="btn btn-sm btn-outline-secondary" onclick="setStatusFilter('Packed')">Packed <span id="ctPacked" class="filter-badge">…</span></button>
+                  <button id="btnShipped" class="btn btn-sm btn-outline-primary" onclick="setStatusFilter('Shipped')">Shipped <span id="ctShipped" class="filter-badge">…</span></button>
+                  <button id="btnCancelled" class="btn btn-sm btn-outline-danger" onclick="setStatusFilter('Cancelled')">Cancelled <span id="ctCancelled" class="filter-badge">…</span></button>
+                  <button id="btnPackQueue" class="btn btn-sm btn-dark" onclick="togglePackQueue()">✅ Pack Queue</button>
+                </div>
+
+                <!-- Client-side toggles -->
+                <div class="d-flex gap-3 flex-wrap mt-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-older24" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-older24">Unpaid &gt; 24h</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-noaddr" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-noaddr">No address</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-noemail" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-noemail">No email</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-notracking" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-notracking">No tracking (shipped)</label>
+                  </div>
+                </div>
+
+                <div class="mt-2">
+                  <small class="text-muted">
+                    Search/filters apply to <strong>loaded orders</strong>. For full search/export across everything, click “Load all”.
+                  </small>
+                </div>
+              </div>
+
+              <div>
+                <div class="bulk-bar mt-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
+                    <label class="form-check-label" for="select-all"><strong>Select all (shown)</strong></label>
+                  </div>
+
+                  <button class="btn btn-sm btn-secondary" onclick="bulkMarkPacked()">✅ Bulk Mark Packed</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
+                  <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
+                  
+                  <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-dark" onclick="prevPage()">◀ Prev</button>
+                    <button class="btn btn-sm btn-outline-dark" onclick="nextPage()">Next ▶</button>
+                    <span class="text-muted small" id="page-indicator">Page …</span>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <select id="page-size" class="form-select form-select-sm" style="width:110px;" onchange="changePageSize(this.value)">
+                      <option value="25" selected>25/page</option>
+                      <option value="50">50/page</option>
+                      <option value="100">100/page</option>
+                    </select>
+
+                    <button class="btn btn-sm btn-dark" onclick="loadAllOrdersForSearch()">⬇️ Load all</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p id="admin-status" class="text-muted mt-3">Checking access…</p>
+          <div id="admin-warning"></div>
+          <div id="orders-list" class="mt-3"></div>
         </div>
 
         <!-- REVIEWS -->
@@ -2814,8 +2819,6 @@ function renderPackingCards(orderIds){
               <div class="d-flex flex-wrap align-items-center gap-2">
                 <strong>${escapeHtml(ref)}</strong>
                 ${badge(status)}
-                ${needs3pmReminder(order) ? `<div class="priority-banner">⏰ 3PM reminder due</div>` : ``}
-
               </div>
               <div class="small text-muted mt-1">${escapeHtml(created)}</div>
               <div class="mt-1">
@@ -2842,34 +2845,24 @@ function renderPackingCards(orderIds){
         </div>
 
         <div class="mobile-primary-actions">
+          <button class="btn btn-success"
+            ${isPaid || isPacked || isShipped || isCancelled ? "disabled" : ""}
+            onclick="markPaidAndSendById('${order.id}')">
+            💷 Mark Paid
+          </button>
 
-  <button class="btn btn-success"
-    ${isPaid || isPacked || isShipped || isCancelled ? "disabled" : ""}
-    onclick="markPaidAndSendById('${order.id}')">
-    💷 Mark Paid
-  </button>
+          <button class="btn btn-danger"
+  ${isCancelled ? "disabled" : ""}
+  onclick="quickCancelAndRestock('${order.id}')">
+  ❌ Cancel + Restock
+</button>
 
-  <button class="btn btn-danger"
-    ${isCancelled ? "disabled" : ""}
-    onclick="quickCancelAndRestock('${order.id}')">
-    ❌ Cancel + Restock
-  </button>
-
-  <button class="btn btn-primary"
-    ${isShipped || isCancelled ? "disabled" : ""}
-    onclick="sendShippedEmailById('${order.id}')">
-    📦 Mark Shipped
-  </button>
-
-  <!-- ✅ ADD THIS -->
-  <button class="btn btn-warning"
-    ${!needs3pmReminder(order) ? "disabled" : ""}
-    onclick="quick3pmReminder('${order.id}')">
-    ⏰ 3PM Reminder
-  </button>
-
-</div>
-
+          <button class="btn btn-primary"
+            ${isShipped || isCancelled ? "disabled" : ""}
+            onclick="sendShippedEmailById('${order.id}')">
+            📦 Mark Shipped
+          </button>
+        </div>
 
         <div class="accordion mt-3" id="acc-${order.id}">
           <div class="accordion-item border-0">
