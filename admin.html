@@ -2862,13 +2862,6 @@ function renderPackingCards(orderIds){
             onclick="sendShippedEmailById('${order.id}')">
             📦 Mark Shipped
           </button>
-
-          <button class="btn btn-warning"
-  ${!needs3pmReminder(order) ? "disabled" : ""}
-  onclick="quick3pmReminder('${order.id}')">
-  ⏰ 3PM Reminder
-</button>
-        </div>
         </div>
 
         <div class="accordion mt-3" id="acc-${order.id}">
