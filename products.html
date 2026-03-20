@@ -986,7 +986,7 @@ function getMgValue(name) {
                   <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                  <img id="modalImg" src="" class="img-fluid mb-4" style="max-height: 320px;">
+                  <div id="modalMedia" class="mb-4"></div>
                   <h3 id="modalName"></h3>
                   <p class="product-price fs-1" id="modalPrice"></p>
                   <p class="stock text-success mb-2" id="modalStock"></p>
@@ -1006,7 +1006,7 @@ function getMgValue(name) {
         modal = document.getElementById('productModal');
       }
 
-      document.getElementById('modalImg').src = imgSrc(p.image);
+      const modalMedia = document.getElementById('modalMedia');  if ((p.name || '').toLowerCase().includes('nad+')) {   modalMedia.innerHTML = `     <video       id="modalVideo"       class="img-fluid"       style="max-height: 320px; width: 100%;"       controls       autoplay       playsinline     >       <source src="https://luminaweight.co.uk/NAD+.mp4" type="video/mp4">       Your browser does not support the video tag.     </video>   `; } else {   modalMedia.innerHTML = `     <img       id="modalImg"       src="${imgSrc(p.image)}"       class="img-fluid"       style="max-height: 320px;"       alt="${p.name}"     >   `; }
       document.getElementById('modalTitle').textContent = p.name;
       document.getElementById('modalName').textContent = p.name;
       document.getElementById('modalPrice').innerHTML =
@@ -1049,8 +1049,23 @@ descEl.innerHTML = `
         bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
       };
 
+      const modalVideo = document.getElementById('modalVideo');
+if (modalVideo) {
+  modalVideo.play().catch(() => {});
+}
+
       new bootstrap.Modal(modal).show();
     }
+
+    document.addEventListener('hidden.bs.modal', function (e) {
+  if (e.target && e.target.id === 'productModal') {
+    const modalVideo = document.getElementById('modalVideo');
+    if (modalVideo) {
+      modalVideo.pause();
+      modalVideo.currentTime = 0;
+    }
+  }
+});
 
     function changeQty(delta) {
       const input = document.getElementById('modalQty');
