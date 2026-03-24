@@ -779,9 +779,9 @@
   );
 }
     function imgSrc(image) {
-      if (!image) return '';
-      return 'https://luminaweight.co.uk/' + encodeURIComponent(image);
-    }
+  if (!image) return '';
+  return './' + encodeURIComponent(image);
+}
 
     function getDisplayPriceHtml(p, unitSuffix) {
       if ((p.name || '').includes('NAD+')) {
@@ -1006,7 +1006,7 @@ function getMgValue(name) {
         modal = document.getElementById('productModal');
       }
 
-      const modalMedia = document.getElementById('modalMedia');  if ((p.name || '').toLowerCase().includes('nad+')) {   modalMedia.innerHTML = `     <video       id="modalVideo"       class="img-fluid"       style="max-height: 320px; width: 100%;"       controls       autoplay       playsinline     >       <source src="https://luminaweight.co.uk/NAD+.mp4" type="video/mp4">       Your browser does not support the video tag.     </video>   `; } else {   modalMedia.innerHTML = `     <img       id="modalImg"       src="${imgSrc(p.image)}"       class="img-fluid"       style="max-height: 320px;"       alt="${p.name}"     >   `; }
+      const modalMedia = document.getElementById('modalMedia');  if ((p.name || '').toLowerCase().includes('nad+')) {   modalMedia.innerHTML = `     <video       id="modalVideo"       class="img-fluid"       style="max-height: 320px; width: 100%;"       controls       autoplay       playsinline     >       <source src="https://lumi24.org/NAD+.mp4" type="video/mp4">       Your browser does not support the video tag.     </video>   `; } else {   modalMedia.innerHTML = `     <img       id="modalImg"       src="${imgSrc(p.image)}"       class="img-fluid"       style="max-height: 320px;"       alt="${p.name}"     >   `; }
       document.getElementById('modalTitle').textContent = p.name;
       document.getElementById('modalName').textContent = p.name;
       document.getElementById('modalPrice').innerHTML =
