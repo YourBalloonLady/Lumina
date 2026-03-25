@@ -898,7 +898,7 @@ const extraInfo = ' Accessories (if applicable) are supplied for laboratory hand
           <div class="col-md-3">
             <div class="position-relative h-100 product-card ${stockNum === 0 ? 'out-of-stock' : ''}" onclick="${stockNum > 0 ? `openModal(${i})` : ''}">
               ${badge ? `<span class="pill-label ${badge.class}">${badge.text}</span>` : ''}
-${isComingSoon ? `<span class="pill-coming-soon">Coming Soon</span>` : ''}
+
 ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span>` : ''}
  
               <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
