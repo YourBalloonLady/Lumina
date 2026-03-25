@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+ 
   <!-- FAVICON / TAB ICON -->
   <link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=4">
   <link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=4">
   <link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
-
+ 
   <!-- SEO (neutral / research supply language) -->
   <title>Research Materials Catalogue UK | Lumina</title>
   <meta name="description" content="Browse all Lumina research materials in the UK. Product formats and quantities available with discreet UK dispatch — for laboratory research use only. Not for human consumption.">
   <meta name="robots" content="index, follow">
-
+ 
   <!-- Open Graph / Social -->
   <meta property="og:title" content="Research Materials Catalogue UK | Lumina">
   <meta property="og:description" content="Full UK range of research materials and accessories where applicable. Discreet packaging • UK dispatch • Research use only. Not for human consumption.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.lumi24.org/products.html">
-
+ 
   <link rel="canonical" href="https://www.lumi24.org/products.html">
-
+ 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+ 
   <style>
     :root {
       --lw-mint: #22c55e;
@@ -35,7 +35,7 @@
       --lw-muted: #64748b;
       --lw-bg: #f3f4f6;
     }
-
+ 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--lw-bg);
@@ -43,7 +43,7 @@
       margin: 0;
       padding-top: 80px;
     }
-
+ 
     #trust-bar {
       position: fixed;
       top: 0;
@@ -56,51 +56,51 @@
       z-index: 1100;
       text-align: center;
     }
-
+ 
     #trust-bar span {
       white-space: nowrap;
     }
-
+ 
     .navbar {
       background: #ffffff !important;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
     }
-
+ 
     .navbar.fixed-top {
       top: 32px;
     }
-
+ 
     .navbar-brand img {
       height: 36px;
       margin-right: 10px;
     }
-
+ 
     .navbar-brand span {
       font-weight: 700;
       font-size: 1.15rem;
     }
-
+ 
     .nav-link {
       font-weight: 500;
       color: var(--lw-muted) !important;
     }
-
+ 
     .nav-link.active,
     .nav-link:hover {
       color: var(--lw-dark) !important;
     }
-
+ 
     .cart-icon {
       cursor: pointer;
       font-size: 1.5rem;
       color: var(--lw-dark);
     }
-
+ 
     .hero {
       background: radial-gradient(circle at top left, var(--lw-mint-soft), #e0f2fe 40%, var(--lw-purple-soft) 100%);
       padding: 120px 0 80px;
     }
-
+ 
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
@@ -112,29 +112,29 @@
       font-size: 0.85rem;
       font-weight: 600;
     }
-
+ 
     .hero-eyebrow i {
       font-size: 0.9rem;
     }
-
+ 
     .hero-title {
   font-size: clamp(2.2rem, 4vw, 2.6rem);
   font-weight: 800;
   line-height: 1.1;
   margin-top: 18px;
 }
-
+ 
 .hero-subtitle {
   color: var(--lw-muted);
   font-size: 1rem;
   max-width: 650px;
   margin: 16px auto 0;
 }
-
+ 
 #products {
   padding: 60px 0 80px;
 }
-
+ 
 .section-eyebrow {
   text-transform: uppercase;
   letter-spacing: .08em;
@@ -142,18 +142,18 @@
   color: #0f766e;
   font-weight: 700;
 }
-
+ 
 .section-title {
   font-size: 2rem;
   font-weight: 800;
 }
-
+ 
 .section-subtitle {
   color: var(--lw-muted);
   max-width: 560px;
   margin: 10px auto 0;
 }
-
+ 
 .product-card {
   border: 0;
   border-radius: 24px;
@@ -164,32 +164,32 @@
   transition: transform .2s ease, box-shadow .2s ease;
   cursor: pointer;
 }
-
+ 
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 26px 60px rgba(15, 23, 42, 0.12);
 }
-
+ 
 .product-card.out-of-stock {
   opacity: 0.55;
   cursor: not-allowed;
 }
-
+ 
 .product-card img {
   height: 200px;
   object-fit: contain;
 }
-
+ 
 .product-body {
   padding: 1.5rem 1.6rem 1.6rem;
 }
-
+ 
 .product-name {
   font-weight: 700;
   font-size: 1.05rem;
   margin-bottom: .15rem;
 }
-
+ 
 .product-price {
   font-size: 1.3rem;
   font-weight: 800;
@@ -199,26 +199,26 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-
+ 
 .product-price .unit-suffix {
   font-size: .85rem;
   color: var(--lw-muted);
   font-weight: 500;
 }
-
+ 
 .sale-old {
   text-decoration: line-through;
   color: #9ca3af;
   font-weight: 700;
   font-size: 1rem;
 }
-
+ 
 .sale-new {
   color: #16a34a;
   font-weight: 800;
   font-size: 1.3rem;
 }
-
+ 
 .sale-tag {
   display: inline-block;
   font-size: 0.72rem;
@@ -228,7 +228,7 @@
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-
+ 
 .pill-label {
   position: absolute;
   top: 14px;
@@ -240,23 +240,23 @@
   color: #ffffff;
   z-index: 2;
 }
-
+ 
 .pill-popular {
   background: #22c55e;
 }
-
+ 
 .pill-premium {
   background: #6366f1;
 }
-
+ 
 .pill-best-value {
   background: #f97316;
 }
-
+ 
 .pill-wolverine {
   background: #111827;
 }
-
+ 
 .pill-restock {
   position: absolute;
   top: 16px;
@@ -272,7 +272,7 @@
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
   z-index: 2;
 }
-
+ 
 .pill-coming-soon {
   position: absolute;
   top: 16px;
@@ -293,21 +293,21 @@
   margin-top: 4px;
   margin-bottom: 0;
 }
-
+ 
     .btn-add {
       border-radius: 999px;
       font-weight: 600;
       padding-inline: 24px;
       margin-top: 12px;
     }
-
+ 
     .info-card {
       border-radius: 20px;
       background: #ffffff;
       padding: 20px 18px;
       box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
     }
-
+ 
     .info-icon {
       width: 42px;
       height: 42px;
@@ -319,7 +319,7 @@
       color: #15803d;
       font-size: 1.1rem;
     }
-
+ 
     .btn-info-link {
       font-size: 0.85rem;
       font-weight: 600;
@@ -331,12 +331,12 @@
       padding: 0;
       text-decoration: none;
     }
-
+ 
     .btn-info-link:hover {
       text-decoration: underline;
       color: #115e59;
     }
-
+ 
     .cart-sidebar {
       height: 100vh;
       width: 420px;
@@ -349,11 +349,11 @@
       z-index: 9999;
       overflow-y: auto;
     }
-
+ 
     .cart-sidebar.open {
       right: 0;
     }
-
+ 
     .overlay {
       display: none;
       position: fixed;
@@ -361,55 +361,55 @@
       background: rgba(15, 23, 42, 0.45);
       z-index: 9998;
     }
-
+ 
     .overlay.show {
       display: block;
     }
-
+ 
     .qty-btn {
       width: 38px;
       height: 38px;
     }
-
+ 
     .qty-input {
       width: 60px;
       text-align: center;
     }
-
+ 
     footer {
       background: #020617;
       color: #9ca3af;
       padding: 22px 0;
       font-size: 0.9rem;
     }
-
+ 
     @media (min-width: 769px) {
       .navbar.fixed-top {
         position: fixed;
         left: 0;
         right: 0;
       }
-
+ 
       body {
         padding-top: 80px;
       }
     }
-
+ 
     @media (max-width: 768px) {
       #trust-bar {
         position: static;
       }
-
+ 
       .navbar.fixed-top {
         position: static;
         top: auto;
       }
-
+ 
       body {
         padding-top: 0;
       }
     }
-
+ 
     #backToTop {
       position: fixed;
       right: 18px;
@@ -421,7 +421,7 @@
     }
   </style>
 </head>
-
+ 
 <body>
   <div id="trust-bar">
     <div class="container d-flex justify-content-center gap-4 flex-wrap">
@@ -431,17 +431,17 @@
       <span>📦 Discreet Packaging</span>
     </div>
   </div>
-
+ 
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html#home">
         <span>Lumina</span>
       </a>
-
+ 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-
+ 
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
           <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
@@ -449,19 +449,19 @@
           <li class="nav-item"><a class="nav-link" href="peptides.html">Peptide Library</a></li>
           <li class="nav-item"><a class="nav-link" href="calculator.html">Calculator</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-
+ 
           <li class="nav-item" id="logout-nav-item" style="display:none;">
             <a class="nav-link" href="#" id="logout-btn">Logout</a>
           </li>
-
+ 
           <li class="nav-item" id="admin-nav-item" style="display:none;">
             <a class="nav-link" href="admin.html">Admin</a>
           </li>
-
+ 
           <li class="nav-item">
             <a class="nav-link" href="account.html" id="account-link">My Account</a>
           </li>
-
+ 
           <li class="nav-item ms-lg-3">
             <div class="position-relative">
               <i class="fas fa-shopping-cart cart-icon" onclick="toggleCart()"></i>
@@ -472,19 +472,19 @@
       </div>
     </div>
   </nav>
-
+ 
   <div class="overlay" onclick="toggleCart()"></div>
-
+ 
   <div class="cart-sidebar" id="cart-sidebar">
     <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">Your Cart (<span id="cart-items-count">0</span>)</h5>
       <button class="btn-close" onclick="toggleCart()"></button>
     </div>
-
+ 
     <div id="cart-items" class="p-4" style="min-height: 60vh;">
       <p class="text-center text-muted m-0">Your cart is empty</p>
     </div>
-
+ 
     <div class="p-4 border-top bg-light">
       <div class="d-flex justify-content-between fs-5 mb-3">
         <span class="fw-semibold">Total:</span>
@@ -496,16 +496,16 @@
       </small>
     </div>
   </div>
-
+ 
   <section class="hero text-center">
     <div class="container">
       <div class="hero-eyebrow">
         <i class="fa-solid fa-vial-circle-check"></i>
         UK Research Materials Catalogue
       </div>
-
+ 
       <h1 class="hero-title">All Lumina Products</h1>
-
+ 
       <p class="hero-subtitle">
         Browse the full Lumina range of laboratory research materials supplied from the UK.
         Orders placed before <strong>3PM</strong> are dispatched the same working day with discreet packaging.
@@ -514,34 +514,34 @@
       </p>
     </div>
   </section>
-
+ 
   <section id="products">
     <div class="container">
       <div class="text-center mb-4">
         <div class="section-eyebrow">Research Materials</div>
-
+ 
         <h2 class="section-title">Choose Your Format</h2>
-
+ 
         <p class="section-subtitle">
           Lumina supplies research materials in multiple formats depending on laboratory requirements.
           Each product listing displays the available format, stock level and price.
         </p>
-
+ 
         <p class="text-muted small mt-2">
           <strong>Where applicable, accessories are supplied for laboratory handling and measurement.</strong><br>
           <strong>Lumina does not provide dosing, administration or medical guidance.</strong><br>
           <strong>All products are supplied strictly for laboratory research use only.</strong>
         </p>
       </div>
-
+ 
       <div id="all-products-status" class="text-center text-muted mb-3">
         Loading products…
       </div>
-
+ 
       <div class="row g-4" id="all-products-list"></div>
     </div>
   </section>
-
+ 
   <section id="info-cards" class="py-5">
     <div class="container">
       <div class="text-center mb-4">
@@ -552,7 +552,7 @@
           All information provided on this website is administrative in nature and does not constitute medical guidance.
         </p>
       </div>
-
+ 
       <div class="row g-4">
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
@@ -565,7 +565,7 @@
             <a href="disclaimer.html" class="btn-info-link">Read now</a>
           </div>
         </div>
-
+ 
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
             <div class="info-icon mb-3"><i class="fa-solid fa-shield-halved"></i></div>
@@ -574,14 +574,14 @@
             <a href="terms.html" class="btn-info-link">View terms</a>
           </div>
         </div>
-
+ 
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
             <div class="info-icon mb-3"><i class="fa-regular fa-star"></i></div>
             <p class="small mb-3">Ordering experience, delivery speed, packaging and customer service feedback.</p>
           </div>
         </div>
-
+ 
         <div class="col-md-3">
           <div class="info-card h-100 text-center">
             <div class="info-icon mb-3"><i class="fa-solid fa-truck-fast"></i></div>
@@ -593,41 +593,41 @@
       </div>
     </div>
   </section>
-
+ 
   <footer class="text-center">
     <div class="container">
       © 2026 Lumina • UK Research Materials Supplier • Research Purposes Only • Not For Human Consumption
     </div>
   </footer>
-
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+ 
   <script>
     const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+ 
     const ADMIN_EMAIL = "luminaweight@gmail.com";
     const adminNavItem = document.getElementById('admin-nav-item');
     const accountLink = document.getElementById('account-link');
     const logoutNavItem = document.getElementById('logout-nav-item');
     const logoutBtn = document.getElementById('logout-btn');
-
+ 
     (async () => {
       try {
         const { data, error } = await supabaseClient.auth.getUser();
         const user = data?.user || null;
-
+ 
         if (!error && adminNavItem) {
           adminNavItem.style.display = (user && user.email === ADMIN_EMAIL) ? 'block' : 'none';
         }
-
+ 
         if (accountLink) {
           accountLink.textContent = user ? 'My Account' : 'Login';
           accountLink.href = 'account.html';
         }
-
+ 
         if (logoutNavItem) {
           logoutNavItem.style.display = user ? 'block' : 'none';
         }
@@ -635,7 +635,7 @@
         console.error('Error checking auth', e);
       }
     })();
-
+ 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -648,7 +648,7 @@
       });
     }
   </script>
-
+ 
   <script>
     // ---------- CART ----------
     let cart = [];
@@ -660,25 +660,26 @@
         cart = [];
       }
     }
-
+ 
     function saveCart() {
       localStorage.setItem('cart', JSON.stringify(cart));
     }
-
+ 
     function updateCart() {
       const totalItems = cart.reduce((s, i) => s + (i.qty || 0), 0);
       const total = cart.reduce((s, i) => s + (Number(i.price || 0) * (i.qty || 0)), 0);
-
+ 
       document.getElementById('cart-count').textContent = totalItems;
       document.getElementById('cart-items-count').textContent = totalItems;
       document.getElementById('cart-total').textContent = `£${total.toFixed(2)}`;
-
+ 
       document.getElementById('cart-items').innerHTML = cart.length === 0
         ? '<p class="text-center text-muted m-0">Your cart is empty</p>'
         : cart.map((item, i) => `
           <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
             <div class="flex-grow-1">
               <strong>${item.name}</strong><br>
+              ${item.variant ? `<small class="text-muted d-block">${getVariantLabel(item.variant)}</small>` : ''}
               <small>£${Number(item.price || 0).toFixed(2)} × ${item.qty}</small>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -690,29 +691,29 @@
           </div>
         `).join('');
     }
-
+ 
     updateCart();
-
+ 
     function updateQty(i, delta) {
       if (!cart[i]) return;
       const next = (cart[i].qty || 0) + delta;
-
+ 
       if (next <= 0) {
         cart.splice(i, 1);
       } else {
         cart[i].qty = next;
       }
-
+ 
       updateCart();
       saveCart();
     }
-
+ 
     function removeFromCart(i) {
       cart.splice(i, 1);
       updateCart();
       saveCart();
     }
-
+ 
     function toggleCart(force) {
       const sb = document.getElementById('cart-sidebar');
       const ov = document.querySelector('.overlay');
@@ -720,7 +721,7 @@
       sb.classList.toggle('open', open);
       ov.classList.toggle('show', open);
     }
-
+ 
     function goToCheckout() {
       if (cart.length === 0) return alert('Your cart is empty!');
       const cartData = encodeURIComponent(JSON.stringify(cart));
@@ -728,24 +729,46 @@
       const refPart = ref ? `&ref=${ref}` : '';
       window.location.href = `checkout.html?cart=${cartData}${refPart}`;
     }
-
+ 
     // ---------- PRODUCTS FROM SUPABASE ----------
     let products = [];
     let currentProduct = null;
-
+    let currentVariant = 'full-kit';
+ 
+    function hasCartridgeOption(p) {
+      const name = String(p?.name || '').toLowerCase();
+      return (
+        name.includes('pen') &&
+        (
+          name.includes('semaglutide') ||
+          name.includes('tirzepatide') ||
+          name.includes('retatrutide')
+        )
+      );
+    }
+ 
+    function getVariantLabel(variant) {
+      return variant === 'cartridge-only' ? 'Cartridge Only' : 'Full Kit (Pen + Cartridge)';
+    }
+ 
+    function getVariantPrice(product, variant) {
+      return Number(product?.price || 0);
+    }
+ 
+ 
     function computeBadge(p) {
   const name = (p.name || '').toLowerCase();
-
+ 
   // Wolverine stack
   if (name.includes('bpc-157') || name.includes('tb500')) {
     return { text: 'Wolverine Stack', class: 'pill-wolverine' };
   }
-
+ 
   // NAD+ sale
   if (name.includes('nad+')) {
     return { text: 'Sale', class: 'pill-best-value' };
   }
-
+ 
   // Coming Soon products
   if (
   name.includes('cagrilintide') ||
@@ -754,22 +777,22 @@
 ) {
   return null;
 }
-
+ 
   // Popular products
   if (p.name?.includes('20mg')) {
     return { text: 'Most Popular', class: 'pill-popular' };
   }
-
+ 
   // Premium products
   if (p.price >= 130) {
     return { text: 'Premium', class: 'pill-premium' };
   }
-
+ 
   return null;
-
+ 
   
 }
-
+ 
     function isComingSoonProduct(p) {
   const name = String(p?.name || '').toLowerCase();
   return (
@@ -782,7 +805,7 @@
   if (!image) return '';
   return './' + encodeURIComponent(image);
 }
-
+ 
     function getDisplayPriceHtml(p, unitSuffix) {
       if ((p.name || '').includes('NAD+')) {
         return `
@@ -796,7 +819,7 @@
           </div>
         `;
       }
-
+ 
       return `
         <div class="product-price">
           £${Number(p.price || 0).toFixed(2)}
@@ -804,7 +827,7 @@
         </div>
       `;
     }
-
+ 
     function getTypeLabel(p) {
   switch (String(p.type || '').toLowerCase().trim()) {
     case 'blend':
@@ -823,26 +846,26 @@
       return 'RESEARCH PEPTIDE';
   }
 }
-
+ 
     function renderProducts() {
       const listEl = document.getElementById('all-products-list');
       const statusEl = document.getElementById('all-products-status');
-
+ 
       if (!products.length) {
         statusEl.textContent = 'No products available yet.';
         listEl.innerHTML = '';
         return;
       }
-
+ 
       statusEl.textContent = '';
-
+ 
       listEl.innerHTML = products.map((p, i) => {
         const badge = computeBadge(p);
 const isComingSoon = isComingSoonProduct(p);
-
+ 
 let restockBadge = null;
 const SHOW_RESTOCK_BADGE = false;
-
+ 
         if (
           SHOW_RESTOCK_BADGE &&
           (
@@ -852,35 +875,35 @@ const SHOW_RESTOCK_BADGE = false;
         ) {
           restockBadge = { text: 'Back Monday', class: 'pill-restock' };
         }
-
+ 
         const typeLabel = getTypeLabel(p);
 const isBlend = p.type === 'blend';
-
+ 
         const baseDesc = p.description || 'Research material supplied for laboratory environments.';
 const extraInfo = ' Accessories (if applicable) are supplied for laboratory handling and measurement.';
-
+ 
         const unitSuffix = '/unit';
-
+ 
         const stockNum = Number(p.stock ?? 0);
         const stockLabel =
           stockNum === 0 ? '<strong>Out of stock</strong>' :
           stockNum <= 5 ? `<strong>Low stock</strong> • ${stockNum} left` :
           `<strong>In stock</strong> • ${stockNum} available`;
-
+ 
         const stockClass =
           stockNum === 0 ? 'text-danger' :
           stockNum <= 5 ? 'text-warning' :
           'text-success';
-
+ 
         return `
           <div class="col-md-3">
             <div class="position-relative h-100 product-card ${stockNum === 0 ? 'out-of-stock' : ''}" onclick="${stockNum > 0 ? `openModal(${i})` : ''}">
               ${badge ? `<span class="pill-label ${badge.class}">${badge.text}</span>` : ''}
 ${isComingSoon ? `<span class="pill-coming-soon">Coming Soon</span>` : ''}
 ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span>` : ''}
-
+ 
               <img src="${imgSrc(p.image)}" class="w-100 p-4" alt="${p.name}">
-
+ 
               <div class="product-body d-flex flex-column h-100">
                 <div class="text-start">
                   <div class="text-uppercase text-xs text-muted" style="font-size: .75rem;">${typeLabel}</div>
@@ -889,11 +912,11 @@ ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span
                     ${baseDesc + extraInfo}
                   </div>
                 </div>
-
+ 
                 <div class="mt-3">
                   ${getDisplayPriceHtml(p, unitSuffix)}
                   <p class="stock ${stockClass} mt-2">${stockLabel}</p>
-
+ 
                   <button
                     class="btn btn-success btn-add mt-auto"
                     ${stockNum === 0 ? 'disabled' : ''}
@@ -908,7 +931,7 @@ ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span
         `;
       }).join('');
     }
-
+ 
     function getTypeSortOrder(type) {
   switch (String(type || '').toLowerCase().trim()) {
     case 'blend': return 1;
@@ -920,26 +943,26 @@ ${restockBadge ? `<span class="${restockBadge.class}">${restockBadge.text}</span
     default: return 99;
   }
 }
-
+ 
 function getMgValue(name) {
   const match = String(name || '').match(/(\d+(?:\.\d+)?)\s*mg/i);
   return match ? Number(match[1]) : 0;
 }
-
+ 
     async function loadProductsFromDb() {
       const statusEl = document.getElementById('all-products-status');
       statusEl.textContent = 'Loading products…';
-
+ 
       const { data, error } = await supabaseClient
   .from('Products')
   .select('id, name, price, image, stock, description, type');
-
+ 
       if (error) {
         console.error('Error loading products', error);
         statusEl.textContent = 'Could not load products.';
         return;
       }
-
+ 
       products = (data || [])
   .map(row => ({
     id: row.id,
@@ -953,28 +976,28 @@ function getMgValue(name) {
   .sort((a, b) => {
     const typeDiff = getTypeSortOrder(a.type) - getTypeSortOrder(b.type);
     if (typeDiff !== 0) return typeDiff;
-
+ 
     const mgDiff = getMgValue(a.name) - getMgValue(b.name);
     if (mgDiff !== 0) return mgDiff;
-
+ 
     return a.name.localeCompare(b.name);
   });
-
+ 
       renderProducts();
     }
-
+ 
     // ---------- MODAL ----------
     function openModal(i) {
       const p = products[i];
       if (!p || Number(p.stock ?? 0) === 0) return;
-
+ 
       currentProduct = p;
-
+ 
       const accessoriesLine = 'Accessories (if applicable) are supplied for laboratory handling and measurement only.';
       const stockNum = Number(p.stock ?? 0);
-
+ 
       let modal = document.getElementById('productModal');
-
+ 
       if (!modal) {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = `
@@ -991,6 +1014,7 @@ function getMgValue(name) {
                   <p class="product-price fs-1" id="modalPrice"></p>
                   <p class="stock text-success mb-2" id="modalStock"></p>
                   <div id="modalDescription" class="text-start small text-muted mb-3"></div>
+                  <div id="modalVariantWrap" class="mb-3"></div>
                   <div class="d-flex justify-content-center align-items-center gap-3 my-3">
                     <button class="btn btn-outline-secondary qty-btn" onclick="changeQty(-1)">–</button>
                     <input type="number" id="modalQty" value="1" min="1" class="form-control qty-input">
@@ -1005,7 +1029,7 @@ function getMgValue(name) {
         document.body.appendChild(wrapper.firstElementChild);
         modal = document.getElementById('productModal');
       }
-
+ 
       const modalMedia = document.getElementById('modalMedia');  if ((p.name || '').toLowerCase().includes('nad+')) {   modalMedia.innerHTML = `     <video       id="modalVideo"       class="img-fluid"       style="max-height: 320px; width: 100%;"       controls       autoplay       playsinline     >       <source src="https://lumi24.org/NAD+.mp4" type="video/mp4">       Your browser does not support the video tag.     </video>   `; } else {   modalMedia.innerHTML = `     <img       id="modalImg"       src="${imgSrc(p.image)}"       class="img-fluid"       style="max-height: 320px;"       alt="${p.name}"     >   `; }
       document.getElementById('modalTitle').textContent = p.name;
       document.getElementById('modalName').textContent = p.name;
@@ -1013,50 +1037,78 @@ function getMgValue(name) {
         (p.name || '').includes('NAD+')
           ? `<span class="sale-old">£160</span> <span class="sale-new">£120</span>`
           : `£${Number(p.price || 0).toFixed(2)}`;
-
+ 
       document.getElementById('modalStock').innerHTML =
         stockNum === 0
           ? '<span class="text-danger fw-bold">Out of stock</span>'
           : stockNum <= 5
             ? `<span class="text-warning fw-bold">Low stock • ${stockNum} left</span>`
             : `<span class="text-success fw-bold">In stock • ${stockNum} available</span>`;
-
+ 
       const descEl = document.getElementById('modalDescription');
-
+ 
 descEl.innerHTML = `
   <p>${p.description || 'Research material supplied for laboratory environments.'}</p>
   <p><strong>${accessoriesLine}</strong></p>
   <p class="mb-1"><em>Supplied strictly for laboratory research purposes only.</em></p>
   <p class="mb-1"><em>Not for human consumption or medical use.</em></p>
 `;
-
+ 
+      const variantWrap = document.getElementById('modalVariantWrap');
+      currentVariant = 'full-kit';
+ 
+      if (hasCartridgeOption(p)) {
+        variantWrap.innerHTML = `
+          <div class="product-variant-selection text-start">
+            <label for="modalFormatSelect" class="form-label fw-semibold mb-2">Choose Format:</label>
+            <select id="modalFormatSelect" class="form-select" onchange="updateModalVariant()">
+              <option value="full-kit" selected>Full Kit (Pen + Cartridge)</option>
+              <option value="cartridge-only">Cartridge Only</option>
+            </select>
+          </div>
+        `;
+      } else {
+        variantWrap.innerHTML = '';
+      }
+ 
       const qtyInput = document.getElementById('modalQty');
       qtyInput.value = 1;
       qtyInput.max = stockNum;
-
+ 
       document.getElementById('modalAddBtn').onclick = () => {
         let qty = parseInt(document.getElementById('modalQty').value) || 1;
         qty = Math.max(1, Math.min(qty, stockNum));
-
-        const existing = cart.find(item => item.id === p.id);
+ 
+        const existing = cart.find(item => item.id === p.id && (item.variant || 'full-kit') === currentVariant);
         const already = existing ? (existing.qty || 0) : 0;
-
+ 
         if (already + qty > stockNum) {
-          return alert(`Only ${stockNum} available. You already have ${already} in your cart.`);
+          return alert(`Only ${stockNum} available. You already have ${already} in your cart for this format.`);
         }
-
-        addToCart(p, qty);
+ 
+        addToCart(p, qty, currentVariant);
         bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
       };
-
+ 
       const modalVideo = document.getElementById('modalVideo');
 if (modalVideo) {
   modalVideo.play().catch(() => {});
 }
-
+ 
       new bootstrap.Modal(modal).show();
     }
-
+ 
+    function updateModalVariant() {
+      const select = document.getElementById('modalFormatSelect');
+      if (!currentProduct) return;
+ 
+      currentVariant = select ? select.value : 'full-kit';
+      document.getElementById('modalPrice').innerHTML =
+        (currentProduct.name || '').includes('NAD+')
+          ? `<span class="sale-old">£160</span> <span class="sale-new">£120</span>`
+          : `£${getVariantPrice(currentProduct, currentVariant).toFixed(2)}`;
+    }
+ 
     document.addEventListener('hidden.bs.modal', function (e) {
   if (e.target && e.target.id === 'productModal') {
     const modalVideo = document.getElementById('modalVideo');
@@ -1066,7 +1118,7 @@ if (modalVideo) {
     }
   }
 });
-
+ 
     function changeQty(delta) {
       const input = document.getElementById('modalQty');
       const max = parseInt(input.max) || 999999;
@@ -1074,30 +1126,32 @@ if (modalVideo) {
       val = Math.max(1, Math.min(max, val + delta));
       input.value = val;
     }
-
-    function addToCart(product, qty) {
-      const existing = cart.find(item => item.id === product.id);
-
+ 
+    function addToCart(product, qty, variant = 'full-kit') {
+      const price = getVariantPrice(product, variant);
+      const existing = cart.find(item => item.id === product.id && (item.variant || 'full-kit') === variant);
+ 
       if (existing) {
         existing.qty += qty;
       } else {
         cart.push({
           id: product.id,
           name: product.name,
-          price: Number(product.price || 0),
+          price: price,
           qty: qty,
-          image: product.image || ''
+          image: product.image || '',
+          variant: variant
         });
       }
-
+ 
       updateCart();
       saveCart();
       toggleCart(true);
     }
-
+ 
     loadProductsFromDb();
   </script>
-
+ 
   <script>
     (function captureReferral() {
       const p = new URLSearchParams(location.search);
