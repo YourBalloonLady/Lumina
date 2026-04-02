@@ -229,6 +229,7 @@
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
 
+
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
@@ -246,6 +247,23 @@
   let userRequestedCreditAmount = 0;
 
   function money(n){ return `£${Number(n || 0).toFixed(2)}`; }
+
+  function getVariantLabel(variant) {
+    return variant === 'cartridge-only'
+      ? 'Cartridge Only'
+      : 'Full Kit (Pen + Cartridge)';
+  }
+
+  function getVariantPrice(product, variant) {
+    const basePrice = Number(product?.price || 0);
+    return variant === 'cartridge-only'
+      ? Math.max(0, basePrice - 10)
+      : basePrice;
+  }
+
+  function getVariantDisplay(item) {
+    return item?.variant ? `<br><small class="text-muted">${getVariantLabel(item.variant)}</small>` : '';
+  }
 
   (function captureReferralOnCheckout(){
     const p = new URLSearchParams(location.search);
@@ -347,10 +365,12 @@
     const name = item ? (item.name || '') : (itemOrName || '');
     const n = String(name).toLowerCase();
 
+    if (item?.variant === 'cartridge-only' || item?.variant === 'full-kit') return true;
+
     const semaForm = item ? String(item.sema_form || '').toLowerCase().trim() : '';
     if (semaForm === 'pen') return true;
 
-    const form = item ? String(item.form || item.type || item.format || item.variant || '').toLowerCase() : '';
+    const form = item ? String(item.form || item.type || item.format || '').toLowerCase() : '';
     if (form.includes('pen')) return true;
 
     return n.includes('pen') || n.includes('flexpen') || n.includes('cartridge');
@@ -364,7 +384,7 @@
     const semaForm = item ? String(item.sema_form || '').toLowerCase().trim() : '';
     if (semaForm === 'vial') return true;
 
-    const form = item ? String(item.form || item.type || item.format || item.variant || '').toLowerCase() : '';
+    const form = item ? String(item.form || item.type || item.format || '').toLowerCase() : '';
     if (form.includes('vial')) return true;
 
     return n.includes('vial');
@@ -478,10 +498,19 @@
       }
 
       const map = new Map((data || []).map(p => [p.id, p]));
+
       cart = cart.map(item => {
         const p = map.get(item.id);
         if (!p) return item;
-        return { ...item, name: p.name || item.name, price: Number(p.price || 0) };
+
+        const variant = item.variant || 'full-kit';
+
+        return {
+          ...item,
+          name: p.name || item.name,
+          variant: variant,
+          price: getVariantPrice(p, variant)
+        };
       });
 
       saveCartToStorage();
@@ -589,34 +618,34 @@
     }
 
     if (isPenItem(item)) {
-  const current = item.pen_heads ? String(item.pen_heads) : '';
-  return `
-    <div class="addon-row d-flex align-items-center justify-content-between">
-      <label class="m-0">Pen heads <span class="text-danger">*</span></label>
-      <select class="form-select form-select-sm" style="max-width: 180px;" required
-        onchange="setAccessory(${index}, 'pen_heads', this.value)">
-        <option value="" ${current === '' ? 'selected' : ''} disabled>Select…</option>
-        <option value="none" ${current === 'none' ? 'selected' : ''}>None</option>
-        <option value="5" ${current === '5' ? 'selected' : ''}>5</option>
-      </select>
-    </div>
-  `;
-}
+      const current = item.pen_heads ? String(item.pen_heads) : '';
+      return `
+        <div class="addon-row d-flex align-items-center justify-content-between">
+          <label class="m-0">Pen heads <span class="text-danger">*</span></label>
+          <select class="form-select form-select-sm" style="max-width: 180px;" required
+            onchange="setAccessory(${index}, 'pen_heads', this.value)">
+            <option value="" ${current === '' ? 'selected' : ''} disabled>Select…</option>
+            <option value="none" ${current === 'none' ? 'selected' : ''}>None</option>
+            <option value="5" ${current === '5' ? 'selected' : ''}>5</option>
+          </select>
+        </div>
+      `;
+    }
 
     if (isVialItem(item)) {
-  const current = item.syringes ? String(item.syringes) : '';
-  return `
-    <div class="addon-row d-flex align-items-center justify-content-between">
-      <label class="m-0">Syringes <span class="text-danger">*</span></label>
-      <select class="form-select form-select-sm" style="max-width: 180px;" required
-        onchange="setAccessory(${index}, 'syringes', this.value)">
-        <option value="" ${current === '' ? 'selected' : ''} disabled>Select…</option>
-        <option value="none" ${current === 'none' ? 'selected' : ''}>None</option>
-        <option value="5" ${current === '5' ? 'selected' : ''}>5</option>
-      </select>
-    </div>
-  `;
-}
+      const current = item.syringes ? String(item.syringes) : '';
+      return `
+        <div class="addon-row d-flex align-items-center justify-content-between">
+          <label class="m-0">Syringes <span class="text-danger">*</span></label>
+          <select class="form-select form-select-sm" style="max-width: 180px;" required
+            onchange="setAccessory(${index}, 'syringes', this.value)">
+            <option value="" ${current === '' ? 'selected' : ''} disabled>Select…</option>
+            <option value="none" ${current === 'none' ? 'selected' : ''}>None</option>
+            <option value="5" ${current === '5' ? 'selected' : ''}>5</option>
+          </select>
+        </div>
+      `;
+    }
 
     return '';
   }
@@ -638,7 +667,11 @@
     summaryEl.innerHTML = cart.map((i, idx) => `
       <div class="py-2 border-bottom">
         <div class="d-flex justify-content-between">
-          <span>${i.qty} × ${i.name}${extraLabel(i)}</span>
+          <span>
+            ${i.qty} × ${i.name}
+            ${getVariantDisplay(i)}
+            ${extraLabel(i)}
+          </span>
           <span>£${(Number(i.price || 0) * Number(i.qty || 0)).toFixed(2)}</span>
         </div>
         ${accessoryDropdownHTML(i, idx)}
@@ -678,7 +711,7 @@
   function buildItemsText() {
     if (!cart.length) return 'No items (cart empty).';
     return cart.map(i =>
-      `${i.qty} × ${i.name}${extraLabel(i)} — £${(Number(i.price || 0) * Number(i.qty || 0)).toFixed(2)}`
+      `${i.qty} × ${i.name}${i.variant ? ` (${getVariantLabel(i.variant)})` : ''}${extraLabel(i)} — £${(Number(i.price || 0) * Number(i.qty || 0)).toFixed(2)}`
     ).join('\n');
   }
 
@@ -708,6 +741,8 @@
         items: cart.map(i => ({
           id: i.id || null,
           name: i.name,
+          variant: i.variant || 'full-kit',
+          variant_label: getVariantLabel(i.variant || 'full-kit'),
           qty: i.qty,
           price_each: Number(i.price || 0),
           line_total: Number(i.price || 0) * Number(i.qty || 0),
@@ -991,14 +1026,18 @@
 
       await Promise.allSettled([ sendAdminEmail(details), sendCustomerEmail(details) ]);
 
-      document.getElementById('customerName').textContent = name;
       document.getElementById('payment-summary').innerHTML = cart.map(i => `
         <div class="d-flex justify-content-between">
-          <span>${i.qty} × ${i.name}${extraLabel(i)}</span>
+          <span>
+            ${i.qty} × ${i.name}
+            ${getVariantDisplay(i)}
+            ${extraLabel(i)}
+          </span>
           <span>£${(Number(i.price || 0) * Number(i.qty || 0)).toFixed(2)}</span>
         </div>
       `).join('');
 
+      document.getElementById('customerName').textContent = name;
       document.getElementById('payment-total').textContent = `£${Number(total || 0).toFixed(2)}`;
       document.getElementById('order-ref').textContent = ref;
 
@@ -1052,6 +1091,7 @@
 
     cart = cart.map(i => ({
       ...i,
+      variant: i.variant || 'full-kit',
       pen_heads: i.pen_heads || "",
       syringes: i.syringes || "",
       sema_form: i.sema_form || ""
