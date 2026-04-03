@@ -720,15 +720,23 @@
                       <ul id="bundleModalContents"></ul>
                     </div>
 
-                    <div class="bundle-options-card mb-3" id="bundleModalOptionsWrap" style="display:none;">
-                      <h6>Bundle options</h6>
-                      <div id="bundleModalOptions"></div>
-                    </div>
+                    // ... inside ensureBundleModal() wrapper.innerHTML ...
 
-                    <div class="d-flex gap-2 flex-wrap">
-                      <a href="contact.html" id="bundleEnquireBtn" class="btn btn-outline-secondary rounded-pill px-4">Enquire</a>
-                      <a href="products.html" class="btn btn-success rounded-pill px-4">View Main Catalogue</a>
-                    </div>
+<div class="bundle-options-card mb-3" id="bundleModalOptionsWrap" style="display:none;">
+    <h6>Customise your bundle</h6>
+    <div id="bundleModalOptions"></div>
+</div>
+
+<div class="d-flex gap-2 flex-wrap mt-4">
+    <div class="qty-group d-flex border rounded-pill overflow-hidden bg-white" style="height: 48px;">
+        <button class="btn btn-light px-3 border-0" onclick="changeBundleQty(-1)">−</button>
+        <input type="number" id="bundleQty" value="1" class="form-control border-0 text-center fw-bold" style="width: 50px; background:transparent;" readonly>
+        <button class="btn btn-light px-3 border-0" onclick="changeBundleQty(1)">+</button>
+    </div>
+    <button id="bundleAddToCartBtn" class="btn btn-success rounded-pill px-4 flex-grow-1 fw-bold" style="height: 48px;">
+        <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
+    </button>
+</div>
 
                     <p class="small text-muted mt-3 mb-0">
                       Supplied strictly for laboratory research purposes only. Not for human consumption or medical use.
