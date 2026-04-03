@@ -753,58 +753,104 @@
       return document.getElementById('bundleModal');
     }
 
-    function openBundleModal(index) {
-      const bundle = filteredBundles[index];
-      if (!bundle) return;
+    let currentActiveBundle = null; // Track bundle for add-to-cart
 
-      const modalEl = ensureBundleModal();
-      const contents = parseBundleContents(bundle.bundle_contents);
-      const options = parseBundleOptions(bundle.bundle_options);
-      const stockNum = Number(bundle.stock ?? 0);
+function openBundleModal(index) {
+  const bundle = filteredBundles[index];
+  if (!bundle) return;
+  currentActiveBundle = bundle; // Set global reference
 
-      document.getElementById('bundleModalTitle').textContent = bundle.name;
-      document.getElementById('bundleModalImage').src = imgSrc(bundle.image);
-      document.getElementById('bundleModalImage').alt = bundle.name;
-      document.getElementById('bundleModalName').textContent = bundle.name;
-      document.getElementById('bundleModalDescription').textContent =
-        bundle.description || 'Grouped research bundle supplied for laboratory environments.';
+  const modalEl = ensureBundleModal();
+  const contents = parseBundleContents(bundle.bundle_contents);
+  const options = parseBundleOptions(bundle.bundle_options);
+  const stockNum = Number(bundle.stock ?? 0);
 
-      document.getElementById('bundleModalMeta').innerHTML = `
-        <span class="bundle-meta-pill">Bundle</span>
-        <span class="bundle-meta-pill">${contents.length} item${contents.length === 1 ? '' : 's'}</span>
-      `;
+  // Reset Quantity
+  document.getElementById('bundleQty').value = 1;
 
-      document.getElementById('bundleModalPrice').innerHTML = `
-        £${Number(bundle.price || 0).toFixed(2)}
-        ${bundle.compare_at_price ? `<span class="sale-old">£${Number(bundle.compare_at_price).toFixed(2)}</span>` : ''}
-      `;
+  // Basic Info
+  document.getElementById('bundleModalTitle').textContent = bundle.name;
+  document.getElementById('bundleModalImage').src = imgSrc(bundle.image);
+  document.getElementById('bundleModalName').textContent = bundle.name;
+  document.getElementById('bundleModalDescription').textContent = bundle.description;
 
-      document.getElementById('bundleModalStock').innerHTML =
-        stockNum === 0
-          ? '<span class="text-danger fw-bold">Out of stock</span>'
-          : stockNum <= 5
-            ? `<span class="text-warning fw-bold">Low stock • ${stockNum} left</span>`
-            : `<span class="text-success fw-bold">In stock • ${stockNum} available</span>`;
+  // Stock & Price
+  document.getElementById('bundleModalPrice').innerHTML = `£${Number(bundle.price || 0).toFixed(2)}`;
+  document.getElementById('bundleModalStock').innerHTML = stockNum === 0 ? 'Out of Stock' : 'In Stock';
 
-      document.getElementById('bundleModalContents').innerHTML = contents.length
-        ? contents.map(item => `<li>${item.qty || 1} × ${item.name || ''}</li>`).join('')
-        : '<li>Bundle contents not listed.</li>';
+  // Contents
+  document.getElementById('bundleModalContents').innerHTML = contents.map(item => 
+    `<li>${item.qty || 1} × ${item.name || ''}</li>`
+  ).join('');
 
-      const optionsWrap = document.getElementById('bundleModalOptionsWrap');
-      const optionsEl = document.getElementById('bundleModalOptions');
+  // Handle Pen Color Dropdown
+  const optionsWrap = document.getElementById('bundleModalOptionsWrap');
+  const optionsEl = document.getElementById('bundleModalOptions');
+  
+  if (options.penColours && options.penColours.length > 0) {
+    optionsWrap.style.display = 'block';
+    optionsEl.innerHTML = `
+      <label class="form-label small fw-bold text-muted">SELECT PEN COLOUR</label>
+      <select class="form-select border-0 shadow-sm" id="bundlePenColorSelect" style="background-color: #fff;">
+        ${options.penColours.map(c => `<option value="${c}">${c}</option>`).join('')}
+      </select>
+    `;
+  } else {
+    optionsWrap.style.display = 'none';
+  }
 
-      let optionsHtml = '';
+  // Add to Cart Button Click Handler
+  const btn = document.getElementById('bundleAddToCartBtn');
+  btn.onclick = () => {
+    const qty = parseInt(document.getElementById('bundleQty').value);
+    const colorSelect = document.getElementById('bundlePenColorSelect');
+    const color = colorSelect ? colorSelect.value : null;
+    
+    addToCart(bundle, qty, color);
+    bootstrap.Modal.getInstance(modalEl).hide();
+  };
 
-      if (Array.isArray(options.penColours) && options.penColours.length) {
-        optionsHtml += `
-          <div class="mb-2">
-            <label class="form-label fw-semibold">Available Pen Colours</label>
-            <select class="form-select" disabled>
-              ${options.penColours.map(colour => `<option>${colour}</option>`).join('')}
-            </select>
-          </div>
-        `;
-      }
+  new bootstrap.Modal(modalEl).show();
+}
+
+// Helper: Handle Quantity Toggles
+function changeBundleQty(delta) {
+    const input = document.getElementById('bundleQty');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    input.value = val;
+}
+
+// Helper: Add to Cart Function
+function addToCart(bundle, qty, color) {
+    // This connects to your existing cart logic
+    const cartItem = {
+        id: bundle.id,
+        name: bundle.name + (color ? ` (${color})` : ''),
+        price: bundle.price,
+        qty: qty,
+        image: bundle.image,
+        type: 'bundle'
+    };
+
+    // If you already have a global 'cart' array and 'updateCart()' function:
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Check if exact same item/color exists
+    const existing = cart.find(item => item.id === cartItem.id && item.name === cartItem.name);
+    if (existing) {
+        existing.qty += qty;
+    } else {
+        cart.push(cartItem);
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Notify user (Optional: trigger your existing toast/sidebar)
+    alert(`${qty} x ${bundle.name} added to cart!`);
+    
+    if (typeof updateCartUI === "function") updateCartUI(); 
+}
 
       if (optionsHtml) {
         optionsEl.innerHTML = optionsHtml;
