@@ -1,1 +1,275 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocol Bundles | Research Lab</title>
+    <style>
+        :root {
+            --primary: #2c5e3b;
+            --primary-hover: #1e4228;
+            --secondary: #e2f0e7;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #f9fbf9;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Grid Layout */
+        .bundles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        /* Card Styling */
+        .bundle-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .bundle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .bundle-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background-color: #f0f3f1;
+        }
+
+        .bundle-content {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .badge {
+            align-self: flex-start;
+            background-color: var(--secondary);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .bundle-title {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .bundle-desc {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .included-items {
+            list-style: none;
+            margin-bottom: 20px;
+            border-top: 1px solid #eeeeee;
+            padding-top: 15px;
+        }
+
+        .included-items li {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .included-items li::before {
+            content: "✓";
+            color: var(--primary);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .price-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid #eeeeee;
+            padding-top: 15px;
+        }
+
+        .price-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bundle-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .btn-shop {
+            background-color: var(--primary);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .btn-shop:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .disclaimer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.4;
+            padding: 20px;
+            border-top: 1px solid #eeeeee;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 20px 10px; }
+            header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Protocol Bundles</h1>
+            <p>Optimized peptide stacks curated for maximum research synergy.</p>
+        </header>
+
+        <div class="bundles-grid">
+
+            <div class="bundle-card">
+                <img src="metabolic-stack.jpg" alt="Ultimate Metabolic Stack" class="bundle-img">
+                <div class="bundle-content">
+                    <span class="badge">Advanced Fat Loss</span>
+                    <h2 class="bundle-title">Ultimate Metabolic Stack</h2>
+                    <p class="bundle-desc">Combines standard GLP-1 receptor targeting with mitochondrial cellular energy support.</p>
+                    <ul class="included-items">
+                        <li>Retatrutide 60mg Cartridge</li>
+                        <li>MOTS-C 40mg Cartridge</li>
+                        <li>Refill Pen Device</li>
+                    </ul>
+                    <div class="price-section">
+                        <div class="price-wrapper">
+                            <span class="original-price">£255.00</span>
+                            <span class="bundle-price">£220.00</span>
+                        </div>
+                        <a href="#" class="btn-shop">Shop Bundle</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bundle-card">
+                <img src="https://placehold.co/600x400/e2f0e7/2c5e3b?text=Total+Repair+Bundle" alt="Total Repair Protocol" class="bundle-img">
+                <div class="bundle-content">
+                    <span class="badge">Recovery & Skin</span>
+                    <h2 class="bundle-title">Total Repair Protocol</h2>
+                    <p class="bundle-desc">The perfect heal-and-glow stack designed to support soft tissue repair while minimizing sting.</p>
+                    <ul class="included-items">
+                        <li>BPC-157 & TB500 Blend 10mg</li>
+                        <li>GHK-Cu 100mg Vial</li>
+                        <li>Refill Pen Device</li>
+                    </ul>
+                    <div class="price-section">
+                        <div class="price-wrapper">
+                            <span class="original-price">£100.00</span>
+                            <span class="bundle-price">£85.00</span>
+                        </div>
+                        <a href="#" class="btn-shop">Shop Bundle</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bundle-card">
+                <img src="https://placehold.co/600x400/e2f0e7/2c5e3b?text=Beginners+Duo" alt="Beginner's Weight Loss Duo" class="bundle-img">
+                <div class="bundle-content">
+                    <span class="badge">Starter Kit</span>
+                    <h2 class="bundle-title">Beginner's Weight Loss Duo</h2>
+                    <p class="bundle-desc">A perfect entry-level bundle featuring high-purity Tirzepatide and hardware.</p>
+                    <ul class="included-items">
+                        <li>Tirzepatide 20mg Vial</li>
+                        <li>Refill Pen Device</li>
+                    </ul>
+                    <div class="price-section">
+                        <div class="price-wrapper">
+                            <span class="original-price">£130.00</span>
+                            <span class="bundle-price">£115.00</span>
+                        </div>
+                        <a href="#" class="btn-shop">Shop Bundle</a>
+                    </div>
+                </div>
+            </div>
+
+        </div> <div class="disclaimer">
+            *All items listed are for laboratory research use only. Not for human consumption.
+        </div>
+    </div>
+
+</body>
+</html>
