@@ -1023,13 +1023,7 @@ function getMgValue(name) {
         modal = document.getElementById('productModal');
       }
  
-      const modalMedia = document.getElementById('modalMedia');  if ((p.name || '').toLowerCase().includes('nad+')) {   modalMedia.innerHTML = `     <video       id="modalVideo"       class="img-fluid"       style="max-height: 320px; width: 100%;"       controls       autoplay       playsinline     >       <source src="https://lumi24.org/NAD+.mp4" type="video/mp4">       Your browser does not support the video tag.     </video>   `; } else {   modalMedia.innerHTML = `     <img       id="modalImg"       src="${imgSrc(p.image)}"       class="img-fluid"       style="max-height: 320px;"       alt="${p.name}"     >   `; }
-      document.getElementById('modalTitle').textContent = p.name;
-      document.getElementById('modalName').textContent = p.name;
-      document.getElementById('modalPrice').innerHTML =
-        (p.name || '').includes('NAD+')
-          ? `<span class="sale-old">£160</span> <span class="sale-new">£120</span>`
-          : `£${Number(p.price || 0).toFixed(2)}`;
+      
  
       document.getElementById('modalStock').innerHTML =
         stockNum === 0
@@ -1083,33 +1077,7 @@ descEl.innerHTML = `
         bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
       };
  
-      const modalVideo = document.getElementById('modalVideo');
-if (modalVideo) {
-  modalVideo.play().catch(() => {});
-}
- 
-      new bootstrap.Modal(modal).show();
-    }
- 
-    function updateModalVariant() {
-      const select = document.getElementById('modalFormatSelect');
-      if (!currentProduct) return;
- 
-      currentVariant = select ? select.value : 'full-kit';
-      document.getElementById('modalPrice').innerHTML =
-        (currentProduct.name || '').includes('NAD+')
-          ? `<span class="sale-old">£160</span> <span class="sale-new">£120</span>`
-          : `£${getVariantPrice(currentProduct, currentVariant).toFixed(2)}`;
-    }
- 
-    document.addEventListener('hidden.bs.modal', function (e) {
-  if (e.target && e.target.id === 'productModal') {
-    const modalVideo = document.getElementById('modalVideo');
-    if (modalVideo) {
-      modalVideo.pause();
-      modalVideo.currentTime = 0;
-    }
-  }
+      
 });
  
     function changeQty(delta) {
