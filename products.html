@@ -945,6 +945,22 @@
 
         return a.name.localeCompare(b.name);
       });
+    renderBundles();
+    }
+
+    async function loadBundlesFromDb() {
+      const statusEl = document.getElementById('bundles-status');
+      statusEl.textContent = 'Loading bundles…';
+      const { data, error } = await supabaseClient.from('Products').select('*').order('name', { ascending: true });
+      if (error) {
+        console.error('Error loading bundles:', error);
+        statusEl.textContent = `Could not load bundles: ${error.message}`;
+        return;
+      }
+      allBundles = (data || []).filter(row => String(row.type || '').toLowerCase() === 'bundle');
+      filteredBundles = [...allBundles];
+      renderBundles();
+    }
 
     renderProducts();
   }
