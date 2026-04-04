@@ -685,7 +685,7 @@
           <div class="flex-grow-1">
             <strong>${item.name}</strong><br>
             ${item.variant ? `<small class="text-muted d-block">${getVariantLabel(item.variant)}</small>` : ''}
-${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColour}</small>` : ''}
+            ${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColour}</small>` : ''}
             <small>£${Number(item.price || 0).toFixed(2)} × ${item.qty}</small>
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -739,7 +739,7 @@ ${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColo
   // ---------- PRODUCTS FROM SUPABASE ----------
   let products = [];
   let currentProduct = null;
-  let currentVariant = 'full-kit';
+  let currentVariant = '';
 
   function hasCartridgeOption(p) {
     const name = String(p?.name || '').toLowerCase();
@@ -789,26 +789,26 @@ ${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColo
   }
 
   function getDisplayPriceHtml(p, unitSuffix) {
-  const price = Number(p.price || 0);
-  const compareAt = Number(p.compare_at_price || 0);
+    const price = Number(p.price || 0);
+    const compareAt = Number(p.compare_at_price || 0);
 
-  if (compareAt > price) {
+    if (compareAt > price) {
+      return `
+        <div class="product-price">
+          <span class="sale-old">£${compareAt.toFixed(2)}</span>
+          <span class="sale-new">£${price.toFixed(2)}</span>
+          <span class="unit-suffix">${unitSuffix}</span>
+        </div>
+      `;
+    }
+
     return `
       <div class="product-price">
-        <span class="sale-old">£${compareAt.toFixed(2)}</span>
-        <span class="sale-new">£${price.toFixed(2)}</span>
+        £${price.toFixed(2)}
         <span class="unit-suffix">${unitSuffix}</span>
       </div>
     `;
   }
-
-  return `
-    <div class="product-price">
-      £${price.toFixed(2)}
-      <span class="unit-suffix">${unitSuffix}</span>
-    </div>
-  `;
-}
 
   function getTypeLabel(p) {
     switch (String(p.type || '').toLowerCase().trim()) {
@@ -931,8 +931,8 @@ ${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColo
     statusEl.textContent = 'Loading products…';
 
     const { data, error } = await supabaseClient
-  .from('Products')
-  .select('id, name, price, compare_at_price, image, stock, description, type, bundle_options');
+      .from('Products')
+      .select('id, name, price, compare_at_price, image, stock, description, type, bundle_options');
 
     if (error) {
       console.error('Error loading products', error);
@@ -941,40 +941,42 @@ ${item.penColour ? `<small class="text-muted d-block">Pen Colour: ${item.penColo
     }
 
     products = (data || [])
-  .map(row => ({
-    id: row.id,
-    name: row.name,
-    price: Number(row.price || 0),
-    compare_at_price: Number(row.compare_at_price || 0),
-    image: row.image || '20mg Tirz Vial.png',
-    stock: row.stock ?? 0,
-    description: row.description || '',
-    type: String(row.type || '').toLowerCase().trim(),
-    bundle_options: row.bundle_options || {}
-  }))
-  .sort((a, b) => {
-    const typeDiff = getTypeSortOrder(a.type) - getTypeSortOrder(b.type);
-    if (typeDiff !== 0) return typeDiff;
+      .map(row => ({
+        id: row.id,
+        name: row.name,
+        price: Number(row.price || 0),
+        compare_at_price: Number(row.compare_at_price || 0),
+        image: row.image || '20mg Tirz Vial.png',
+        stock: row.stock ?? 0,
+        description: row.description || '',
+        type: String(row.type || '').toLowerCase().trim(),
+        bundle_options: row.bundle_options || {}
+      }))
+      .sort((a, b) => {
+        const typeDiff = getTypeSortOrder(a.type) - getTypeSortOrder(b.type);
+        if (typeDiff !== 0) return typeDiff;
 
-    const mgDiff = getMgValue(a.name) - getMgValue(b.name);
-    if (mgDiff !== 0) return mgDiff;
+        const mgDiff = getMgValue(a.name) - getMgValue(b.name);
+        if (mgDiff !== 0) return mgDiff;
 
-    return a.name.localeCompare(b.name);
-  });
+        return a.name.localeCompare(b.name);
+      });
 
     renderProducts();
   }
-function parseBundleOptions(raw) {
-  if (!raw) return {};
-  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;
 
-  try {
-    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
+  function parseBundleOptions(raw) {
+    if (!raw) return {};
+    if (typeof raw === 'object' && !Array.isArray(raw)) return raw;
+
+    try {
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+      return {};
+    }
   }
-}
+
   // ---------- MODAL ----------
   function openModal(i) {
     const p = products[i];
@@ -1032,16 +1034,18 @@ function parseBundleOptions(raw) {
 
     document.getElementById('modalTitle').textContent = p.name;
     document.getElementById('modalName').textContent = p.name;
-    const initialVariant = hasCartridgeOption(p) ? 'full-kit' : '';
-const modalPrice = initialVariant
-  ? Number(getVariantPrice(p, initialVariant))
-  : Number(p.price || 0);
-const modalCompareAt = Number(p.compare_at_price || 0);
 
-document.getElementById('modalPrice').innerHTML =
-  modalCompareAt > modalPrice
-    ? `<span class="sale-old">£${modalCompareAt.toFixed(2)}</span> <span class="sale-new">£${modalPrice.toFixed(2)}</span>`
-    : `£${modalPrice.toFixed(2)}`;
+    const initialVariant = hasCartridgeOption(p) ? 'full-kit' : '';
+    const modalPrice = initialVariant
+      ? Number(getVariantPrice(p, initialVariant))
+      : Number(p.price || 0);
+
+    const modalCompareAt = Number(p.compare_at_price || 0);
+
+    document.getElementById('modalPrice').innerHTML =
+      modalCompareAt > modalPrice
+        ? `<span class="sale-old">£${modalCompareAt.toFixed(2)}</span> <span class="sale-new">£${modalPrice.toFixed(2)}</span>`
+        : `£${modalPrice.toFixed(2)}`;
 
     document.getElementById('modalStock').innerHTML =
       stockNum === 0
@@ -1059,35 +1063,35 @@ document.getElementById('modalPrice').innerHTML =
     `;
 
     const variantWrap = document.getElementById('modalVariantWrap');
-currentVariant = hasCartridgeOption(p) ? 'full-kit' : '';
+    currentVariant = hasCartridgeOption(p) ? 'full-kit' : '';
 
-const bundleOptions = parseBundleOptions(p.bundle_options);
-let optionsHtml = '';
+    const bundleOptions = parseBundleOptions(p.bundle_options);
+    let optionsHtml = '';
 
-if (hasCartridgeOption(p)) {
-  optionsHtml += `
-    <div class="product-variant-selection text-start mb-3">
-      <label for="modalFormatSelect" class="form-label fw-semibold mb-2">Choose Format:</label>
-      <select id="modalFormatSelect" class="form-select" onchange="updateModalVariant()">
-        <option value="full-kit" selected>Full Kit (Pen + Cartridge)</option>
-        <option value="cartridge-only">Cartridge Only</option>
-      </select>
-    </div>
-  `;
-}
+    if (hasCartridgeOption(p)) {
+      optionsHtml += `
+        <div class="product-variant-selection text-start mb-3">
+          <label for="modalFormatSelect" class="form-label fw-semibold mb-2">Choose Format:</label>
+          <select id="modalFormatSelect" class="form-select" onchange="updateModalVariant()">
+            <option value="full-kit" selected>Full Kit (Pen + Cartridge)</option>
+            <option value="cartridge-only">Cartridge Only</option>
+          </select>
+        </div>
+      `;
+    }
 
-if (Array.isArray(bundleOptions.penColours) && bundleOptions.penColours.length) {
-  optionsHtml += `
-    <div class="product-variant-selection text-start">
-      <label for="modalPenColourSelect" class="form-label fw-semibold mb-2">Choose Pen Colour:</label>
-      <select id="modalPenColourSelect" class="form-select">
-        ${bundleOptions.penColours.map(colour => `<option value="${colour}">${colour}</option>`).join('')}
-      </select>
-    </div>
-  `;
-}
+    if (Array.isArray(bundleOptions.penColours) && bundleOptions.penColours.length) {
+      optionsHtml += `
+        <div class="product-variant-selection text-start">
+          <label for="modalPenColourSelect" class="form-label fw-semibold mb-2">Choose Pen Colour:</label>
+          <select id="modalPenColourSelect" class="form-select">
+            ${bundleOptions.penColours.map(colour => `<option value="${colour}">${colour}</option>`).join('')}
+          </select>
+        </div>
+      `;
+    }
 
-variantWrap.innerHTML = optionsHtml;
+    variantWrap.innerHTML = optionsHtml;
 
     const qtyInput = document.getElementById('modalQty');
     qtyInput.value = 1;
@@ -1105,9 +1109,9 @@ variantWrap.innerHTML = optionsHtml;
       }
 
       const penColourSelect = document.getElementById('modalPenColourSelect');
-const selectedPenColour = penColourSelect ? penColourSelect.value : null;
+      const selectedPenColour = penColourSelect ? penColourSelect.value : null;
 
-addToCart(p, qty, currentVariant, selectedPenColour);
+      addToCart(p, qty, currentVariant, selectedPenColour);
       bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
     };
 
@@ -1115,22 +1119,22 @@ addToCart(p, qty, currentVariant, selectedPenColour);
   }
 
   function updateModalVariant() {
-  const select = document.getElementById('modalFormatSelect');
-  if (!currentProduct) return;
+    const select = document.getElementById('modalFormatSelect');
+    if (!currentProduct) return;
 
-  currentVariant = select ? select.value : '';
+    currentVariant = select ? select.value : '';
 
-  const price = currentVariant
-    ? Number(getVariantPrice(currentProduct, currentVariant))
-    : Number(currentProduct.price || 0);
+    const price = currentVariant
+      ? Number(getVariantPrice(currentProduct, currentVariant))
+      : Number(currentProduct.price || 0);
 
-  const compareAt = Number(currentProduct.compare_at_price || 0);
+    const compareAt = Number(currentProduct.compare_at_price || 0);
 
-  document.getElementById('modalPrice').innerHTML =
-    compareAt > price
-      ? `<span class="sale-old">£${compareAt.toFixed(2)}</span> <span class="sale-new">£${price.toFixed(2)}</span>`
-      : `£${price.toFixed(2)}`;
-}
+    document.getElementById('modalPrice').innerHTML =
+      compareAt > price
+        ? `<span class="sale-old">£${compareAt.toFixed(2)}</span> <span class="sale-new">£${price.toFixed(2)}</span>`
+        : `£${price.toFixed(2)}`;
+  }
 
   function changeQty(delta) {
     const input = document.getElementById('modalQty');
@@ -1141,61 +1145,35 @@ addToCart(p, qty, currentVariant, selectedPenColour);
   }
 
   function addToCart(product, qty, variant = '', penColour = null) {
-  const finalVariant = variant || '';
-  const price = finalVariant
-    ? getVariantPrice(product, finalVariant)
-    : Number(product?.price || 0);
+    const finalVariant = variant || '';
+    const price = finalVariant
+      ? getVariantPrice(product, finalVariant)
+      : Number(product?.price || 0);
 
-  const existing = cart.find(item =>
-    item.id === product.id &&
-    (item.variant || '') === finalVariant &&
-    (item.penColour || null) === (penColour || null)
-  );
+    const existing = cart.find(item =>
+      item.id === product.id &&
+      (item.variant || '') === finalVariant &&
+      (item.penColour || null) === (penColour || null)
+    );
 
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: price,
-      qty: qty,
-      image: product.image || '',
-      variant: finalVariant,
-      penColour: penColour
-    });
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: price,
+        qty: qty,
+        image: product.image || '',
+        variant: finalVariant,
+        penColour: penColour
+      });
+    }
+
+    updateCart();
+    saveCart();
+    toggleCart(true);
   }
-
-  updateCart();
-  saveCart();
-  toggleCart(true);
-}
-  const price = getVariantPrice(product, variant);
-
-  const existing = cart.find(item =>
-    item.id === product.id &&
-    (item.variant || 'full-kit') === variant &&
-    (item.penColour || null) === (penColour || null)
-  );
-
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: price,
-      qty: qty,
-      image: product.image || '',
-      variant: variant,
-      penColour: penColour
-    });
-  }
-
-  updateCart();
-  saveCart();
-  toggleCart(true);
-}
 
   loadProductsFromDb();
 </script>
