@@ -1056,7 +1056,7 @@ document.getElementById('modalPrice').innerHTML =
     `;
 
     const variantWrap = document.getElementById('modalVariantWrap');
-currentVariant = 'full-kit';
+currentVariant = hasCartridgeOption(p) ? 'full-kit' : '';
 
 const bundleOptions = parseBundleOptions(p.bundle_options);
 let optionsHtml = '';
@@ -1094,7 +1094,7 @@ variantWrap.innerHTML = optionsHtml;
       let qty = parseInt(document.getElementById('modalQty').value) || 1;
       qty = Math.max(1, Math.min(qty, stockNum));
 
-      const existing = cart.find(item => item.id === p.id && (item.variant || 'full-kit') === currentVariant);
+      const existing = cart.find(item => item.id === p.id && (item.variant || '') === (currentVariant || ''));
       const already = existing ? (existing.qty || 0) : 0;
 
       if (already + qty > stockNum) {
@@ -1115,9 +1115,12 @@ addToCart(p, qty, currentVariant, selectedPenColour);
   const select = document.getElementById('modalFormatSelect');
   if (!currentProduct) return;
 
-  currentVariant = select ? select.value : 'full-kit';
+  currentVariant = select ? select.value : '';
 
-  const price = Number(getVariantPrice(currentProduct, currentVariant));
+  const price = currentVariant
+    ? Number(getVariantPrice(currentProduct, currentVariant))
+    : Number(currentProduct.price || 0);
+
   const compareAt = Number(currentProduct.compare_at_price || 0);
 
   document.getElementById('modalPrice').innerHTML =
@@ -1134,7 +1137,34 @@ addToCart(p, qty, currentVariant, selectedPenColour);
     input.value = val;
   }
 
-  function addToCart(product, qty, variant = 'full-kit', penColour = null) {
+  function addToCart(product, qty, variant = '', penColour = null) {
+  const finalVariant = variant || '';
+  const price = finalVariant ? getVariantPrice(product, finalVariant) : Number(product?.price || 0);
+
+  const existing = cart.find(item =>
+    item.id === product.id &&
+    (item.variant || '') === finalVariant &&
+    (item.penColour || null) === (penColour || null)
+  );
+
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: price,
+      qty: qty,
+      image: product.image || '',
+      variant: finalVariant,
+      penColour: penColour
+    });
+  }
+
+  updateCart();
+  saveCart();
+  toggleCart(true);
+}
   const price = getVariantPrice(product, variant);
 
   const existing = cart.find(item =>
