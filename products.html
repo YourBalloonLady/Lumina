@@ -288,6 +288,22 @@
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
   z-index: 3;
 }
+
+    .pill-preorder {
+  position: absolute;
+  top: 16px;
+  left: -56px;
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 78px;
+  transform: rotate(-35deg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  z-index: 3;
+}
       .stock {
   font-size: 0.9rem;
   margin-top: 4px;
@@ -844,18 +860,17 @@
     listEl.innerHTML = products.map((p, i) => {
       const badge = computeBadge(p);
 
-      let restockBadge = null;
-      const SHOW_RESTOCK_BADGE = false;
+let restockBadge = null;
 
-      if (
-        SHOW_RESTOCK_BADGE &&
-        (
-          p.name.includes('Tirzepatide 60mg Pen') ||
-          p.name.includes('Tirzepatide 60mg Vial')
-        )
-      ) {
-        restockBadge = { text: 'Back Monday', class: 'pill-restock' };
-      }
+if (
+  p.name.includes('Tirzepatide 60mg Pen') ||
+  p.name.includes('Tirzepatide 60mg Vial')
+) {
+  restockBadge = {
+    text: 'Pre-Order • Available Wednesday',
+    class: 'pill-preorder'
+  };
+}
 
       const typeLabel = getTypeLabel(p);
       const baseDesc = p.description || 'Research material supplied for laboratory environments.';
