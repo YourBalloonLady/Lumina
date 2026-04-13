@@ -6,35 +6,871 @@
   <title>Admin | Lumina Weight</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- FAVICON / TAB ICON -->
   <link rel="icon" type="image/png" sizes="32x32" href="/Favicon.png?v=4">
   <link rel="icon" type="image/png" sizes="16x16" href="/Favicon.png?v=4">
   <link rel="apple-touch-icon" sizes="180x180" href="/Favicon.png?v=4">
 
   <style>
-  body{
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background:#f3f4f6;
-  }
+    :root{
+      --bg: #f7f7fb;
+      --surface: #ffffff;
+      --surface-2: #fafafa;
+      --border: rgba(15,23,42,.08);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --nav: #0f172a;
+      --nav-soft: #111827;
+      --accent: #86a96f;
+      --accent-2: #a9c18b;
+      --accent-soft: #edf5e9;
+      --accent-soft-2: #f4f8f0;
+      --shadow: 0 10px 25px rgba(0,0,0,.06);
+      --shadow-strong: 0 14px 32px rgba(0,0,0,.10);
+      --radius: 18px;
+    }
 
-  #trust-bar{
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-    color:#fff;
-    font-size:.85rem;
-    font-weight:600;
-    padding:6px 0;
-  }
-  #trust-bar span{ white-space: nowrap; }
+    body{
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(169,193,139,.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(134,169,111,.12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+    }
 
-  .navbar{ background:#020617; }
-  .navbar .nav-link{ color:#e5e7eb; }
-  .navbar .nav-link:hover{ color:#fff; }
+    a{ text-decoration:none; }
 
-  .section-card{
-    background:#fff;
-    border-radius:16px;
-    padding:16px;
+    #trust-bar{
+      background: linear-gradient(90deg, #cfe3bf, #b8d2a5);
+      color:#1f2937;
+      font-size:.85rem;
+      font-weight:600;
+      padding:6px 0;
+      border-bottom:1px solid rgba(0,0,0,.04);
+    }
+    #trust-bar span{ white-space: nowrap; }
+
+    .navbar{ background: var(--nav) !important; }
+    .navbar .nav-link{ color:#e5e7eb; }
+    .navbar .nav-link:hover{ color:#fff; }
+
+    .admin-shell{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .admin-sidebar{
+      width:260px;
+      background: linear-gradient(180deg, #0f172a, #111827);
+      color:#e5e7eb;
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:16px;
+      display:none;
+      border-right:1px solid rgba(255,255,255,.06);
+    }
+
+    .admin-sidebar a{
+      color:#e5e7eb;
+      display:block;
+      padding:10px 12px;
+      border-radius:12px;
+      margin-bottom:6px;
+    }
+    .admin-sidebar a:hover{
+      background: rgba(255,255,255,.08);
+      color:#fff;
+    }
+
+    .admin-main{
+      flex:1;
+      width:100%;
+    }
+
+    @media (min-width: 992px){
+      .admin-sidebar{ display:block; }
+    }
+
+    .mobile-topbar{
+      background: linear-gradient(90deg, #0f172a, #111827);
+      color:#fff;
+      padding:10px 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    @media (min-width: 992px){
+      .mobile-topbar{ display:none; }
+    }
+
+    .section-card,
+    .order-card,
+    .review-card,
+    .packing-card{
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding:16px;
+      box-shadow: var(--shadow);
+      margin-bottom:12px;
+      border:1px solid var(--border);
+    }
+
+    .section-card{
+      margin-bottom:24px;
+    }
+
+    .review-meta,
+    .muted-line{
+      font-size:.85rem;
+      color: var(--muted);
+    }
+
+    .items-box,
+    .packing-items,
+    .packing-address{
+      margin-top:10px;
+      background: var(--accent-soft-2);
+      border:1px solid rgba(15,23,42,.06);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:.92rem;
+      color:#0f172a;
+      white-space: pre-line;
+    }
+
+    .items-box strong,
+    .packing-items strong,
+    .packing-address strong{
+      font-size:.82rem;
+      color:#52624b;
+      display:block;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .mini-actions,
+    .filter-row,
+    .view-toggle-bar,
+    .bulk-bar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn-row{
+      display:grid;
+      gap:6px;
+      margin-top:8px;
+    }
+
+    .kpi-pill{
+      background: linear-gradient(90deg, #0f172a, #111827);
+      color:#fff;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:.85rem;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .kpi-pill span{ opacity:.88; font-weight:600; }
+
+    .controls-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (min-width: 992px){
+      .controls-grid{
+        grid-template-columns: 1.45fr 1fr;
+        align-items:start;
+      }
+    }
+
+    .sticky-admin-controls{
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(247,247,251,.92);
+      backdrop-filter: blur(8px);
+      padding: 10px 0 12px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    @media (max-width: 991.98px){
+      .sticky-admin-controls{
+        position: static;
+        top: auto;
+        backdrop-filter:none;
+      }
+    }
+
+    .filter-badge{
+      margin-left: 6px;
+      font-size: .75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,.08);
+    }
+
+    .small-input{ font-size:.85rem; }
+    .note-area{
+      width:100%;
+      min-height:64px;
+      resize:vertical;
+      font-size:.9rem;
+    }
+
+    #backToTop{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9999;
+      display: none;
+      border-radius: 999px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    }
+
+    #busyOverlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:99999;
+      background: rgba(15,23,42,.35);
+      align-items:center;
+      justify-content:center;
+    }
+    #busyOverlay .box{
+      background:#fff;
+      border-radius:16px;
+      padding:16px 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .btn-outline-purple{
+      --bs-btn-color:#7c5db6;
+      --bs-btn-border-color:#7c5db6;
+      --bs-btn-hover-color:#fff;
+      --bs-btn-hover-bg:#7c5db6;
+      --bs-btn-hover-border-color:#7c5db6;
+      --bs-btn-focus-shadow-rgb:124,93,182;
+      --bs-btn-active-color:#fff;
+      --bs-btn-active-bg:#6b4ea3;
+      --bs-btn-active-border-color:#6b4ea3;
+    }
+
+    .packing-only{ display:none; }
+    body.packing-mode .admin-only{ display:none !important; }
+    body.packing-mode .packing-only{ display:block !important; }
+
+    .mobile-primary-actions,
+    .mobile-secondary-actions{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .mobile-primary-actions .btn,
+    .mobile-secondary-actions .btn,
+    .packing-actions .btn{
+      width:100%;
+      font-weight:700;
+      border-radius:12px;
+      padding:10px 12px;
+    }
+
+    @media (min-width: 992px){
+      .mobile-primary-actions{
+        grid-template-columns:repeat(3, 1fr);
+      }
+      .mobile-secondary-actions{
+        grid-template-columns:repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 768px){
+      .packing-actions{
+        display:grid;
+        grid-template-columns:repeat(4, 1fr);
+        gap:8px;
+        margin-top:12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="trust-bar">
+    <div class="container d-flex justify-content-center gap-4 flex-wrap">
+      <span>🚚 <strong>Next Day Delivery</strong> on orders before <strong>3PM</strong></span>
+      <span>🔒 Secure Bank Transfer</span>
+      <span>🇬🇧 UK Dispatch</span>
+      <span>📦 Discreet Packaging</span>
+    </div>
+  </div>
+
+  <div class="mobile-topbar">
+    <div class="fw-bold">🌙 Lumina Admin</div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">Menu</button>
+      <button id="logout-btn" class="btn btn-sm btn-outline-light">Logout</button>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Lumina Admin</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a href="index.html#home" class="d-block mb-2">Store Home</a>
+      <a href="products.html" class="d-block mb-2">Products</a>
+      <a href="account.html" class="d-block mb-2">My Account</a>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="fw-bold mb-3">🌙 Lumina Admin</div>
+      <a href="index.html#home">Store Home</a>
+      <a href="products.html">Products</a>
+      <a href="account.html">My Account</a>
+      <hr style="border-color:rgba(255,255,255,.12);">
+      <button id="logout-btn-desktop" class="btn btn-sm btn-outline-light w-100">Logout</button>
+    </aside>
+
+    <main class="admin-main">
+      <div class="container mt-4">
+        <div class="section-card">
+          <div class="d-flex justify-content-between flex-wrap align-items-center gap-2">
+            <h3 class="mb-0">Orders</h3>
+            <div id="kpi-bar" class="d-flex gap-2 flex-wrap"></div>
+          </div>
+
+          <div id="quick-stats" class="d-flex gap-2 flex-wrap mt-2"></div>
+
+          <div class="view-toggle-bar">
+            <button id="view-normal-btn" class="btn btn-sm btn-dark" onclick="setAdminView('normal')">Full Admin</button>
+            <button id="view-pack-btn" class="btn btn-sm btn-outline-dark" onclick="setAdminView('pack')">Packing Mode</button>
+          </div>
+
+          <div class="section-card mt-3 admin-only">
+            <h5 class="mb-2">Dashboard</h5>
+            <p class="text-muted small mb-2">Charts use loaded orders. Click “Load all” for broader totals.</p>
+
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="p-3 bg-white rounded-4 shadow-sm">
+                  <div class="fw-bold mb-2">Revenue (last 30 days)</div>
+                  <canvas id="chartRevenue"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="p-3 bg-white rounded-4 shadow-sm">
+                  <div class="fw-bold mb-2">Orders per day (last 30 days)</div>
+                  <canvas id="chartOrders"></canvas>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="p-3 bg-white rounded-4 shadow-sm">
+                  <div class="fw-bold mb-2">Top products (loaded)</div>
+                  <canvas id="chartTopProducts"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap mt-3 admin-only">
+            <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('all')">⬇️ Export ALL (CSV)</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="exportOrdersCsv('shipped')">⬇️ Export SHIPPED (CSV)</button>
+            <button class="btn btn-sm btn-outline-dark" onclick="exportOrdersCsv('selected')">⬇️ Export SELECTED (CSV)</button>
+            <button class="btn btn-sm btn-outline-info" onclick="exportOrdersJson('all')">⬇️ Export ALL (JSON)</button>
+            <button class="btn btn-sm btn-outline-info" onclick="exportOrdersXlsx('all')">⬇️ Export ALL (XLSX)</button>
+            <button class="btn btn-sm btn-outline-purple" onclick="exportTimExcel('all')">⬇️ Export Tim Excel (XLSX)</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyTimExcelTsv('all')">📋 Copy shown as Excel (TSV)</button>
+          </div>
+
+          <div class="sticky-admin-controls">
+            <div class="controls-grid">
+              <div>
+                <div class="input-group mt-3">
+                  <span class="input-group-text">🔎</span>
+                  <input id="order-search" class="form-control"
+                         placeholder="Search ref, name, email... OR status:paid tracking:missing email:@gmail" />
+                  <button class="btn btn-outline-secondary" onclick="clearSearch()">Clear</button>
+                </div>
+
+                <div class="filter-row mt-2">
+                  <button id="btnAll" class="btn btn-sm btn-outline-dark" onclick="setStatusFilter('all')">All <span id="ctAll" class="filter-badge">…</span></button>
+                  <button id="btnPending" class="btn btn-sm btn-outline-warning" onclick="setStatusFilter('Pending')">Pending <span id="ctPending" class="filter-badge">…</span></button>
+                  <button id="btnPaid" class="btn btn-sm btn-outline-success" onclick="setStatusFilter('Paid')">Paid <span id="ctPaid" class="filter-badge">…</span></button>
+                  <button id="btnPacked" class="btn btn-sm btn-outline-secondary" onclick="setStatusFilter('Packed')">Packed <span id="ctPacked" class="filter-badge">…</span></button>
+                  <button id="btnShipped" class="btn btn-sm btn-outline-primary" onclick="setStatusFilter('Shipped')">Shipped <span id="ctShipped" class="filter-badge">…</span></button>
+                  <button id="btnCancelled" class="btn btn-sm btn-outline-danger" onclick="setStatusFilter('Cancelled')">Cancelled <span id="ctCancelled" class="filter-badge">…</span></button>
+                  <button id="btnPackQueue" class="btn btn-sm btn-dark" onclick="togglePackQueue()">✅ Pack Queue</button>
+                </div>
+
+                <div class="d-flex gap-3 flex-wrap mt-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-older24" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-older24">Unpaid &gt; 24h</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-noaddr" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-noaddr">No address</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-noemail" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-noemail">No email</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="flt-notracking" onchange="applyClientFilters()">
+                    <label class="form-check-label" for="flt-notracking">No tracking (shipped)</label>
+                  </div>
+                </div>
+
+                <div class="mt-2">
+                  <small class="text-muted">
+                    Search/filters apply to <strong>loaded orders</strong>. For full search/export across everything, click “Load all”.
+                  </small>
+                </div>
+              </div>
+
+              <div>
+                <div class="bulk-bar mt-3 admin-only">
+                  <div class="d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
+                    <label class="form-check-label" for="select-all"><strong>Select all (shown)</strong></label>
+                  </div>
+
+                  <button class="btn btn-sm btn-secondary" onclick="bulkMarkPacked()">✅ Bulk Mark Packed</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="bulkMarkShippedNoEmail()">📦 Bulk Mark Shipped (no email)</button>
+                  <button class="btn btn-sm btn-outline-dark" onclick="bulkCopyAddresses()">📋 Copy selected addresses</button>
+                  <button class="btn btn-sm btn-outline-success" onclick="exportOrdersCsv('selected')">⬇️ Export selected</button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-dark" onclick="prevPage()">◀ Prev</button>
+                    <button class="btn btn-sm btn-outline-dark" onclick="nextPage()">Next ▶</button>
+                    <span class="text-muted small" id="page-indicator">Page …</span>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <select id="page-size" class="form-select form-select-sm" style="width:110px;" onchange="changePageSize(this.value)">
+                      <option value="25" selected>25/page</option>
+                      <option value="50">50/page</option>
+                      <option value="100">100/page</option>
+                    </select>
+                    <button class="btn btn-sm btn-dark" onclick="loadAllOrdersForSearch()">⬇️ Load all</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p id="admin-status" class="text-muted mt-3">Checking access…</p>
+          <div id="admin-warning"></div>
+          <div id="orders-list" class="mt-3"></div>
+        </div>
+
+        <div class="section-card">
+          <h3>Pending Reviews</h3>
+          <p class="text-muted" id="reviews-status">Loading pending reviews…</p>
+          <div id="reviews-list" class="mt-3"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <button id="backToTop" class="btn btn-dark btn-sm">⬆️ Top</button>
+
+  <div id="busyOverlay">
+    <div class="box">
+      <div class="spinner-border" role="status" aria-label="Loading"></div>
+      <div>
+        <div class="fw-bold" id="busyTitle">Working…</div>
+        <div class="text-muted small" id="busyMeta">Please wait</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customerTitle">Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="customerBody">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+    const ADMIN_EMAIL = "luminaweight@gmail.com";
+
+    const REFERRAL_CODE_COL = "referral_code";
+    const REFERRED_BY_COL = "referred_by";
+    const REFERRAL_CREDIT = 10.00;
+    const BUYER_CREDIT = 10.00;
+
+    const CUSTOMERS_TABLE = "customers";
+    const CREDIT_BALANCE_COL = "credit_balance";
+
+    const CREDIT_RATE = null;
+    const CREDIT_MIN = null;
+    const CREDIT_MAX = null;
+    const CREDIT_FLAT = 10.00;
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    (function () {
+      try { if (window.emailjs) emailjs.init({ publicKey: "uZOuTrBdIAc6AmKjo" }); }
+      catch (e) { console.error("EmailJS init failed", e); }
+    })();
+
+    const statusEl = document.getElementById("admin-status");
+    const ordersEl = document.getElementById("orders-list");
+    const warningEl = document.getElementById("admin-warning");
+    const logoutBtn = document.getElementById("logout-btn");
+    const logoutBtnDesktop = document.getElementById("logout-btn-desktop");
+    const reviewsStatus = document.getElementById("reviews-status");
+    const reviewsEl = document.getElementById("reviews-list");
+    const kpiBar = document.getElementById("kpi-bar");
+    const quickStatsEl = document.getElementById("quick-stats");
+    const searchInput = document.getElementById("order-search");
+    const pageIndicator = document.getElementById("page-indicator");
+
+    const ordersCache = {};
+
+    let PAGE_SIZE = 25;
+    let currentPage = 0;
+    let totalCount = 0;
+
+    let statusFilter = "all";
+    let packQueueOnly = false;
+    let filteredOrderIds = [];
+    const selectedIds = new Set();
+
+    window.__ADMIN_EMAIL = "admin";
+
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function showToast(message, type="success"){
+      try{
+        const id = "t" + Date.now();
+        const wrap = document.createElement("div");
+        wrap.innerHTML = `
+          <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:999999;">
+            <div id="${id}" class="toast text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+              <div class="d-flex">
+                <div class="toast-body">${escapeHtml(message)}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(wrap);
+        const el = document.getElementById(id);
+        const t = new bootstrap.Toast(el, { delay: 2200 });
+        el.addEventListener("hidden.bs.toast", () => wrap.remove());
+        t.show();
+      }catch(e){
+        alert(message);
+      }
+    }
+
+    function setBusy(on, title="Working…", meta="Please wait"){
+      const ov = document.getElementById("busyOverlay");
+      if(!ov) return;
+      document.getElementById("busyTitle").textContent = title;
+      document.getElementById("busyMeta").textContent = meta;
+      ov.style.display = on ? "flex" : "none";
+    }
+
+    function badge(status) {
+      status = (status || "Pending").toLowerCase();
+      if (status === "paid") return `<span class="badge bg-success">PAID</span>`;
+      if (status === "packed") return `<span class="badge bg-secondary">PACKED</span>`;
+      if (status === "shipped") return `<span class="badge bg-primary">SHIPPED</span>`;
+      if (status === "cancelled") return `<span class="badge bg-danger">CANCELLED</span>`;
+      return `<span class="badge bg-warning text-dark">PENDING</span>`;
+    }
+
+    async function cacheAdminEmail(){
+      try{
+        const s = await supabaseClient.auth.getSession();
+        window.__ADMIN_EMAIL = s?.data?.session?.user?.email || "admin";
+      }catch(e){
+        window.__ADMIN_EMAIL = "admin";
+      }
+    }
+
+    let chartRevenue, chartOrders, chartTopProducts;
+
+    function yyyyMmDd(d){
+      const x = new Date(d);
+      const y = x.getFullYear();
+      const m = String(x.getMonth()+1).padStart(2,"0");
+      const da = String(x.getDate()).padStart(2,"0");
+      return `${y}-${m}-${da}`;
+    }
+
+    function buildLastNDays(n){
+      const out = [];
+      const now = new Date();
+      for(let i=n-1;i>=0;i--){
+        const d = new Date(now);
+        d.setDate(now.getDate()-i);
+        d.setHours(0,0,0,0);
+        out.push(yyyyMmDd(d));
+      }
+      return out;
+    }
+
+    function renderCharts(){
+      if(!window.Chart) return;
+      const orders = Object.values(ordersCache || {});
+      const days = buildLastNDays(30);
+      const revByDay = Object.fromEntries(days.map(d=>[d,0]));
+      const cntByDay = Object.fromEntries(days.map(d=>[d,0]));
+      const prodCount = new Map();
+
+      for(const o of orders){
+        if(!o.created_at) continue;
+        const day = yyyyMmDd(o.created_at);
+        if(revByDay[day] !== undefined){
+          revByDay[day] += Number(o.total_amount || 0);
+          cntByDay[day] += 1;
+        }
+        const items = o.details?.items || [];
+        for(const it of items){
+          const key = String(it?.name || "Unknown").trim() || "Unknown";
+          prodCount.set(key, (prodCount.get(key) || 0) + Number(it?.qty || 1));
+        }
+      }
+
+      const revenueData = days.map(d=> Number(revByDay[d] || 0));
+      const ordersData = days.map(d=> Number(cntByDay[d] || 0));
+      const top = [...prodCount.entries()].sort((a,b)=> b[1]-a[1]).slice(0,10);
+      const topLabels = top.map(x=>x[0]);
+      const topVals = top.map(x=>x[1]);
+
+      const ctxR = document.getElementById("chartRevenue");
+      if(ctxR){
+        if(chartRevenue) chartRevenue.destroy();
+        chartRevenue = new Chart(ctxR, {
+          type:"line",
+          data:{ labels: days, datasets:[{ label:"£ Revenue", data: revenueData, borderColor:"#86a96f", backgroundColor:"rgba(134,169,111,.15)", fill:true, tension:.35 }] },
+          options:{ responsive:true, maintainAspectRatio:true }
+        });
+      }
+
+      const ctxO = document.getElementById("chartOrders");
+      if(ctxO){
+        if(chartOrders) chartOrders.destroy();
+        chartOrders = new Chart(ctxO, {
+          type:"bar",
+          data:{ labels: days, datasets:[{ label:"Orders", data: ordersData, backgroundColor:"#a9c18b" }] },
+          options:{ responsive:true, maintainAspectRatio:true }
+        });
+      }
+
+      const ctxT = document.getElementById("chartTopProducts");
+      if(ctxT){
+        if(chartTopProducts) chartTopProducts.destroy();
+        chartTopProducts = new Chart(ctxT, {
+          type:"bar",
+          data:{ labels: topLabels, datasets:[{ label:"Qty", data: topVals, backgroundColor:"#c7d8b8" }] },
+          options:{ responsive:true, maintainAspectRatio:true, indexAxis:"y" }
+        });
+      }
+    }
+
+    function pushHistory(order, action, extra={}){
+      const details = order.details || {};
+      const meta = details.meta || {};
+      const history = Array.isArray(meta.history) ? meta.history : [];
+      return {
+        ...details,
+        meta: {
+          ...meta,
+          history: [...history, { at:new Date().toISOString(), by:(window.__ADMIN_EMAIL||"admin"), action, ...extra }].slice(-60)
+        }
+      };
+    }
+
+    function historyHtml(order){
+      const h = order?.details?.meta?.history;
+      if(!Array.isArray(h) || !h.length) return `<div class="muted-line">No history yet.</div>`;
+      return [...h].reverse().slice(0,25).map(x=>{
+        const at = x.at ? new Date(x.at).toLocaleString() : "";
+        const by = x.by || "admin";
+        const a = x.action || "";
+        const extra = x.tracking ? ` • ${x.tracking}` : x.note ? ` • ${x.note}` : "";
+        return `<div class="muted-line">• ${escapeHtml(at)} — <strong>${escapeHtml(a)}</strong> (${escapeHtml(by)})${escapeHtml(extra)}</div>`;
+      }).join("");
+    }
+
+    function getCustomer(order){ return order?.details?.customer || {}; }
+    function getOrderEmail(order){
+      const c = order?.details?.customer || {};
+      return String(c.email || order.customer_email || order.email || "").trim().toLowerCase();
+    }
+
+    function getOrderReferralCode(order){
+      return String(
+        order?.details?.meta?.referral_code ||
+        order?.referral_code ||
+        ""
+      ).trim().toUpperCase();
+    }
+
+    function isPaidLikeStatus(status=""){
+      const s = String(status).toLowerCase();
+      return (s === "paid" || s === "packed" || s === "shipped");
+    }
+
+    async function isFirstPaidOrderForEmail(email, currentOrderId){
+      if(!email) return false;
+      const { data, error } = await supabaseClient
+        .from("Orders")
+        .select("id, status, customer_email, email, details")
+        .order("created_at", { ascending: true });
+      if(error) throw error;
+
+      const paidOrdersForEmail = (data || []).filter(o => {
+        if(o.id === currentOrderId) return false;
+        if(!isPaidLikeStatus(o.status)) return false;
+        const c = o?.details?.customer || {};
+        const e = String(c.email || o.customer_email || o.email || "").trim().toLowerCase();
+        return e === email;
+      });
+
+      return paidOrdersForEmail.length === 0;
+    }
+
+    async function findCustomerByReferralCode(code){
+      if(!code) return null;
+      const { data, error } = await supabaseClient
+        .from("ReferralCodes")
+        .select("owner_email, owner_name, code")
+        .eq("code", code)
+        .eq("active", true)
+        .maybeSingle();
+      if(error) throw error;
+      if(!data?.owner_email) return null;
+      return { email: data.owner_email, name: data.owner_name || "" };
+    }
+
+    function round2(n){
+      return Math.floor((Number(n || 0) + Number.EPSILON) * 100) / 100;
+    }
+
+    function calcCreditAmount(order){
+      if (typeof CREDIT_FLAT === "number") return round2(CREDIT_FLAT);
+      const total = Number(order?.total_amount || 0);
+      let credit = total * CREDIT_RATE;
+      const override = order?.details?.meta?.credit_override;
+      if (override !== undefined && override !== null && String(override).trim() !== "") {
+        credit = Number(override);
+      }
+      if (CREDIT_MIN !== null) credit = Math.max(CREDIT_MIN, credit);
+      if (CREDIT_MAX !== null) credit = Math.min(CREDIT_MAX, credit);
+      return round2(credit);
+    }
+
+    function hasCreditAlready(order){
+      const meta = order?.details?.meta || {};
+      return !!meta.credit_awarded_at || !!meta.credit_awarded_amount;
+    }
+
+    async function awardCreditToCustomerByEmail(email, name, amount){
+      if(!email) throw new Error("No customer email");
+      if(!(amount > 0)) return;
+      const { data: existing, error: selErr } = await supabaseClient
+        .from(CUSTOMERS_TABLE)
+        .select(`email, name, ${CREDIT_BALANCE_COL}`)
+        .eq("email", email)
+        .maybeSingle();
+      if(selErr) throw selErr;
+
+      if(!existing){
+        const { error: insErr } = await supabaseClient
+          .from(CUSTOMERS_TABLE)
+          .insert({
+            email,
+            name: name || "",
+            [CREDIT_BALANCE_COL]: amount
+          });
+        if(insErr) throw insErr;
+        return;
+      }
+
+      const current = Number(existing?.[CREDIT_BALANCE_COL] || 0);
+      const next = round2(current + amount);
+      const { error: upErr } = await supabaseClient
+        .from(CUSTOMERS_TABLE)
+        .update({
+          name: name || existing.name || "",
+          [CREDIT_BALANCE_COL]: next
+        })
+        .eq("email", email);
+      if(upErr) throw upErr;
+    }
+
+    async function awardCreditForPaidOrder(orderId){
+      const order = ordersCache[orderId];
+      if(!order) throw new Error("Order not found in cache");
+      if(!isPaidLikeStatus(order.status)) return;
+
+      const meta = order?.details?.meta || {};
+      if(meta.referral_awarded_at) return;
+
+      const buyerEmail = getOrderEmail(order);
+      const buyerName = String(order?.details?.customer?.name || order.customer_name || order.name || "").trim();
+      if(!buyerEmail) return;
+
+      const firstPaid = await isFirstPaidOrderForEmail(buyerEmail, orderId);
+      if(!firstPaid) return;
+
+      const code = getOrderReferralCode(order);
+      if(!code) return;
+
+      const referrer = await findCustomerByReferralCode(code);
+      if(!referrer?.email) return;
+
+      const referrerEmail = String(referrer.email).trim().toLowerCase();
+      if(!referrerEmail || referrerEmail === buyerEmail) return;
+
+      await awardCreditToCustomerByEmail(buyerEmail, buyerName, round2(BUYER_CREDIT));
+      await awardCreditToCustomerByEmail(referrerEmail, referrer.name || "", round2(REFERRAL_CREDIT));
+    }
+  </script>
+</body>
+</html>    padding:16px;
     box-shadow:0 10px 25px rgba(0,0,0,.08);
     margin-bottom:24px;
   }
