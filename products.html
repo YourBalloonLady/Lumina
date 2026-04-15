@@ -422,9 +422,77 @@
       box-shadow: 0 12px 28px rgba(0,0,0,0.18);
     }
   </style>
+  <style>
+  /* Chat Bubble Button */
+  #lumi-launcher {
+    position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+    background: #28a745; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+  }
+  /* Chat Window */
+  #lumi-chat-container {
+    position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px;
+    background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    display: none; flex-direction: column; overflow: hidden; z-index: 9999; font-family: sans-serif;
+  }
+  #lumi-header { background: #28a745; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+  #lumi-messages { flex-grow: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; font-size: 14px; line-height: 1.5; }
+  #lumi-input-area { border-top: 1px solid #eee; display: flex; padding: 10px; }
+  #lumi-user-text { border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; flex-grow: 1; outline: none; }
+  #lumi-send-btn { background: #28a745; color: white; border: none; margin-left: 10px; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
+  .msg-bot { background: #e9ecef; padding: 8px 12px; border-radius: 15px; margin-bottom: 10px; align-self: flex-start; }
+  .msg-user { background: #28a745; color: white; padding: 8px 12px; border-radius: 15px; margin-bottom: 10px; align-self: flex-end; text-align: right; }
+</style>
 </head>
  
 <body>
+
+  <div id="lumi-launcher" onclick="document.getElementById('lumi-chat-container').style.display = (document.getElementById('lumi-chat-container').style.display === 'flex' ? 'none' : 'flex')">💬</div>
+<div id="lumi-chat-container">
+  <div id="lumi-header"><span>Lumi24 Assistant</span> <span onclick="document.getElementById('lumi-chat-container').style.display = 'none'" style="cursor:pointer">×</span></div>
+  <div id="lumi-messages"><div class="msg-bot">Hi! I'm here to help with technical questions about our research materials. What can I help you find?</div></div>
+  <div id="lumi-input-area">
+    <input type="text" id="lumi-user-text" placeholder="Type a message...">
+    <button id="lumi-send-btn" onclick="sendMessage()">➔</button>
+  </div>
+</div>
+
+<script type="module">
+  import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+  const genAI = new GoogleGenerativeAI("AIzaSyAetl0tlsgpASM9AhyBL-xbgnldIJsXLeE");
+  
+  // This is the "Grounding" data from your screenshots
+  const productData = `
+    Products: Semaglutide, Tirzepatide, Retatrutide, Cagrilintide, BPC-157/TB500, GHK-Cu, Selank, Semax, MOTS-c, NAD+, MT-2.
+    Stacks: Advanced Fat Loss (£260), Fat Loss Starter (£120), Repair & Recovery (£70).
+    Shipping: UK Dispatch, 24-48h delivery.
+  `;
+
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    systemInstruction: "You are the Lumi24 Research Assistant. User Data: " + productData + ". STRICT: State products are for laboratory research only. NEVER give dosage. If asked how much to take, say you cannot provide instructions for human consumption."
+  });
+
+  window.sendMessage = async function() {
+    const input = document.getElementById('lumi-user-text');
+    const msgBox = document.getElementById('lumi-messages');
+    if (!input.value) return;
+
+    msgBox.innerHTML += `<div class="msg-user">${input.value}</div>`;
+    const userText = input.value;
+    input.value = "";
+
+    try {
+      const result = await model.generateContent(userText);
+      const response = await result.response;
+      msgBox.innerHTML += `<div class="msg-bot">${response.text()}</div>`;
+      msgBox.scrollTop = msgBox.scrollHeight;
+    } catch (e) {
+      msgBox.innerHTML += `<div class="msg-bot">Sorry, I'm having trouble connecting. Please check your connection.</div>`;
+    }
+  }
+</script>
   <div id="trust-bar">
     <div class="container d-flex justify-content-center gap-4 flex-wrap">
       <span>🚚 <strong>24 -48 Delivery</strong> on orders before <strong>3PM</strong></span>
