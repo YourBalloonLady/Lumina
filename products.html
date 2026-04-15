@@ -446,6 +446,7 @@
     right: 20px;
     width: 350px;
     height: 450px;
+    max-width: calc(100vw - 24px);
     background: white;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.2);
@@ -463,6 +464,7 @@
     font-weight: bold;
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   #lumi-messages {
@@ -480,6 +482,8 @@
   #lumi-input-area {
     border-top: 1px solid #eee;
     display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 10px;
   }
 
@@ -487,7 +491,8 @@
     border: 1px solid #ddd;
     border-radius: 20px;
     padding: 10px 15px;
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     outline: none;
   }
 
@@ -495,11 +500,18 @@
     background: #28a745;
     color: white;
     border: none;
-    margin-left: 10px;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
   }
 
   .msg-bot,
@@ -523,6 +535,43 @@
     align-self: flex-end;
     text-align: right;
   }
+
+  @media (max-width: 576px) {
+    #lumi-launcher {
+      right: 14px;
+      bottom: 14px;
+      width: 56px;
+      height: 56px;
+    }
+
+    #lumi-chat-container {
+      right: 12px;
+      left: 12px;
+      bottom: 80px;
+      width: auto;
+      height: min(70vh, 520px);
+      max-width: none;
+      border-radius: 16px;
+    }
+
+    #lumi-header {
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+
+    #lumi-messages {
+      padding: 12px;
+      font-size: 14px;
+    }
+
+    #lumi-input-area {
+      padding: 10px;
+    }
+
+    #lumi-user-text {
+      font-size: 16px;
+    }
+  }
 </style>
 </head>
  
@@ -534,7 +583,7 @@
   <div id="lumi-messages"><div class="msg-bot">Hi! I'm here to help with technical questions about our research materials. What can I help you find?</div></div>
   <div id="lumi-input-area">
     <input type="text" id="lumi-user-text" placeholder="Type a message...">
-    <button id="lumi-send-btn" onclick="sendMessage()">➔</button>
+    <button id="lumi-send-btn" type="button" onclick="sendMessage()">➔</button>
   </div>
 </div>
 
