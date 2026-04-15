@@ -66,8 +66,9 @@ ${productContext}
     });
 
     const reply =
-      response?.text?.trim() ||
-      "Sorry, I could not generate a reply right now.";
+  typeof response.text === "function"
+    ? response.text().trim()
+    : "Sorry, I could not generate a reply right now.";
 
     return jsonResponse({ reply }, 200);
   } catch (error) {
