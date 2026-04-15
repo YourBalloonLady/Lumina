@@ -363,9 +363,7 @@
 
   if (n.includes('refill')) return false;
 
-  // Cartridge-only is NOT a full pen for accessory logic
-  if (item?.variant === 'cartridge-only') return false;
-  if (item?.variant === 'full-kit') return true;
+  if (item?.variant === 'cartridge-only' || item?.variant === 'full-kit') return true;
 
   const semaForm = item ? String(item.sema_form || '').toLowerCase().trim() : '';
   if (semaForm === 'pen') return true;
@@ -375,7 +373,7 @@
   if (form.includes('pen')) return true;
   if (form.includes('vial')) return false;
 
-  return n.includes('pen') || n.includes('flexpen');
+  return n.includes('pen') || n.includes('flexpen') || n.includes('cartridge');
 }
 
   function isVialItem(itemOrName) {
@@ -395,11 +393,10 @@
 }
 
   function extraLabel(item) {
-  if (item?.variant === 'cartridge-only') return '';
-  if (isPenItem(item) && item.pen_heads) return ` (Pen heads: ${item.pen_heads === 'none' ? 'None required' : item.pen_heads})`;
-  if (isVialItem(item) && item.syringes) return ` (Syringes: ${item.syringes === 'none' ? 'None required' : item.syringes})`;
-  return '';
-}
+    if (isPenItem(item) && item.pen_heads) return ` (Pen heads: ${item.pen_heads === 'none' ? 'None required' : item.pen_heads})`;
+    if (isVialItem(item) && item.syringes) return ` (Syringes: ${item.syringes === 'none' ? 'None required' : item.syringes})`;
+    return '';
+  }
 
   function saveCartToStorage() {
     try { localStorage.setItem('cart', JSON.stringify(cart)); } catch (e) {}
