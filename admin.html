@@ -1227,13 +1227,28 @@ async function findCustomerByReferralCode(code){
   ordersCache[orderId].details = updatedDetails;
 }
     function extrasLabel(item) {
+  if (!item) return "";
+
   const penHeads = item?.pen_heads ? String(item.pen_heads).trim() : "";
   const syringes = item?.syringes ? String(item.syringes).trim() : "";
 
-  if (isCartridgeOnly(item)) return "";
+  // For cartridge-only: still show pen heads if they were selected
+  if (isCartridgeOnly(item)) {
+    if (penHeads && penHeads !== "none") {
+      return ` (Pen heads: ${penHeads})`;
+    }
+    return " (Cartridge Only)";
+  }
 
-  if (isFullKitPen(item) && penHeads) return ` (Pen heads: ${penHeads})`;
-  if (isVialItem(item) && syringes) return ` (Syringes: ${syringes})`;
+  // Normal full kit pen
+  if (isFullKitPen(item) && penHeads && penHeads !== "none") {
+    return ` (Pen heads: ${penHeads})`;
+  }
+
+  // Vial
+  if (isVialItem(item) && syringes && syringes !== "none") {
+    return ` (Syringes: ${syringes})`;
+  }
 
   return "";
 }
