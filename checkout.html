@@ -638,7 +638,22 @@
       await saveOrderToSupabase(details);
       await deductStock(cart);
 
-      await Promise.allSettled([ sendAdminEmail(details), sendCustomerEmail(details) ]);
+      const emailResults = await Promise.allSettled([
+  sendAdminEmail(details),
+  sendCustomerEmail(details)
+]);
+
+console.log('Email results:', emailResults);
+
+const customerEmailOk = emailResults[1]?.status === 'fulfilled';
+
+if (customerEmailOk) {
+  checkoutStatus.textContent = "We've emailed your payment instructions.";
+  checkoutStatus.className = 'small text-success mt-2';
+} else {
+  checkoutStatus.textContent = 'Order saved, but customer email failed to send.';
+  checkoutStatus.className = 'small text-warning mt-2';
+}
 
       document.getElementById('payment-summary').innerHTML = cart.map(i => `
         <div class="d-flex justify-content-between">
@@ -659,8 +674,7 @@
 
       clearStoredCart();
 
-      checkoutStatus.textContent = "We've emailed your payment instructions.";
-      checkoutStatus.className = 'small text-success mt-2';
+      
 
     } catch (err) {
       console.error('Checkout flow error', err);
