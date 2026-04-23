@@ -679,56 +679,58 @@
   }
 
   async function saveOrderToSupabase(details, creditEmail, creditUsed) {
-    try {
-      const { data, error } = await supabaseClient.auth.getUser();
-      const userId = (error || !data || !data.user) ? null : data.user.id;
+  const { data, error } = await supabaseClient.auth.getUser();
+  const userId = (error || !data || !data.user) ? null : data.user.id;
 
-      const orderDetails = {
-        customer: {
-          name: details.name,
-          email: details.email,
-          phone: details.phone,
-          address1: details.address1,
-          address2: details.address2,
-          city: details.city,
-          postcode: details.postcode
-        },
-        items: cart.map(i => ({
-          id: i.id || null,
-          name: i.name,
-          variant: i.variant || 'full-kit',
-          variant_label: getVariantLabel(i.variant || 'full-kit'),
-          qty: i.qty,
-          price_each: Number(i.price || 0),
-          line_total: Number(i.price || 0) * Number(i.qty || 0),
-          pen_heads: i.pen_heads || "",
-          syringes: i.syringes || "",
-          sema_form: i.sema_form || ""
-        })),
-        reference: details.ref
-      };
+  const orderDetails = {
+    customer: {
+      name: details.name,
+      email: details.email,
+      phone: details.phone,
+      address1: details.address1,
+      address2: details.address2,
+      city: details.city,
+      postcode: details.postcode
+    },
+    items: cart.map(i => ({
+      id: i.id || null,
+      name: i.name,
+      variant: i.variant || 'full-kit',
+      variant_label: getVariantLabel(i.variant || 'full-kit'),
+      qty: i.qty,
+      price_each: Number(i.price || 0),
+      line_total: Number(i.price || 0) * Number(i.qty || 0),
+      pen_heads: i.pen_heads || "",
+      syringes: i.syringes || "",
+      sema_form: i.sema_form || ""
+    })),
+    reference: details.ref
+  };
 
-      orderDetails.meta = orderDetails.meta || {};
-      orderDetails.meta.referral_code = (localStorage.getItem('referral_code') || null);
+  orderDetails.meta = orderDetails.meta || {};
+  orderDetails.meta.referral_code = (localStorage.getItem('referral_code') || null);
 
-      const { error: insertError } = await supabaseClient
-  .from('Orders')
-  .insert({
-    user_id: userId,
-    total_amount: Number(total || 0),
-    status: 'Pending',
-    reference: details.ref,
-    details: orderDetails,
-    referral_code: (localStorage.getItem('referral_code') || null),
-    credit_used: Number(creditUsed || 0),
-    credit_email: (creditEmail ? String(creditEmail).trim().toLowerCase() : null),
-    credit_deducted: false
-  });
+  const { error: insertError } = await supabaseClient
+    .from('Orders')
+    .insert({
+      user_id: userId,
+      total_amount: Number(total || 0),
+      status: 'Pending',
+      reference: details.ref,
+      details: orderDetails,
+      referral_code: (localStorage.getItem('referral_code') || null),
+      credit_used: Number(creditUsed || 0),
+      credit_email: (creditEmail ? String(creditEmail).trim().toLowerCase() : null),
+      credit_deducted: false
+    });
 
-      if (insertError) console.error('Error saving order to Supabase:', insertError);
-    } catch (err) {
-      console.error('Unexpected error saving order to Supabase:', err);
-    }
+  if (insertError) {
+    console.error('Error saving order to Supabase:', insertError);
+    throw insertError;
+  }
+
+  return true;
+}
   }
 
   async function logReferralEventIfAny(orderRef, buyerEmail, orderTotalBeforeCredit) {
@@ -976,9 +978,9 @@
 
       const details = { name, phone, email, address1, address2, city, postcode, ref };
 
-      await logReferralEventIfAny(ref, email, totalBeforeCredit);
       await saveOrderToSupabase(details, gate.ok ? creditEmail : null, creditUsed);
-      await deductStock(cart);
+await logReferralEventIfAny(ref, email, totalBeforeCredit);
+await deductStock(cart);
 
       await Promise.allSettled([ sendAdminEmail(details), sendCustomerEmail(details) ]);
 
