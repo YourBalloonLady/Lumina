@@ -908,7 +908,7 @@
 
   function hasCartridgeOption(p) {
     const name = String(p?.name || '').toLowerCase();
-    return name.includes('pen') && !name.includes('refill pen');
+    return name.includes('pen') && !name.includes('refill pen')  && !name.includes('Empty Pen Storage Case');
   }
 
   function getVariantPrice(product, variant) {
