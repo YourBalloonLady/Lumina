@@ -28,31 +28,37 @@
     margin: 0;
   }
 
-  /* Trust bar */
   #trust-bar{
     background:#16a34a;
     color:#fff;
     font-size:0.95rem;
     padding:10px 0;
   }
-  #trust-bar span{opacity:.95}
+
+  #trust-bar span{
+    opacity:.95;
+  }
 
   .navbar {
     background: #ffffff !important;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
   }
+
   .navbar-brand img {
     height: 36px;
     margin-right: 10px;
   }
+
   .navbar-brand span {
     font-weight: 700;
     font-size: 1.15rem;
   }
+
   .nav-link {
     font-weight: 500;
     color: var(--lw-muted) !important;
   }
+
   .nav-link.active,
   .nav-link:hover {
     color: var(--lw-dark) !important;
@@ -67,6 +73,7 @@
     font-size: 2rem;
     font-weight: 800;
   }
+
   .section-subtitle {
     color: var(--lw-muted);
     max-width: 560px;
@@ -93,21 +100,31 @@
     margin-top: 40px;
   }
 
-  /* Desktop: keep trust bar + navbar fixed */
   @media (min-width: 769px) {
     .navbar.fixed-top {
       position: fixed;
       left: 0;
       right: 0;
     }
-    body { padding-top: 80px; }
+
+    body {
+      padding-top: 80px;
+    }
   }
 
-  /* Mobile: make them normal scrolling elements */
   @media (max-width: 768px) {
-    #trust-bar { position: static; }
-    .navbar.fixed-top { position: static; top: auto; }
-    body { padding-top: 0; }
+    #trust-bar {
+      position: static;
+    }
+
+    .navbar.fixed-top {
+      position: static;
+      top: auto;
+    }
+
+    body {
+      padding-top: 0;
+    }
   }
 </style>
 </head>
@@ -138,21 +155,14 @@
 
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-        <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
         <li class="nav-item"><a class="nav-link" href="product-bundles.html">Bundles</a></li>
         <li class="nav-item"><a class="nav-link" href="peptides.html">Peptide Library</a></li>
         <li class="nav-item"><a class="nav-link" href="calculator.html">Calculator</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <!-- Logout (hidden by default) -->
-<li class="nav-item" id="logout-nav-item" style="display:none;">
-  <a class="nav-link" href="#" id="logout-btn">Logout</a>
-</li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
 
-
-        
-
-        <!-- Admin (toggled via Supabase) -->
+        <!-- Admin only -->
         <li class="nav-item" id="admin-nav-item" style="display:none;">
           <a class="nav-link" href="admin.html">Admin</a>
         </li>
@@ -162,7 +172,8 @@
           <a class="nav-link active" href="account.html" id="account-link">My Account</a>
         </li>
 
-        <li class="nav-item">
+        <!-- Single logout button only -->
+        <li class="nav-item" id="logout-nav-item" style="display:none;">
           <button id="logout-btn" type="button" class="btn btn-outline-secondary btn-sm rounded-pill">
             Logout
           </button>
@@ -200,14 +211,13 @@
           <button class="btn btn-dark w-100">Update password</button>
         </div>
       </form>
+
       <div id="pwMsg" class="small mt-2"></div>
 
       <div class="mt-2">
         <a href="/forgot-password.html" class="link-primary">Forgot password?</a>
       </div>
     </div>
-
-    
 
     <!-- ORDERS -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -221,7 +231,7 @@
 
 <footer class="text-center">
   <div class="container">
-    <p class="mb-0">© 2025 Lumina Weight • Research Purposes Only • Not For Human Consumption</p>
+    <p class="mb-0">© 2025 Lumina • Research Purposes Only • Not For Human Consumption</p>
   </div>
 </footer>
 
@@ -231,175 +241,265 @@
 <script>
   const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
+
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ADMIN_EMAIL  = "luminaweight@gmail.com";
-  const adminNavItem = document.getElementById('admin-nav-item');
-  const accountLink  = document.getElementById('account-link');
+  const ADMIN_EMAIL = "luminaweight@gmail.com";
 
-  const greetingEl = document.getElementById('account-greeting');
-  const statusEl   = document.getElementById('account-status');
-  const ordersEl   = document.getElementById('orders-list');
-  const logoutBtn  = document.getElementById('logout-btn');
+  const adminNavItem = document.getElementById("admin-nav-item");
+  const accountLink = document.getElementById("account-link");
+  const logoutNavItem = document.getElementById("logout-nav-item");
+  const logoutBtn = document.getElementById("logout-btn");
 
-  const pwForm = document.getElementById('pwForm');
-  const pwMsg  = document.getElementById('pwMsg');
-  const pw1    = document.getElementById('pw1');
-  const pw2    = document.getElementById('pw2');
+  const greetingEl = document.getElementById("account-greeting");
+  const statusEl = document.getElementById("account-status");
+  const ordersEl = document.getElementById("orders-list");
 
+  const pwForm = document.getElementById("pwForm");
+  const pwMsg = document.getElementById("pwMsg");
+  const pw1 = document.getElementById("pw1");
+  const pw2 = document.getElementById("pw2");
 
-  // Toggle Admin nav + My Account/Login text based on auth
-  (async () => {
-    try {
-      const { data, error } = await supabaseClient.auth.getUser();
-      const user = data?.user || null;
-
-      if (!error && adminNavItem) {
-        adminNavItem.style.display =
-          user && user.email === ADMIN_EMAIL ? 'block' : 'none';
-      }
-
-      if (accountLink) {
-        if (user) {
-          accountLink.textContent = 'My Account';
-          accountLink.href = 'account.html';
-        } else {
-          accountLink.textContent = 'Login';
-          accountLink.href = 'account.html';
-        }
-      }
-    } catch (e) {
-      console.error('Error checking auth for nav', e);
-    }
-  })();
-
-
+  function escapeHtml(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
   function getStatusBadge(status) {
-    const s = (status || 'Pending').toLowerCase();
-    if (s === 'paid')      return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
-    if (s === 'shipped')   return '<span class="badge bg-primary-subtle text-primary badge-status">SHIPPED</span>';
-    if (s === 'cancelled') return '<span class="badge bg-danger-subtle text-danger badge-status">CANCELLED</span>';
+    const s = String(status || "Pending").toLowerCase();
+
+    if (s === "paid") {
+      return '<span class="badge bg-success-subtle text-success badge-status">PAID</span>';
+    }
+
+    if (s === "packed") {
+      return '<span class="badge bg-secondary-subtle text-secondary badge-status">PACKED</span>';
+    }
+
+    if (s === "shipped") {
+      return '<span class="badge bg-primary-subtle text-primary badge-status">SHIPPED</span>';
+    }
+
+    if (s === "cancelled") {
+      return '<span class="badge bg-danger-subtle text-danger badge-status">CANCELLED</span>';
+    }
+
     return '<span class="badge bg-warning-subtle text-warning badge-status">PENDING</span>';
   }
 
-  async function loadAccount() {
-  const { data: { user }, error } = await supabaseClient.auth.getUser();
+  function getCustomerEmailFromOrder(order) {
+    const customer = order?.details?.customer || {};
 
-  if (error || !user) {
-    window.location.href = 'index.html';
-    return;
+    return String(
+      customer.email ||
+      order.customer_email ||
+      order.email ||
+      ""
+    ).trim().toLowerCase();
   }
 
-  const userEmail = String(user.email || '').trim().toLowerCase();
+  function getOrderItemsHtml(order) {
+    const items = Array.isArray(order?.details?.items) ? order.details.items : [];
 
-  greetingEl.textContent = `Signed in as ${user.email}`;
-  statusEl.textContent = 'Loading orders…';
-
-  const { data: orders, error: ordersError } = await supabaseClient
-    .from('Orders')
-    .select('*')
-    .or(`user_id.eq.${user.id},customer_email.eq.${userEmail},email.eq.${userEmail}`)
-    .order('created_at', { ascending: false });
-
-  if (ordersError) {
-    statusEl.textContent = 'Could not load orders.';
-    console.error(ordersError);
-    return;
-  }
-
-  if (!orders || orders.length === 0) {
-    statusEl.textContent = 'No orders found yet.';
-    ordersEl.innerHTML = `
-      <div class="alert alert-light border text-muted">
-        When you place an order while logged in, it will appear here for reference.
-      </div>
-    `;
-    return;
-  }
-
-  statusEl.textContent = `${orders.length} order${orders.length > 1 ? 's' : ''}`;
-
-  ordersEl.innerHTML = orders.map(order => {
-    const created = new Date(order.created_at).toLocaleString();
-    const total   = Number(order.total_amount || 0).toFixed(2);
-    const ref     = order.reference || (order.id ? order.id.slice(0,8) + '…' : 'N/A');
-
-    let itemsHtml = '';
-    if (order.details && order.details.items && Array.isArray(order.details.items)) {
-      itemsHtml = order.details.items.map(item => `
-        <div class="small text-muted">
-          ${item.qty} × ${item.name} – £${Number(item.price_each || 0).toFixed(2)} each
-        </div>
-      `.trim()).join('');
+    if (!items.length) {
+      return "";
     }
 
-    return `
-      <div class="order-card mb-3">
-        <div class="d-flex justify-content-between flex-wrap gap-2">
-          <div>
-            <div class="small text-muted">Order reference</div>
-            <div class="fw-semibold">${ref}</div>
-            <div class="small text-muted mt-1">${created}</div>
-          </div>
-          <div class="text-end">
-            ${getStatusBadge(order.status)}
-            <div class="fw-bold fs-5 mt-1">£${total}</div>
-          </div>
-        </div>
-        ${itemsHtml ? `<div class="mt-2">${itemsHtml}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-}
+    return items.map(item => {
+      const qty = Number(item?.qty || 0);
+      const name = escapeHtml(item?.name || "Item");
+      const priceEach = Number(item?.price_each || 0).toFixed(2);
 
-  // Change password
-  pwForm.addEventListener('submit', async (e) => {
+      let extras = "";
+
+      if (item?.pen_heads) {
+        extras += ` <span class="text-muted">(Pen heads: ${escapeHtml(item.pen_heads)})</span>`;
+      }
+
+      if (item?.syringes) {
+        extras += ` <span class="text-muted">(Syringes: ${escapeHtml(item.syringes)})</span>`;
+      }
+
+      if (item?.format) {
+        extras += ` <span class="text-muted">(${escapeHtml(item.format)})</span>`;
+      }
+
+      return `
+        <div class="small text-muted">
+          ${qty} × ${name}${extras} – £${priceEach} each
+        </div>
+      `.trim();
+    }).join("");
+  }
+
+  async function updateNavState(user) {
+    const userEmail = String(user?.email || "").trim().toLowerCase();
+
+    if (adminNavItem) {
+      adminNavItem.style.display = userEmail === ADMIN_EMAIL.toLowerCase() ? "block" : "none";
+    }
+
+    if (accountLink) {
+      if (user) {
+        accountLink.textContent = "My Account";
+        accountLink.href = "account.html";
+      } else {
+        accountLink.textContent = "Login";
+        accountLink.href = "account.html";
+      }
+    }
+
+    if (logoutNavItem) {
+      logoutNavItem.style.display = user ? "block" : "none";
+    }
+  }
+
+  async function loadAccount() {
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (error || !user) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    const userEmail = String(user.email || "").trim().toLowerCase();
+
+    await updateNavState(user);
+
+    greetingEl.textContent = `Signed in as ${user.email}`;
+    statusEl.textContent = "Loading orders…";
+
+    /*
+      IMPORTANT:
+      The old version had this dangerous logic:
+
+      .update({ user_id: user.id }).is("user_id", null)
+
+      That linked every blank guest order to whoever was logged in.
+      It has been removed completely.
+
+      This page now only reads orders that are already linked to this user_id
+      or where the plain customer_email/email columns match the logged-in email.
+    */
+
+    const { data: orders, error: ordersError } = await supabaseClient
+      .from("Orders")
+      .select("*")
+      .or(`user_id.eq.${user.id},customer_email.eq.${userEmail},email.eq.${userEmail}`)
+      .order("created_at", { ascending: false });
+
+    if (ordersError) {
+      statusEl.textContent = "Could not load orders.";
+      console.error("Could not load account orders:", ordersError);
+
+      ordersEl.innerHTML = `
+        <div class="alert alert-danger border">
+          Could not load your order history. Please try again later.
+        </div>
+      `;
+      return;
+    }
+
+    /*
+      Extra front-end safety filter.
+      Even if Supabase ever returns something unexpected, only show orders that match this user.
+    */
+    const safeOrders = (orders || []).filter(order => {
+      const orderUserId = String(order.user_id || "").trim();
+      const orderEmail = getCustomerEmailFromOrder(order);
+
+      return orderUserId === user.id || orderEmail === userEmail;
+    });
+
+    if (!safeOrders.length) {
+      statusEl.textContent = "No orders found yet.";
+      ordersEl.innerHTML = `
+        <div class="alert alert-light border text-muted">
+          When you place an order while logged in, it will appear here for reference.
+        </div>
+      `;
+      return;
+    }
+
+    statusEl.textContent = `${safeOrders.length} order${safeOrders.length > 1 ? "s" : ""}`;
+
+    ordersEl.innerHTML = safeOrders.map(order => {
+      const created = order.created_at ? new Date(order.created_at).toLocaleString() : "";
+      const total = Number(order.total_amount || 0).toFixed(2);
+      const ref = order.reference || (order.id ? order.id.slice(0, 8) + "…" : "N/A");
+      const itemsHtml = getOrderItemsHtml(order);
+
+      return `
+        <div class="order-card mb-3">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+              <div class="small text-muted">Order reference</div>
+              <div class="fw-semibold">${escapeHtml(ref)}</div>
+              <div class="small text-muted mt-1">${escapeHtml(created)}</div>
+            </div>
+
+            <div class="text-end">
+              ${getStatusBadge(order.status)}
+              <div class="fw-bold fs-5 mt-1">£${escapeHtml(total)}</div>
+            </div>
+          </div>
+
+          ${itemsHtml ? `<div class="mt-2">${itemsHtml}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+  }
+
+  pwForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    pwMsg.textContent = '';
+
+    pwMsg.textContent = "";
 
     if (pw1.value !== pw2.value) {
-      pwMsg.textContent = 'Passwords do not match.';
-      pwMsg.className = 'text-danger small mt-2';
+      pwMsg.textContent = "Passwords do not match.";
+      pwMsg.className = "text-danger small mt-2";
       return;
     }
 
-    const { error } = await supabaseClient.auth.updateUser({ password: pw1.value });
+    const { error } = await supabaseClient.auth.updateUser({
+      password: pw1.value
+    });
+
     if (error) {
       pwMsg.textContent = error.message;
-      pwMsg.className = 'text-danger small mt-2';
+      pwMsg.className = "text-danger small mt-2";
       return;
     }
 
-    pwMsg.textContent = 'Password updated successfully.';
-    pwMsg.className = 'text-success small mt-2';
-    pw1.value = '';
-    pw2.value = '';
+    pwMsg.textContent = "Password updated successfully.";
+    pwMsg.className = "text-success small mt-2";
+
+    pw1.value = "";
+    pw2.value = "";
   });
 
-  /* ✅ FIXED LOGOUT (only change) */
-  logoutBtn.addEventListener('click', async () => {
-    const btn = logoutBtn;
-    btn.disabled = true;
-    const oldText = btn.textContent;
-    btn.textContent = 'Logging out…';
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      logoutBtn.disabled = true;
 
-    try {
-      await supabaseClient.auth.signOut();
-    } catch (e) {
-      console.warn('signOut failed', e);
-    } finally {
-      // Always redirect (prevents "stuck" logout)
-      window.location.replace('index.html');
-    }
-  });
+      const oldText = logoutBtn.textContent;
+      logoutBtn.textContent = "Logging out…";
 
-  
-
-     
-
-
-  
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.warn("signOut failed", e);
+      } finally {
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = oldText;
+        window.location.replace("index.html");
+      }
+    });
+  }
 
   loadAccount();
 </script>
