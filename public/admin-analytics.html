@@ -264,13 +264,14 @@
       const low=products.filter(p=>Number(p.stock||0)>0&&Number(p.stock||0)<=5).length,out=products.filter(p=>Number(p.stock||0)<=0).length;
       $('inventory-badges').innerHTML=`<span class="badge text-bg-dark">${products.length} products</span><span class="badge text-bg-warning">${low} low</span><span class="badge text-bg-danger">${out} out</span>`;
       const shown=products.filter(p=>{const stock=Number(p.stock||0);if(search&&!String(p.name||'').toLowerCase().includes(search))return false;if(filter==='low'&&!(stock>0&&stock<=5))return false;if(filter==='out'&&stock>0)return false;if(filter==='available'&&stock<=0)return false;return true});
-      $('inventory-list').innerHTML=shown.map(p=>{const stock=Number(p.stock||0),state=stock<=0?'Out of stock':stock<=5?'Low stock':'In stock';return `<tr class="${stock<=0?'stock-out':stock<=5?'stock-low':''}"><td><strong>${esc(p.name)}</strong></td><td>${money(p.price)}</td><td><input class="form-control form-control-sm stock-input" id="stock-${esc(p.id)}" type="number" min="0" step="1" value="${stock}"></td><td>${state}</td><td><button class="btn btn-sm btn-dark" data-save-stock="${esc(p.id)}">Save</button></td></tr>`}).join('');
+      $('inventory-list').innerHTML=shown.map(p=>{const stock=Number(p.stock||0),state=stock<=0?'Out of stock':stock<=5?'Low stock':'In stock';return `<tr class="${stock<=0?'stock-out':stock<=5?'stock-low':''}"><td><strong>${esc(p.name)}</strong>${p.stock_group_id?'<div><span class="badge rounded-pill text-bg-info mt-1">Shared vial/pen stock</span></div>':''}</td><td>${money(p.price)}</td><td><input class="form-control form-control-sm stock-input" id="stock-${esc(p.id)}" type="number" min="0" step="1" value="${stock}"></td><td>${state}</td><td><button class="btn btn-sm btn-dark" data-save-stock="${esc(p.id)}">Save</button></td></tr>`}).join('');
     }
 
     async function saveStock(id,button){
       const input=$(`stock-${id}`),stock=Number(input?.value);if(!Number.isInteger(stock)||stock<0)return alert('Stock must be a whole number of zero or more.');
-      button.disabled=true;const {data,error}=await db.from('Products').update({stock}).eq('id',id).select().single();button.disabled=false;if(error)return alert(`Stock update failed: ${error.message}`);
-      products=products.map(p=>p.id===id?data:p);renderInventory();
+      button.disabled=true;const {error}=await db.from('Products').update({stock}).eq('id',id);if(error){button.disabled=false;return alert(`Stock update failed: ${error.message}`)}
+      const {data:refreshed,error:refreshError}=await db.from('Products').select('id,name,price,stock,type,stock_group_id').order('name');button.disabled=false;if(refreshError)return alert(`Stock saved, but the inventory could not refresh: ${refreshError.message}`);
+      products=refreshed||[];renderInventory();
     }
 
     function renderReviews(){
@@ -289,7 +290,7 @@
       const [basketResult,orderResult,productResult,reviewResult,visitResult]=await Promise.all([
         db.from('shopping_carts').select('id,customer_name,customer_email,customer_phone,items,total,status,current_page,order_reference,last_activity_at,recovery_email_consent,recovery_email_status,recovery_email_sent_at').order('last_activity_at',{ascending:false}).limit(500),
         db.from('Orders').select('id,total_amount,status,details,created_at').order('created_at',{ascending:false}).limit(5000),
-        db.from('Products').select('id,name,price,stock,type').order('name'),
+        db.from('Products').select('id,name,price,stock,type,stock_group_id').order('name'),
         db.from('Reviews').select('id,name,rating,review_text,created_at').eq('approved',false).order('created_at',{ascending:false}),
         db.from('site_events').select('occurred_at,session_id,event_name,page_path,referrer_host,event_data').gte('occurred_at',thirtyDaysAgo).order('occurred_at',{ascending:false}).limit(50000)
       ]);
