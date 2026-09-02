@@ -740,6 +740,7 @@
 emailjs.init('uZOuTrBdIAc6AmKjo');
 
 const STRIPE_PAYMENT_URL = 'https://buy.stripe.com/dRm9AL7bO3Yh0IsgBs2880E';
+const PAYMENT_CONFIRMATION_NOTICE = 'Already paid? You can ignore this email and wait for your payment confirmation email. Payment confirmations are completed manually, so they may not be sent instantly—especially overnight. Please don’t worry; we’ll confirm your payment as soon as it has been checked.';
 document.getElementById('stripe-payment-link')?.setAttribute('href', STRIPE_PAYMENT_URL);
 const SUPABASE_URL = "https://qketnqhfjfxbqiuqevnh.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZXRucWhmamZ4YnFpdXFldm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjkzMzAsImV4cCI6MjA4MDI0NTMzMH0.JIrgLIwWIA5Gwu9K4BsgS0Y_jyax2G6irqkaf35aPys";
@@ -1824,6 +1825,7 @@ function sendCustomerEmail(details) {
     order_items: buildItemsText(),
     order_total: `£${Number(total || 0).toFixed(2)}`,
     stripe_payment_url: STRIPE_PAYMENT_URL,
+    payment_confirmation_notice: PAYMENT_CONFIRMATION_NOTICE,
     delivery_method: getDeliveryLabel(),
     delivery_price: getDeliveryCost() > 0 ? `£${getDeliveryCost().toFixed(2)}` : 'FREE'
   });
